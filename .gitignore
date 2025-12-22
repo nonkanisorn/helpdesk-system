@@ -26,6 +26,8 @@
 
 # Go workspace file
 # ### Go ###
+/bin
+/tmp
 *.exe
 *.exe~
 *.dll
