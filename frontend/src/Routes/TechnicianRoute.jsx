@@ -20,13 +20,21 @@ const TechnicianRoute = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => ({ ...state }));
   console.log("tech", user);
-  useEffect(() => {
-    if (!user || !user.token) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
-  const text = "No permission";
-  return user && user.token && user.role === 3 ? (
+  const hasSavedUser = !!localStorage.getItem("user");
+  if (!user?.token && hasSavedUser) return null; // หรือใส่ Loading
+
+  // ✅ ถ้าไม่มี token จริงๆ ให้ไป login (ใช้ Navigate จะนิ่งกว่า useEffect)
+  if (!user?.token) return <Navigate to="/login" replace />;
+
+  // ✅ ถ้า role ไม่ใช่ช่าง
+  if (user.role_id !== 3) return <Notfound404 text="No permission" />;
+  // useEffect(() => {
+  //   if (!user || !user.token) {
+  //     navigate("/login");
+  //   }
+  // }, [user, navigate]);
+  // const text = "No permission";
+  return (
     <div className="app">
       <Sidebartech />
       <main className="content" style={{ backgroundColor: "#F5F6Fa" }}>
@@ -36,7 +44,7 @@ const TechnicianRoute = () => {
             <Routes>
               <Route path="index" element={<TechnicianPage />} />
               <Route path="*" element={<Notfound404 />} />
-              <Route path="repairs/:case_id" element={<Detailcase />} />
+              <Route path="repairs/:ticket_id" element={<Detailcase />} />
               <Route path="reportcasetech" element={<Reportcasetech />} />
               <Route path="device" element={<Managedevice />} />
               <Route
@@ -57,8 +65,6 @@ const TechnicianRoute = () => {
         </Box>
       </main>
     </div>
-  ) : (
-    <Notfound404 text={text} />
   );
 };
 

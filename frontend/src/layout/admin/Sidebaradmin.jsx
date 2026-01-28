@@ -16,10 +16,11 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useSelector } from "react-redux";
 
 const Sidebaradmin = () => {
+  const token = useSelector((state) => state.user.token);
   const [isCollapsed, setisCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [broken, setBroken] = useState(false);
-  const name = useSelector((state) => state.user.name);
+  const firstName = useSelector((state) => state.user.first_name);
   const users_id = useSelector((state) => state.user.users_id);
   const [url, setUrl] = useState("");
 
@@ -28,17 +29,22 @@ const Sidebaradmin = () => {
       const fetchdata = async () => {
         const response = await axios.get(
           `http://localhost:5011/users/${users_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         if (
-          !response.data[0].user_img ||
-          response.data[0].user_img.data.length === 0
+          !response.data[0].avatar_path ||
+          response.data[0].avatar_path.data.length === 0
         ) {
           // setUrl("../../../public/assets/user.png");
           setUrl("/assets/user.png");
         } else {
           const user = response.data[0];
-          console.log(response);
-          const array = new Uint8Array(user.user_img.data);
+          // console.log(response);
+          const array = new Uint8Array(user.avatar_path.data);
           const blob = new Blob([array], { type: "image/jpeg" });
           const url = URL.createObjectURL(blob);
           setUrl(url);
@@ -110,7 +116,9 @@ const Sidebaradmin = () => {
                     />
                   </Box>
                   <Box textAlign="center" color="#ffff">
-                    <Typography sx={{ m: "10px 0 0 0" }}>{name}</Typography>
+                    <Typography sx={{ m: "10px 0 0 0" }}>
+                      {firstName}
+                    </Typography>
                   </Box>
                 </Box>
               )}

@@ -23,41 +23,42 @@ function LoginPage() {
     watch,
   } = useForm();
   const handleLogin = async (data) => {
-    console.log(data);
+    // console.log(data);
     event.preventDefault();
     try {
       const response = await axios.post("http://localhost:5011/login", {
         username: data.username,
-        userpassword: data.password,
+        password: data.password,
       });
       // ดำเนินการหลังจากเข้าสู่ระบบสำเร็จ
-      const is_active = response.data.payload.user.is_active;
+      // console.log(response);
+      const is_active = response.data.user.is_active;
       if (is_active === 0) {
         return alert("คุณไม่มีสิทธื์เข้า");
       }
       dispatch(
         login({
-          // username: response.data.payload.user,
-          role: response.data.payload.user.role,
+          users_id: response.data.user.id,
+          first_name: response.data.user.first_name,
+          last_name: response.data.user.last_name,
+          role: response.data.user.role_id,
           token: response.data.token,
-          name: response.data.payload.user.name,
-          users_id: response.data.payload.user.users_id,
-          dep_id: response.data.payload.user.dep_id,
+          dep_id: response.data.user.department_id,
         }),
       );
       localStorage.setItem(
         "user",
         JSON.stringify({
-          // username: response.data.payload.user,
-          name: response.data.payload.user.name,
-          role: response.data.payload.user.role,
+          users_id: response.data.user.id,
+          first_name: response.data.user.first_name,
+          last_name: response.data.user.last_name,
+          role_id: response.data.user.role_id,
           token: response.data.token,
-          users_id: response.data.payload.user.users_id,
-          dep_id: response.data.payload.user.dep_id,
+          dep_id: response.data.user.department_id,
         }),
       );
       // localStorage.setItem("token", response.data.token)
-      roleRedirects(response.data.payload.user.role);
+      roleRedirects(response.data.user.role_id);
     } catch (error) {
       // ดำเนินการเมื่อมีข้อผิดพลาดเกิดขึ้นในการเข้าสู่ระบบ
       console.error("There was an error logging in!", error);
@@ -67,13 +68,13 @@ function LoginPage() {
   const roleRedirects = (role) => {
     // console.log(role)
     if (role === 1) {
-      navigate("/admin/index");
+      window.location.href = "/admin/index";
     } else if (role == 2) {
-      navigate("/manager/index");
+      window.location.href = "/manager/index";
     } else if (role == 3) {
-      navigate("/technician/index");
+      window.location.href = "/technician/index";
     } else {
-      navigate("/user");
+      window.location.href = "/user/index";
     }
   };
   // useEffect(() => {

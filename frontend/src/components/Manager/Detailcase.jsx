@@ -44,50 +44,74 @@ function Detailcase() {
         console.log(error);
       });
   };
+  // useEffect(() => {
+  //   const fetchdata = async () => {
+  //     try {
+  //       const technicianResponse = await axios.get(
+  //         "http://localhost:5011/technicians/role",
+  //       );
+  //       const technicianData = await technicianResponse.data.map(
+  //         (technician) => ({
+  //           id: technician.users_id,
+  //           name: technician.name,
+  //           user_img: technician.user_img,
+  //           user_email: technician.user_email,
+  //           user_phone: technician.user_phone,
+  //         }),
+  //       );
+  //       settechnician(technicianData);
+  //       const imgUrlArray = technician.map((item, idx) => {
+  //         if (item.user_img) {
+  //           console.log("มีค่า", idx);
+  //           const user = item.user_img;
+  //           const array = new Uint8Array(user.data);
+  //           const blob = new Blob([array], { type: "image/jpeg" });
+  //           return URL.createObjectURL(blob);
+  //         } else {
+  //           return null;
+  //         }
+  //       });
+  //       setImgUrls(imgUrlArray);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  const fetchCaseById = async () => {
+    // const { case_id } = useParams();
+    try {
+      const res = await axios.get(`http://localhost:5011/caseid/${case_id}`);
+      console.log(res.data[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  //   fetchdata();
+  //   fetchCaseById();
+  // }, [case_id]);
+  // TODO: create func fetch technician role & ticketbyid
+  //
   useEffect(() => {
-    const fetchdata = async () => {
-      try {
-        const technicianResponse = await axios.get(
-          "http://localhost:5011/technicians/role",
-        );
-        const technicianData = await technicianResponse.data.map(
-          (technician) => ({
-            id: technician.users_id,
-            name: technician.name,
-            user_img: technician.user_img,
-            user_email: technician.user_email,
-            user_phone: technician.user_phone,
-          }),
-        );
-        settechnician(technicianData);
-        const imgUrlArray = technician.map((item, idx) => {
-          if (item.user_img) {
-            console.log("มีค่า", idx);
-            const user = item.user_img;
-            const array = new Uint8Array(user.data);
-            const blob = new Blob([array], { type: "image/jpeg" });
-            return URL.createObjectURL(blob);
-          } else {
-            return null;
-          }
-        });
-        setImgUrls(imgUrlArray);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const fetchCaseById = async () => {
-      // const { case_id } = useParams();
-      try {
-        const res = await axios.get(`http://localhost:5011/caseid/${case_id}`);
-        console.log(res.data[0]);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchdata();
-    fetchCaseById();
-  }, [case_id]);
+    try {
+      const fetchUserTechData = () => {
+        // This api is want role_id to query db with role_id
+        const role_id = 1;
+
+        axios
+          .get(`${apiUrl}/users/${role_id}/role`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => setUserTech(response.data.result))
+          .catch((error) => console.log(error));
+      };
+      fetchUserTechData();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+  console.log("dasdasd", usersTech);
+
   useEffect(() => {
     if (refresh) {
       setRefresh(false); // รีเซ็ต refresh หลังจากการดึงข้อมูลใหม่เสร็จสมบูรณ์

@@ -19,11 +19,13 @@ import {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 const Addtypedevice = () => {
   const [typeDevice, setTypeDevice] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectItem, setSelectItem] = useState(null);
   const [inputNewType, setInputNewType] = useState("");
+  const token = useSelector((state) => state.user.token);
   const apiUrl = process.env.REACT_APP_API_URL;
   const handleOpenDialog = (item) => {
     setSelectItem(item);
@@ -34,9 +36,17 @@ const Addtypedevice = () => {
   };
   const handleSubmit = (devicetype_id) => {
     axios
-      .patch(`${apiUrl}/device/type/${devicetype_id}`, {
-        devicetype_name: inputNewType,
-      })
+      .patch(
+        `${apiUrl}/device=types/${devicetype_id}`,
+        {
+          devicetype_name: inputNewType,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
       .then((response) => {
         console.log(response);
       })
@@ -49,7 +59,11 @@ const Addtypedevice = () => {
   useEffect(() => {
     const fetchtypedevice = () => {
       axios
-        .get(`${apiUrl}/device/type`)
+        .get(`${apiUrl}/device-types`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
           setTypeDevice(response.data);
         })

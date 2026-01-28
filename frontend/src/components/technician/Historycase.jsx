@@ -24,10 +24,10 @@ function Historycase() {
       .get(`http://localhost:5011/Casetechhistory/${technician_id}`)
       .then(function(response) {
         setcaseData(response.data);
-        console.log(response);
+        // console.log(response);
       })
       .catch(function(error) {
-        console.log(error);
+        // console.log(error);
       })
       .finally(function() { });
   }, []);

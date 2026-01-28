@@ -10,9 +10,11 @@ import Paper from "@mui/material/Paper";
 import { Button } from "@mui/material";
 
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Managestatus() {
   const [statusData, setStatusdata] = useState([]);
+  const token = useSelector((state) => state.user.token);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const Deletestatus = async (status_id) => {
@@ -22,11 +24,19 @@ function Managestatus() {
     }
 
     axios
-      .delete(`${apiUrl}/status/${status_id}`)
+      .delete(`${apiUrl}/status/${status_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         console.log(response.data);
         axios
-          .get(`${apiUrl}/status`)
+          .get(`${apiUrl}/status`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
           .then((response) => {
             setStatusdata(response.data);
             console.log(response);
@@ -42,7 +52,11 @@ function Managestatus() {
 
   useEffect(() => {
     axios
-      .get(`${apiUrl}/status`)
+      .get(`${apiUrl}/status`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(function (response) {
         setStatusdata(response.data);
         console.log(statusData);

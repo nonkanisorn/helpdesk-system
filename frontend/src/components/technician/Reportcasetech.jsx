@@ -13,31 +13,35 @@ import { useSelector } from "react-redux";
 import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
 function Reportcasetech() {
-  const navigate = useNavigate();
+  const token = useSelector((state) => state.user.token);
   const technician_id = useSelector((state) => state.user.users_id);
-  const [caseData, setcaseData] = useState([]);
+  const navigate = useNavigate();
+  const [tickets, settickets] = useState([]);
   const status_id = 4;
   const [refresh, setRefresh] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const topagedetail = (case_id) => {
-    navigate(`/technician/repairs/${case_id}`);
+
+  const topagedetail = (ticket_id) => {
+    navigate(`/technician/repairs/${ticket_id}`);
   };
-  const waitingforpart = (case_id) => {
+  const waitingforpart = (ticket_id) => {
     axios
-      .patch(`${apiUrl}/Case/${technician_id}/${case_id}`, {
+      .patch(`${apiUrl}/Case/${technician_id}/${ticket_id}`, {
         status_id,
       })
       .then(setRefresh(true));
   };
   useEffect(() => {
     axios
-      .get(`${apiUrl}/Casetech/${technician_id}`)
+      .get(`${apiUrl}/technician/${technician_id}/tickets`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then(function (response) {
-        setcaseData(response.data);
-        console.log(response);
+        settickets(response.data.result);
+        // console.log("respponseasd", response);
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       })
       .finally(function () {});
   }, [refresh]);
@@ -59,7 +63,7 @@ function Reportcasetech() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {caseData.map((item, index) => (
+            {tickets.map((item, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -67,10 +71,10 @@ function Reportcasetech() {
                 <TableCell component="th" scope="row">
                   {index + 1}
                 </TableCell>
-                <TableCell>{item.case_title}</TableCell>
-                <TableCell>{item.usersname}</TableCell>
-                <TableCell>{item.case_detail}</TableCell>
-                <TableCell>{item.status_name}</TableCell>
+                <TableCell>{item.title}</TableCell>
+                <TableCell>{item.user_id}</TableCell>
+                <TableCell>{item.description}</TableCell>
+                <TableCell>{item.status_id}</TableCell>
 
                 <TableCell>
                   <Button
@@ -78,7 +82,7 @@ function Reportcasetech() {
                     // sx={{ fontSize: 7, padding: 0.5 }}
                     variant="contained"
                     color="success"
-                    onClick={() => topagedetail(item.case_id)}
+                    onClick={() => topagedetail(item.ticket_id)}
                     sx={{ mr: 2 }}
                   >
                     ปิดงาน
@@ -88,7 +92,7 @@ function Reportcasetech() {
                     color="secondary"
                     size="small"
                     sx={{ mr: 2 }}
-                    onClick={() => waitingforpart(item.case_id)}
+                    onClick={() => waitingforpart(item.ticket_id)}
                   >
                     รออะไหล่
                   </Button>

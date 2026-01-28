@@ -21,7 +21,7 @@ function Historyrepair() {
   const [selected, setSelected] = useState("1");
   const [controlShowData, setControlShowData] = useState(0);
 
-  console.log("datacas", caseData);
+  // console.log("datacas", caseData);
   const handleChange = (event, newSelected) => {
     if (newSelected !== null) {
       setSelected(event.target.value);
@@ -32,17 +32,17 @@ function Historyrepair() {
       .get(`http://localhost:5011/caseuser/${user_id}`)
       .then(function (response) {
         setcaseData(response.data);
-        console.log(response);
+        // console.log(response);
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       })
       .finally(function () {});
   }, []);
-  console.log(
-    "casesta1",
-    caseData.filter((items) => items.status_id === 1),
-  );
+  // console.log(
+  //   "casesta1",
+  //   caseData.filter((items) => items.status_id === 1),
+  // );
   const status_6 = caseData.filter((item) => item.status_id === 6).length;
   const status_5 = caseData.filter((item) => item.status_id === 5).length;
   const status_4 = caseData.filter((item) => item.status_id === 4).length;
@@ -58,7 +58,7 @@ function Historyrepair() {
       return item.status_id === controlShowData;
     });
   };
-  console.log("fil", filterStatus());
+  // console.log("fil", filterStatus());
   return (
     <>
       <Box

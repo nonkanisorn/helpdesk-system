@@ -12,10 +12,12 @@ import Select from "@mui/material/Select";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 function Addstatus() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [statusName, setStatusname] = useState("");
+  const token = useSelector((state) => state.user.token);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   // console.log(positionName);
@@ -25,17 +27,14 @@ function Addstatus() {
   const createstatus = async (e, event) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${apiUrl}/Status`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json", // ระบุ Content-Type ไปยัง server
-          },
-        }
-      );
+      const response = await axios.post(`${apiUrl}/Status`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // ระบุ Content-Type ไปยัง server
+        },
+      });
       setStatusname("");
-      navigate("/admin/Managestatus")
+      navigate("/admin/Managestatus");
       console.log(response);
     } catch (error) {
       console.log(error);

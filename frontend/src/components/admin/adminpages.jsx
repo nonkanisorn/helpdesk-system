@@ -31,7 +31,7 @@ function Adminpages() {
         );
         setDepartment(fetchDepartmentData.data.length);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchData();

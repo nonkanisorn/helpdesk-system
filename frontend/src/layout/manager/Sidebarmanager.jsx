@@ -18,12 +18,14 @@ const Sidebarmanager = () => {
   const name = useSelector((state) => state.user.name);
   const users_id = useSelector((state) => state.user.users_id);
   const [url, setUrl] = useState("");
+  const token = useSelector((state) => state.user.token);
 
   useEffect(() => {
     if (users_id) {
       const fetchdata = async () => {
         const response = await axios.get(
           `http://localhost:5011/users/${users_id}`,
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         if (
           !response.data[0].user_img ||
@@ -32,7 +34,7 @@ const Sidebarmanager = () => {
           setUrl("/assets/user.png");
         } else {
           const user = response.data[0];
-          console.log(response);
+          // console.log(response);
           const array = new Uint8Array(user.user_img.data);
           const blob = new Blob([array], { type: "image/jpeg" });
           const url = URL.createObjectURL(blob);

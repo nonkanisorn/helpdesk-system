@@ -3,6 +3,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
+import { useForm } from "react-hook-form";
 
 import InputLabel from "@mui/material/InputLabel";
 import { Button, IconButton, Typography, Paper } from "@mui/material";
@@ -16,38 +17,36 @@ import { useSelector } from "react-redux";
 import { useRef, useState, useEffect } from "react";
 
 function Addcase() {
-  const [caseDetail, setCaseDetail] = useState("");
-  const [case_title, setcase_title] = useState("");
-  const [categories, setCategories] = useState([]);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const token = useSelector((state) => state.user.token);
+  const [issues, setIssues] = useState([]);
   const [fetchtrigger, setFetchtrigger] = useState(false);
-  const [dataDev, setDataDev] = useState([]);
   const [selectcategory, setSelectcategory] = useState("");
   const status_id = 1;
   const apiUrl = process.env.REACT_APP_API_URL;
-  const userId = useSelector((state) => state.user.users_id);
-  const userName = useSelector((state) => state.user.name);
-  const createcase = async (e) => {
+  const userID = useSelector((state) => state.user.users_id);
+  const createCase = async (data) => {
     try {
       const response = await axios.post(
-        "http://localhost:5011/Case",
+        "http://localhost:5011/tickets",
         {
-          // dep_name: selectedDepartment,
-          case_title,
-          case_detail: caseDetail,
-          case_device_id: null,
-          user_id: userId,
+          user_id: userID,
           status_id,
-          categories_id: selectcategory,
+          title: data.title,
+          description: data.description,
+          issue_categories_id: data.issues_categories_id,
         },
         {
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         },
       );
-      setCaseDetail("");
-      setcase_title("");
-      setSelectcategory("");
       //ใช้ NOT ! เพื่อsetFetchtrigger ให้เปลี่ยนค่า จากเดิมที่กดหนดเป็นfalse ให้เป็นtrue
       setFetchtrigger(!fetchtrigger);
     } catch (error) {
@@ -57,27 +56,18 @@ function Addcase() {
 
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        const response = await axios.get(apiUrl + "/device");
-        setDataDev(response.data);
-      };
-      fetchData();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-  useEffect(() => {
-    try {
       const fetchdata = async () => {
-        const response = await axios.get(apiUrl + "/categoriesdevice");
-        setCategories(response.data);
+        const response = await axios.get(apiUrl + "/issues", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setIssues(response.data.result);
       };
       fetchdata();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }, []);
-  console.log(selectcategory);
+  // console.log(selectcategory);
   return (
     <>
       <Box
@@ -104,64 +94,57 @@ function Addcase() {
             }}
           >
             {/* ฟอร์ม */}
-            <Box
-              component="form"
-              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-            >
-              {/* หัวข้อ */}
-              <Typography>ชื่องาน *</Typography>
-              <TextField
-                label="หัวข้อ"
-                id="case_title"
-                value={case_title}
-                onChange={(e) => setcase_title(e.target.value)}
-                placeholder="กรอกหัวข้อการแจ้งซ่อม"
-                fullWidth
-              />
+            <form onSubmit={handleSubmit(createCase)}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                {/* หัวข้อ */}
+                <Typography>ชื่องาน *</Typography>
+                <TextField
+                  label="หัวข้อ"
+                  placeholder="กรอกหัวข้อการแจ้งซ่อม"
+                  fullWidth
+                  {...register("title")}
+                />
 
-              {/* รายละเอียด */}
-              <Typography>รายละเอียดปัญหา *</Typography>
-              <TextField
-                label="รายละเอียด"
-                id="case_detail"
-                value={caseDetail}
-                onChange={(e) => setCaseDetail(e.target.value)}
-                placeholder="กรอกรายละเอียดปัญหา"
-                multiline
-                rows={4}
-                fullWidth
-              />
+                {/* รายละเอียด */}
+                <Typography>รายละเอียดปัญหา *</Typography>
+                <TextField
+                  label="รายละเอียด"
+                  placeholder="กรอกรายละเอียดปัญหา"
+                  multiline
+                  rows={4}
+                  fullWidth
+                  {...register("description")}
+                />
 
-              {/* ประเภทปัญหา */}
-              <Typography>ประเภทปัญหา</Typography>
-              <FormControl fullWidth>
-                <InputLabel id="problem-type-label">ประเภทปัญหา</InputLabel>
-                <Select
-                  sx={{}}
-                  labelId="problem-type-label"
-                  value={selectcategory}
-                  onChange={(e) => setSelectcategory(e.target.value)}
+                {/* ประเภทปัญหา */}
+                <Typography>ประเภทปัญหา</Typography>
+                <FormControl fullWidth>
+                  <InputLabel id="problem-type-label">ประเภทปัญหา</InputLabel>
+                  <Select
+                    sx={{}}
+                    labelId="problem-type-label"
+                    value={selectcategory}
+                    {...register("issues_categories_id")}
+                    onChange={(e) => setSelectcategory(e.target.value)}
+                  >
+                    {issues.map((item) => (
+                      <MenuItem key={item.issues_id} value={item.issues_id}>
+                        {item.issues_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* ปุ่ม */}
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{ mt: 2, py: 1.5, bgcolor: "#2764E7" }}
                 >
-                  {categories.map((item) => (
-                    <MenuItem
-                      key={item.categories_id}
-                      value={item.categories_id}
-                    >
-                      {item.categories_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* ปุ่ม */}
-              <Button
-                variant="contained"
-                onClick={createcase}
-                sx={{ mt: 2, py: 1.5, bgcolor: "#2764E7" }}
-              >
-                เพิ่มการแจ้งซ่อม
-              </Button>
-            </Box>
+                  เพิ่มการแจ้งซ่อม
+                </Button>
+              </Box>
+            </form>
           </Paper>
         </Box>
       </Box>

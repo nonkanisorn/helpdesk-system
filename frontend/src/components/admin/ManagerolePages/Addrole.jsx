@@ -8,8 +8,10 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 function Addrole() {
+  const token = useSelector((state) => state.user.token);
   const navigate = useNavigate();
   const [roleName, setrolename] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -22,6 +24,7 @@ function Addrole() {
     try {
       const response = await axios.post(`${apiUrl}/roles`, formData, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json", // ระบุ Content-Type ไปยัง server
         },
       });

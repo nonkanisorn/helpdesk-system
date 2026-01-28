@@ -18,7 +18,7 @@ function History() {
       .then(function(response) {
         // console.log(response)
         setcasedatabyID(response.data);
-        console.log("case", casedatabyID);
+        // console.log("case", casedatabyID);
         const urls = response.data.map((casedata) => {
           const bufferData = new Uint8Array(casedata.case_img.data);
           const blob = new Blob([bufferData], { type: "image/jpeg" });
@@ -28,12 +28,12 @@ function History() {
         setImgUrls(urls);
       })
       .catch(function(error) {
-        console.log(error);
+        // console.log(error);
       })
       .finally(function() { });
   }, [case_id]);
-  console.log(casedatabyID);
-  console.log("ddd");
+  // console.log(casedatabyID);
+  // console.log("ddd");
   return (
     <Box sx={{ p: 3 }}>
       {casedatabyID.map((data, index) => (

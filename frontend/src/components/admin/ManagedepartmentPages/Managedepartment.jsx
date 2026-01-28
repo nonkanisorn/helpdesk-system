@@ -10,10 +10,12 @@ import Paper from "@mui/material/Paper";
 import { Button } from "@mui/material";
 
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Managedepartment() {
   const [departmentData, setDepartmentdata] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = useSelector((state) => state.user.token);
   const Deletedepartment = async (dep_id) => {
     const shouldDelete = window.confirm("คุณต้องการลบอุปกรณ์นี้หรือไม่?");
     if (!shouldDelete) {
@@ -21,13 +23,17 @@ function Managedepartment() {
     }
 
     axios
-      .delete(`${apiUrl}/departments/${dep_id}`)
+      .delete(`${apiUrl}/departments/${dep_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         console.log(response.data);
         axios
-          .get(`${apiUrl}/departments`)
+          .get(`${apiUrl}/departments`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
           .then((response) => {
-            setDepartmentdata(response.data);
+            setDepartmentdata(response.data.result);
             console.log(response);
           })
           .catch((error) => {
@@ -41,9 +47,11 @@ function Managedepartment() {
 
   useEffect(() => {
     axios
-      .get(`${apiUrl}/departments`)
+      .get(`${apiUrl}/departments`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then(function (response) {
-        setDepartmentdata(response.data);
+        setDepartmentdata(response.data.result);
         console.log(departmentData);
       })
       .catch(function (error) {

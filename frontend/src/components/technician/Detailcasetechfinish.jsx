@@ -18,7 +18,7 @@ function Detailcasetechfinish() {
       .then(function (response) {
         // console.log(response)
         setcasedatabyID(response.data);
-        console.log("case", casedatabyID);
+        // console.log("case", casedatabyID);
         const urls = response.data.map((casedata) => {
           const bufferData = new Uint8Array(casedata.case_img.data);
           const blob = new Blob([bufferData], { type: "image/jpeg" });
@@ -28,11 +28,11 @@ function Detailcasetechfinish() {
         setImgUrls(urls);
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       })
       .finally(function () {});
   }, [case_id]);
-  console.log(casedatabyID);
+  // console.log(casedatabyID);
   return <History />;
 }
 

@@ -20,9 +20,9 @@ function Statuscase() {
   const [caseData, setcaseData] = useState([]);
   const [reFresh, setRefresh] = useState(true);
   const navigate = useNavigate();
-  console.log("deviceid", caseDeviceId);
-  console.log("caseData: ", caseData);
-  console.log("id", caseId);
+  // console.log("deviceid", caseDeviceId);
+  // console.log("caseData: ", caseData);
+  // console.log("id", caseId);
   const topagedetail = (case_id) => {
     navigate(`/user/Detailcase/${case_id}`);
   };
@@ -35,11 +35,11 @@ function Statuscase() {
         status_id,
       })
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         setRefresh((prev) => !prev);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 
@@ -47,11 +47,11 @@ function Statuscase() {
     axios
       .get(`http://localhost:5011/caseuserstatus/${user_id}`)
       .then(function(response) {
-        setcaseData(response.data);
-        console.log(response.data);
+        // setcaseData(response.data);
+        // console.log(response.data);
       })
       .catch(function(error) {
-        console.log(error);
+        // console.log(error);
       })
       .finally(function() { });
   }, [reFresh]);

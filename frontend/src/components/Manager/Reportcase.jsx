@@ -17,11 +17,13 @@ import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import Detailcase from "./Detailcase";
 import { Typography } from "@mui/material";
+import { useSelector } from "react-redux";
 
 function Reportcase() {
+  const token = useSelector((state) => state.user.token);
   const [nametech, setNametech] = useState([]);
   const [selectedTechnicians, setSelectedTechnicians] = useState({});
-  const [caseData, setcaseData] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const navigate = useNavigate();
   const departmentMap = {
     1: "ไอที",
@@ -37,9 +39,15 @@ function Reportcase() {
   const sendtech = (case_id) => {
     const technician_name = selectedTechnicians[case_id];
     axios
-      .patch(`http://localhost:5011/addtechcase/${case_id}`, {
-        technician_name,
-      })
+      .patch(
+        `http://localhost:5011/addtechcase/${case_id}`,
+        {
+          technician_name,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
       .then(() => {
         console.log("success");
       })
@@ -48,22 +56,26 @@ function Reportcase() {
       });
   };
 
-  const topagedetail = (case_id) => {
-    navigate(`/manager/detail/${case_id}`, { state: { caseData: caseData } });
+  const toAssignTechnicianPages = (tickets_id) => {
+    navigate(`/manager/tickets/assign/${tickets_id}`);
   };
   useEffect(() => {
     axios
-      .get("http://localhost:5011/case/")
+      .get("http://localhost:5011/tickets", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(function (response) {
-        setcaseData(response.data);
-        console.log(caseData);
+        setTickets(response.data.result);
+        console.log(tickets);
       })
       .catch(function (error) {
         console.log(error);
       })
       .finally(function () {});
   }, []);
-  console.log("dsadas", caseData);
+  console.log("dsadas", tickets);
   return (
     // TODO: แก้ไข เพิ่มปุ่ม เพิ่มเติม ย้าย รายละเอียดงาน ไปไว้อีกหน้า
     //
@@ -78,7 +90,7 @@ function Reportcase() {
               <TableCell>ลำดับ </TableCell>
               <TableCell>ชื่องาน</TableCell>
               <TableCell>รายละเอียดผู้แจ้ง</TableCell>
-              <TableCell>แผนกผู้แจ้ง</TableCell>
+              {/* <TableCell>แผนกผู้แจ้ง</TableCell> */}
               <TableCell>รายละเอียดงาน</TableCell>
               <TableCell>สถานะ</TableCell>
               <TableCell>วันที่แจ้ง</TableCell>
@@ -86,7 +98,7 @@ function Reportcase() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {caseData.map((item, index) => (
+            {tickets.map((item, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -94,10 +106,10 @@ function Reportcase() {
                 <TableCell component="th" scope="row">
                   {index + 1}
                 </TableCell>
-                <TableCell>{item.case_title}</TableCell>
-                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.title}</TableCell>
+                <TableCell>{item.title}</TableCell>
                 <TableCell>{departmentMap[item.dep_id]}</TableCell>
-                <TableCell>{item.case_detail}</TableCell>
+                <TableCell>{item.description}</TableCell>
                 <TableCell>
                   {item.status_id === 1
                     ? "รอดำเนินการ"
@@ -110,14 +122,14 @@ function Reportcase() {
                           : null}
                 </TableCell>
                 <TableCell>
-                  {new Date(item.created_date).toLocaleString("th-TH", {
+                  {new Date(item.created_at).toLocaleString("th-TH", {
                     dateStyle: "long",
                     timeStyle: "medium",
                   })}
                 </TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => topagedetail(item.case_id)}
+                    onClick={() => toAssignTechnicianPages(item.ticket_id)}
                     variant="contained"
                     color="success"
                   >

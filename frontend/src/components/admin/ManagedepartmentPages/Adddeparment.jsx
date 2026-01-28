@@ -9,12 +9,14 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 function Adddepartment() {
   const navigate = useNavigate();
   const [departmentName, setDepartmentname] = useState("");
   console.log(departmentName);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = useSelector((state) => state.user.token);
   const formData = new FormData();
   formData.append("dep_name", departmentName);
 
@@ -23,6 +25,7 @@ function Adddepartment() {
     try {
       const response = await axios.post(`${apiUrl}/departments`, formData, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json", // ระบุ Content-Type ไปยัง server
         },
       });

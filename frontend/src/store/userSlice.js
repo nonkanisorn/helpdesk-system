@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-  username: "",
-  role: "",
+  users_id: "",
+  first_name: "",
+  last_name: "",
+  role_id: "",
   token: "",
-  // users_id: null,
+  dep_id: "",
 };
 
 const userSlice = createSlice({
@@ -11,35 +13,40 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      const { username, role, token, name, users_id } = action.payload;
-      state.username = username;
-      state.role = role;
-      state.token = token;
-      state.name = name;
+      const { first_name, last_name, role_id, token, users_id, dep_id } =
+        action.payload;
       state.users_id = users_id;
-      localStorage.setItem("user", JSON.stringify(action.payload));
+      state.first_name = first_name;
+      state.last_name = last_name;
+      state.role_id = role_id;
+      state.token = token;
+      state.dep_id = dep_id;
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          users_id: state.users_id,
+          first_name: state.first_name,
+          last_name: state.last_name,
+          role_id: state.role_id,
+          token: state.token,
+          dep_id: state.dep_id,
+        }),
+      );
     },
     logout: (state) => {
-      state.username = "";
-      state.role = "";
-      state.token = "";
-      state.name = "";
       state.users_id = "";
+      state.first_name = "";
+      state.last_name = "";
+      state.role_id = "";
+      state.token = "";
+      state.dep_id = "";
 
       localStorage.removeItem("user");
       // navigate("/login");
       // window.location.reload();
     },
-    loadUserFromStorage: (state, action) => {
-      const userData = action.payload;
-      if (userData) {
-        state.username = userData.username;
-        state.role = userData.role;
-        state.token = userData.token;
-      }
-    },
   },
 });
 
-export const { login, logout, loadUserFromStorage } = userSlice.actions;
+export const { login, logout } = userSlice.actions;
 export default userSlice.reducer;

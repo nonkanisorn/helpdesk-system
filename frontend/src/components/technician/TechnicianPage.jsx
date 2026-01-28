@@ -26,8 +26,8 @@ import { Link } from "react-router-dom";
 function Technicianpage() {
   const [casedata, setcasedata] = useState([]);
   const technician_id = useSelector((state) => state.user.users_id);
-  console.log(technician_id);
-  console.log(casedata);
+  // console.log(technician_id);
+  // console.log(casedata);
   const casedatalenght = () => {
     return casedata.length;
   };
@@ -52,7 +52,7 @@ function Technicianpage() {
         setcasedata(response.data);
       });
   }, []);
-  console.log(casedata);
+  // console.log(casedata);
   return (
     <Box sx={{ pr: 2, height: "100vh", overflowY: "scroll" }}>
       <Typography variant="h4" fontWeight="fontWeightBold">

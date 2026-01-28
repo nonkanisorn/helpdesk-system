@@ -33,25 +33,32 @@ const AdminRoute = ({ children }) => {
   const [loading, setLoading] = useState(true); // เพิ่ม state สำหรับตรวจสอบการโหลด
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userFromLocalStorage = localStorage.getItem("user");
+  if (userFromLocalStorage) {
+    const { token } = JSON.parse(userFromLocalStorage);
+    console.log(token);
+  } else {
+    console.log("not found user");
+  }
   const currentAdmin = async (idToken) => {
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/current-admin`,
-        {},
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/admin/ping`,
         {
           headers: {
-            authtoken: idToken,
+            Authorization: `Bearer ${idToken}`,
           },
         },
       );
       console.log(res);
       return res.data;
     } catch (error) {
-      console.log(error);
+      console.log("err", error);
       throw error;
     }
   };
 
+  console.log("usertoken", user.token);
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {

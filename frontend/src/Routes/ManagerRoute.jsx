@@ -17,17 +17,19 @@ import Devicehistory from "../components/Manager/Devicehistory";
 import ManageDevice from "../components/Manager/ManageDevice";
 import DeviceDetailPages from "../components/Manager/DeviceDetailPages";
 import InstanceDeviceHistoryPage from "../components/Manager/InstanceDeviceHistoryPage";
+import AssignTechnician from "../components/Manager/AssignTechnician";
 const ManagerRoute = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => ({ ...state }));
-  console.log("manager", user);
+  console.log("manager", user.token);
   useEffect(() => {
+    if (user === undefined) return;
     if (!user || !user.token) {
       navigate("/login");
     }
   }, [user, navigate]);
   const text = "No permission";
-  return user && user.token && user.role === 2 ? (
+  return user && user.token && user.role_id === 2 ? (
     <div className="app">
       <Sidebarmanager />
       <main className="content" style={{ backgroundColor: "#F5F6Fa" }}>
@@ -56,6 +58,10 @@ const ManagerRoute = () => {
               <Route
                 path="casedetail/:case_id"
                 element={<Casedetailstatus />}
+              />
+              <Route
+                path="tickets/assign/:tickets_id"
+                element={<AssignTechnician />}
               />
               <Route path="*" element={<Notfound404 />} />
             </Routes>

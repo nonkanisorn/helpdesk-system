@@ -25,6 +25,7 @@ import {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Managedevice = () => {
   const [device, setDevice] = useState([]);
@@ -36,42 +37,45 @@ const Managedevice = () => {
   const [refresh, setRefresh] = useState(false);
   const [inputNewDeviceName, setInputNewDeviceName] = useState("");
   const [inputNewDeviceDetail, setInputNewDeviceDetail] = useState("");
+  const token = useSelector((state) => state.user.token);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const tesnum = 1;
-  const [selectTypeDevice, setSelectTypeDevice] = useState('');
-  console.log(typeof (selectTypeDevice))
+  const [selectTypeDevice, setSelectTypeDevice] = useState("");
+  // console.log(typeof selectTypeDevice);
   const handleSelectTypeDevice = (event) => {
-    setSelectTypeDevice(event.target.value)
-  }
+    setSelectTypeDevice(event.target.value);
+  };
   const handleOpenAddDevice = () => {
-    setSelectTypeDevice('')
+    setSelectTypeDevice("");
     setOpenAddDialog(true);
   };
   const handleCloseAddDevice = () => {
     setOpenAddDialog(false);
   };
   const handleSubmitAddDevice = () => {
-    axios.post(`${apiUrl}/device`, {
-      dev_name: inputNewDeviceName,
-      dev_type: selectTypeDevice
-    }).catch((error) => {
-      if (error) {
-        console.log(error);
-      }
-    });
-    handleCloseAddDevice()
-    setRefresh(prev => !prev)
+    axios
+      .post(`${apiUrl}/device`, {
+        dev_name: inputNewDeviceName,
+        dev_type: selectTypeDevice,
+      })
+      .catch((error) => {
+        if (error) {
+          // console.log(error);
+        }
+      });
+    handleCloseAddDevice();
+    setRefresh((prev) => !prev);
   };
   const handleDeleteDevice = (dev_id) => {
     axios
       .delete(`${apiUrl}/device/${dev_id}`)
       .then((response) => {
-        console.log(response);
-        setRefresh(prev => !prev)
+        // console.log(response);
+        setRefresh((prev) => !prev);
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
       });
   };
   const handleOpenDialog = (item) => {
@@ -82,43 +86,46 @@ const Managedevice = () => {
     setOpenDialog(false);
   };
   const handleSubmit = (dev_id) => {
-    console.log(dev_id);
+    // console.log(dev_id);
     axios
       .put(`${apiUrl}/device/${dev_id}`, {
         newdevicename: inputUpdateDevice,
       })
       .then((response) => {
-        console.log(response);
-        setRefresh(prev => !prev)
+        // console.log(response);
+        setRefresh((prev) => !prev);
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
       });
     handleCloseDialog();
   };
   useEffect(() => {
     const fetchTypeDevice = () => {
-      axios.get(`${apiUrl}/device/type`).then((response) => {
-        console.log(response.data)
-        setTypeDevice(response.data)
-      })
-    }
-    fetchTypeDevice()
-  }, [])
+      axios.get(`${apiUrl}/device-types`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // .then((response) => {
+      //   console.log(response.data);
+      setTypeDevice(response.data);
+      // });
+    };
+    fetchTypeDevice();
+  }, []);
   useEffect(() => {
     const fetchdevice = () => {
-      axios
-        .get(`${apiUrl}/device`)
-        .then((response) => {
-          setDevice(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      axios.get(`${apiUrl}/device`).then((response) => {
+        setDevice(response.data);
+      });
+      // .catch((error) => {
+      //   console.log(error);
+      // });
     };
     fetchdevice();
   }, [refresh]);
-  console.log(device)
+  // console.log(device);
   return (
     <>
       <Box>
@@ -158,7 +165,13 @@ const Managedevice = () => {
                     value={selectTypeDevice}
                     label="ประเภทอุปกรณ์"
                     onChange={handleSelectTypeDevice}
-                  >{typeDevice.map((items) => (<MenuItem value={items.devicetype_id}>{items.devicetype_name}</MenuItem>))}</TextField>
+                  >
+                    {typeDevice.map((items) => (
+                      <MenuItem value={items.devicetype_id}>
+                        {items.devicetype_name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
 
                 {/* ฝั่งขวา */}
@@ -275,7 +288,13 @@ const Managedevice = () => {
                       to={`detail/${items.dev_id}`}
                       state={{ device_name: items.dev_name }}
                     >
-                      <Button variant="contained" color="success" sx={{ ml: 2 }}>จัดการ</Button>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        sx={{ ml: 2 }}
+                      >
+                        จัดการ
+                      </Button>
                     </Link>
                   </TableCell>
                 </TableRow>

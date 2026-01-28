@@ -32,7 +32,7 @@ function Detailcasetech() {
     formState: { errors },
   } = useForm();
   const workComplete = (data) => {
-    console.log("data", data);
+    // console.log("data", data);
     axios
       .patch(`http://localhost:5011/case/${user_id}/${case_id}`, {
         status_id,
@@ -42,7 +42,7 @@ function Detailcasetech() {
       .then(() => navigate(-2))
       .catch((error) => {
         if (error) {
-          console.log("error", error.response.data);
+          // console.log("error", error.response.data);
           alert("กรุณาใส่รหัสอุปกรณ์ให้ถูกต้อง");
         }
       });
@@ -59,7 +59,7 @@ function Detailcasetech() {
         );
         if (response.data && response.data.length > 0) {
           setCaseDatabyId(response.data[0]);
-          console.log("Response data:", response.data[0]);
+          // console.log("Response data:", response.data[0]);
         } else {
           console.error("No data found for this case ID");
         }

@@ -23,15 +23,17 @@ import {
 
 import { Link } from "react-router-dom";
 import { Stack } from "@mui/system";
+import { useSelector } from "react-redux";
 
 function Manageuser() {
   const defaultValues = {
     // ช่องข้อความ
     username: "",
-    userpassword: "",
-    name: "",
-    user_email: "",
-    user_phone: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
     // ช่อง select (number)
     role_id: null, // 👈 number | null
     dep_id: null, // 👈 number | null
@@ -44,6 +46,7 @@ function Manageuser() {
     reset,
     control,
   } = useForm({ defaultValues });
+  const token = useSelector((state) => state.user.token);
   const [userData, setUserData] = useState([]);
   const [roleData, setRoleData] = useState([]);
   const [depData, setDepData] = useState([]);
@@ -59,16 +62,27 @@ function Manageuser() {
     }
   };
   const handleDelete = (user_id) => {
-    axios.delete(`${apiUrl}/users/${user_id}`).then(() => {
-      console.log("ลบสําเร็จ");
-      setrefresh((prev) => !prev);
-    });
+    axios
+      .delete(`${apiUrl}/users/${user_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        
+        setrefresh((prev) => !prev);
+      });
   };
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/users`);
-        setUserData(response.data);
+        const response = await axios.get(`${apiUrl}/users/view`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUserData(response.data.result);
       } catch (err) {
         console.log(err);
       }
@@ -78,48 +92,68 @@ function Manageuser() {
   useEffect(() => {
     const fetchRoleData = async () => {
       try {
-        await axios.get(`${apiUrl}/roles`).then((res) => {
-          console.log("res", res);
-          setRoleData(res.data);
-        });
+        await axios
+          .get(`${apiUrl}/roles`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+
+            setRoleData(res.data);
+          });
       } catch (error) {
         console.log(error);
       }
     };
+    fetchRoleData();
+  }, []);
+  // if (!depData || depData.length === 0) {
+  //   return <div>Loading...</div>;
+  // }
+  useEffect(() => {
+    // console.log("effect token", token);
     const fetchDepData = async () => {
       try {
-        await axios.get(`${apiUrl}/departments`).then((res) => {
-          setDepData(res.data);
-        });
+        await axios
+          .get(`${apiUrl}/departments`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+            setDepData(res.data.result);
+          });
       } catch (error) {
         console.log(error);
       }
     };
     fetchDepData();
-    fetchRoleData();
   }, []);
   if (!userData || userData.length === 0) {
     return null; // หรือแสดงข้อความแจ้งเตือนอื่นๆ
   }
-  console.log(userData);
+
   const onSubmit = async (data) => {
     await axios
       .post(`${apiUrl}/register`, {
         username: data.username,
-        userpassword: data.userpassword,
+        password: data.password,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
         role_id: data.role_id,
-        name: data.name,
-        dep_id: data.dep_id,
-        user_email: data.user_email,
-        user_phone: data.user_phone,
+        department_id: data.dep_id,
+        is_active: 1,
       })
       .then((res) => {
         reset(defaultValues);
       });
-    console.log(watch(data));
+
   };
 
-  console.log("rdata", roleData);
+
   return (
     <>
       <Dialog
@@ -142,13 +176,15 @@ function Manageuser() {
               <Typography>ชื่อผู้ใช้</Typography>
               <TextField {...register("username")}></TextField>
               <Typography>รหัสผ่าน</Typography>
-              <TextField {...register("userpassword")}></TextField>
-              <Typography>ชื่อ-นามสกุล</Typography>
-              <TextField {...register("name")}></TextField>
+              <TextField {...register("password")}></TextField>
+              <Typography>ชื่อ</Typography>
+              <TextField {...register("first_name")}></TextField>
+              <Typography>นามสกุล</Typography>
+              <TextField {...register("last_name")}></TextField>
               <Typography>อีเมล์</Typography>
-              <TextField {...register("user_email")}></TextField>
+              <TextField {...register("email")}></TextField>
               <Typography>เบอร์โทรศัพท์</Typography>
-              <TextField {...register("user_phone")}></TextField>
+              <TextField {...register("phone")}></TextField>
               <Typography>บทบาท</Typography>
               <Controller
                 control={control}
@@ -206,41 +242,42 @@ function Manageuser() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {userData.map((item, index) => (
-                <TableRow
-                  key={index}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell>{item.users_id} </TableCell>
+              {userData &&
+                userData.map((item, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell>{item.user_id} </TableCell>
 
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.role_name}</TableCell>
-                  <TableCell>
-                    <Link to={`/admin/edituser/${item.users_id}`}>
+                    <TableCell>{item.first_name}</TableCell>
+                    <TableCell>{item.role_name}</TableCell>
+                    <TableCell>
+                      <Link to={`/admin/edituser/${item.user_id}`}>
+                        <Button
+                          variant="contained"
+                          sx={{ fontSize: "12px", backgroundColor: "#FF9933" }}
+                        >
+                          แก้ไข
+                        </Button>
+                      </Link>
+
                       <Button
+                        onClick={() => {
+                          handleDelete(item.user_id);
+                        }}
                         variant="contained"
-                        sx={{ fontSize: "12px", backgroundColor: "#FF9933" }}
+                        sx={{
+                          fontSize: "12px",
+                          backgroundColor: "red",
+                          marginLeft: 3,
+                        }}
                       >
-                        แก้ไข
+                        ลบ
                       </Button>
-                    </Link>
-
-                    <Button
-                      onClick={() => {
-                        handleDelete(item.users_id);
-                      }}
-                      variant="contained"
-                      sx={{
-                        fontSize: "12px",
-                        backgroundColor: "red",
-                        marginLeft: 3,
-                      }}
-                    >
-                      ลบ
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>

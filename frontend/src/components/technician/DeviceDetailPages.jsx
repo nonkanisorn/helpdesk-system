@@ -128,7 +128,7 @@ const DeviceDetailPages = () => {
       );
       setRefreshKey((k) => k + 1);
       closeEdit();
-      console.log(data.dep_id);
+      // console.log(data.dep_id);
     } catch (err) {
       setError(err);
     }

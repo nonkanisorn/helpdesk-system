@@ -19,9 +19,9 @@ import { amber, indigo } from "@mui/material/colors";
 
 function User() {
   const [casedata, setcasedata] = useState([]);
-  console.log(casedata);
+  // console.log(casedata);
   const user_id = useSelector((state) => state.user.users_id);
-  console.log(casedata);
+  // console.log(casedata);
 
   useEffect(() => {
     const fetchdata = async () => {
@@ -31,7 +31,7 @@ function User() {
         );
         setcasedata(response.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchdata();

@@ -18,6 +18,7 @@ import ConstructionOutlinedIcon from "@mui/icons-material/ConstructionOutlined";
 import { useSelector } from "react-redux";
 
 const Sidebartech = () => {
+  const token = useSelector((state) => state.user.token);
   const [isCollapsed, setisCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [broken, setBroken] = useState(false);
@@ -31,19 +32,20 @@ const Sidebartech = () => {
       const fetchdata = async () => {
         const response = await axios.get(
           `http://localhost:5011/users/${users_id}`,
+          { headers: { Authorization: `Bearer ${token}` } },
         );
-        if (
-          !response.data[0].user_img ||
-          response.data[0].user_img.data.length === 0
-        ) {
-          setUrl("/assets/user.png");
-        } else {
-          const user = response.data[0];
-          const array = new Uint8Array(user.user_img.data);
-          const blob = new Blob([array], { type: "image/jpeg" });
-          const url = URL.createObjectURL(blob);
-          setUrl(url);
-        }
+        // if (
+        //   !response.data[0].user_img ||
+        //   response.data[0].user_img.data.length === 0
+        // ) {
+        //   setUrl("/assets/user.png");
+        // } else {
+        //   const user = response.data[0];
+        //   const array = new Uint8Array(user.user_img.data);
+        //   const blob = new Blob([array], { type: "image/jpeg" });
+        //   const url = URL.createObjectURL(blob);
+        //   setUrl(url);
+        // }
       };
 
       fetchdata();
@@ -114,35 +116,34 @@ const Sidebartech = () => {
                   </Box>
                 </Box>
               )}
-              <Link to="/technician/index" className="menu-bars">
-                <MenuItem style={{ color: "#fff" }} icon={<HomeOutlinedIcon />}>
-                  หน้าหลัก
-                </MenuItem>
-              </Link>
-              <Link to="/technician/reportcasetech" className="menu-bars">
-                <MenuItem
-                  style={{ color: "#fff" }}
-                  icon={<ConstructionOutlinedIcon />}
-                >
-                  รายการแจ้งซ่อม
-                </MenuItem>
-              </Link>
-              <Link to="/technician/Historycase" className="menu-bars">
-                <MenuItem
-                  style={{ color: "#fff" }}
-                  icon={<HistoryToggleOffIcon />}
-                >
-                  ประวัติการซ่อม
-                </MenuItem>
-              </Link>
-              <Link to="/technician/device" className="menu-bars">
-                <MenuItem
-                  style={{ color: "#fff" }}
-                  icon={<HistoryToggleOffIcon />}
-                >
-                  จัดการอุปกรณ์
-                </MenuItem>
-              </Link>
+              <MenuItem
+                style={{ color: "#fff" }}
+                icon={<HomeOutlinedIcon />}
+                component={<Link to="/technician/index" />}
+              >
+                หน้าหลัก
+              </MenuItem>
+              <MenuItem
+                style={{ color: "#fff" }}
+                icon={<ConstructionOutlinedIcon />}
+                component={<Link to="/technician/reportcasetech" />}
+              >
+                รายการแจ้งซ่อม
+              </MenuItem>
+              <MenuItem
+                style={{ color: "#fff" }}
+                icon={<HistoryToggleOffIcon />}
+                component={<Link to="/technician/Historycase" />}
+              >
+                ประวัติการซ่อม
+              </MenuItem>
+              <MenuItem
+                style={{ color: "#fff" }}
+                icon={<HistoryToggleOffIcon />}
+                component={<Link to="/technician/device" />}
+              >
+                จัดการอุปกรณ์
+              </MenuItem>
             </Menu>
           </div>
         </div>

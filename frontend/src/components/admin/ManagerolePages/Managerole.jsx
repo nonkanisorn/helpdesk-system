@@ -10,9 +10,11 @@ import Paper from "@mui/material/Paper";
 import { Button } from "@mui/material";
 
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Managerole() {
   const [roleData, setroledata] = useState([]);
+  const token = useSelector((state) => state.user.token);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const Deleterole = async (role_id) => {
@@ -22,11 +24,17 @@ function Managerole() {
     }
 
     axios
-      .delete(`${apiUrl}/roles/${role_id}`)
+      .delete(`${apiUrl}/roles/${role_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         console.log(response.data);
         axios
-          .get(`${apiUrl}/roles`)
+          .get(`${apiUrl}/roles`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
           .then((response) => {
             setroledata(response.data);
             console.log(response);
@@ -42,7 +50,11 @@ function Managerole() {
 
   useEffect(() => {
     axios
-      .get(`${apiUrl}/roles`)
+      .get(`${apiUrl}/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(function (response) {
         setroledata(response.data);
         console.log(roleData);
