@@ -25,17 +25,16 @@ function Detailcase() {
   const { ticket_id } = useParams();
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
-  const role_id = useSelector((state) => state.user.role);
+  const role_id = useSelector((state) => state.user.role_id);
   const user_id = useSelector((state) => state.user.users_id);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = useSelector((state) => state.user.token);
   const handleUpdateStatusCaseByUser = (status_id) => {
     try {
-      axios
-        .patch(`${apiUrl}/case/${user_id}/${ticket_id}`, {
-          status_id,
-        })
-        // .then((response) => console.log(response));
+      axios.patch(`${apiUrl}/case/${user_id}/${ticket_id}`, {
+        status_id,
+      });
+      // .then((response) => console.log(response));
     } catch (error) {
       // console.log(error);
     }
@@ -49,7 +48,7 @@ function Detailcase() {
         },
       })
       .then(function (response) {
-        setTickets(response.data.result);
+        setTickets([response.data.result]);
         // console.log("response", response.data.result);
       })
       .catch(function (error) {
