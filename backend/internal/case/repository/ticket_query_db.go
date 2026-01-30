@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -67,4 +68,26 @@ func (t ticketQueryRepository) GetTicketForTechnicianByTicketID(ticketID int) (*
 		return nil, err
 	}
 	return &ticket, nil
+}
+func (t ticketQueryRepository) UpdateStatusTicketByTechnician(ticket *TicketRow) error {
+	if ticket.ResolutionNote != nil {
+		query := "UPDATE  tickets SET resolution_note = ? ,instance_id = ?,status_id = ? ,completed_at = ?  WHERE ticket_id = ? "
+		completedAt := time.Now()
+		statusID := 4
+		_, err := t.db.Exec(query, ticket.ResolutionNote, ticket.InstanceID, statusID, completedAt, ticket.TicketID)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	query := "UPDATE  tickets SET status_id = ? ,started_at = ?  WHERE ticket_id = ? "
+	statusID := 3
+	startedAt := time.Now()
+	_, err := t.db.Exec(query, statusID, startedAt, ticket.TicketID)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
