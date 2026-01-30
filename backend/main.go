@@ -43,6 +43,7 @@ import (
 	registerServ "github.com/nonkanisorn/helpdesk-system/internal/auth/register/service"
 	ticketHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
 	ticketQueryHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
+	"github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryServ "github.com/nonkanisorn/helpdesk-system/internal/case/service"
@@ -93,7 +94,19 @@ func main() {
 	}))
 	// case
 	// ticket
+	// note := "testeiei"
+	instanceID := 98
+	tick := repository.TicketRow{
+		TicketID: 44,
+		// ResolutionNote: &note,
+		InstanceID: &instanceID,
+	}
 	ticketQueryRepo := ticketQueryRepo.NewTicketQueryRepository(db)
+	err = ticketQueryRepo.UpdateStatusTicketByTechnician(&tick)
+	if err != nil {
+		fmt.Println("errrr", err)
+	}
+
 	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo)
 	ticketQueryHand := ticketQueryHand.NewTicketQueryHandlers(ticketQueryServ)
 	app.Post("/tickets/status", ticketQueryHand.UpdateStatusTicket)
