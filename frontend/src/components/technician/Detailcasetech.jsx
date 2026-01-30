@@ -23,6 +23,7 @@ function Detailcasetech() {
   const navigate = useNavigate();
   const [caseDatabyId, setCaseDatabyId] = useState({});
   const user_id = useSelector((state) => state.user.users_id);
+  const token = useSelector((state) => state.user.token);
   const status_id = 3;
 
   const {
@@ -55,7 +56,10 @@ function Detailcasetech() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5011/case/${case_id}`,
+          `http://localhost:5011/tickets/${case_id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
         if (response.data && response.data.length > 0) {
           setCaseDatabyId(response.data[0]);
@@ -70,6 +74,7 @@ function Detailcasetech() {
 
     fetchData();
   }, [case_id]);
+  console.log("caxcasd");
   return (
     <Box sx={{ marginX: "25%" }}>
       <Typography variant="h4" fontWeight="fontWeightBold">
