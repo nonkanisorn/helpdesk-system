@@ -33,7 +33,7 @@
     "react-scripts": "^5.0.1",
     "styled-components": "^6.1.18",
     "universal-cookie": "^7.0.2",
-    "vite": "^6.3.6"
+    "vite": "^6.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
