@@ -5,10 +5,13 @@ import (
 
 	"github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	"github.com/nonkanisorn/helpdesk-system/internal/domain"
+
+	deviceInstanceQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/repository"
 )
 
 type ticketQueryService struct {
-	ticketRepo repository.TicketQueryRepository
+	ticketRepo              repository.TicketQueryRepository
+	deviceInstanceQueryRepo deviceInstanceQueryRepo.DeviceInstanceQueryRepository
 }
 
 func NewTicketQueryService(ticketRepo repository.TicketQueryRepository) ticketQueryService {
@@ -113,4 +116,12 @@ func (t ticketQueryService) GetTicketForTechnicianByTicketID(ticketID int) (*dom
 		ClosedAt:    ticketRow.ClosedAt,
 	}
 	return &ticketRes, nil
+}
+func (t ticketQueryService) UpdateStatusCompleteByTechnician(serialNumber string) error {
+	deviceInstanceRow, err := t.deviceInstanceQueryRepo.CheckSerialNumber(serialNumber)
+	if err != nil {
+		return err
+	}
+	fmt.Println(deviceInstanceRow)
+	return nil
 }

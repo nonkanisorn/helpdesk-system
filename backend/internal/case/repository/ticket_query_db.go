@@ -91,3 +91,11 @@ func (t ticketQueryRepository) UpdateStatusTicketByTechnician(ticket *TicketRow)
 	return nil
 
 }
+func (t ticketQueryRepository) UpdateStatusCompleteByTechnician(ticket *TicketRow) error {
+	query := "UPDATE  tickets SET resolution_note = ? ,instance_id = ?,status_id = ? ,completed_at = ?  WHERE ticket_id = ? "
+	_, err := t.db.Exec(query, ticket.ResolutionNote, ticket.InstanceID, ticket.StatusID, ticket.CompletedAt, ticket.TicketID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

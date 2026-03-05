@@ -21,6 +21,10 @@ import (
 	deviceInstanceRepo "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/repository"
 	deviceInstanceServ "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
 
+	// deviceInstanceQueryHand "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/handler"
+	deviceInstanceQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/repository"
+	// deviceInstanceQueryServ "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
+	// deviceInstanceServ "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
 	deviceHand "github.com/nonkanisorn/helpdesk-system/internal/device/handler"
 	deviceRepo "github.com/nonkanisorn/helpdesk-system/internal/device/repository"
 	deviceServ "github.com/nonkanisorn/helpdesk-system/internal/device/service"
@@ -108,6 +112,10 @@ func main() {
 	}
 
 	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo)
+	// err = ticketQueryServ.UpdateStatusCompleteByTechnician("ABC1234")
+	// if err != nil {
+	// 	fmt.Println("err1 ", err)
+	// }
 	ticketQueryHand := ticketQueryHand.NewTicketQueryHandlers(ticketQueryServ)
 	app.Post("/tickets/status", ticketQueryHand.UpdateStatusTicket)
 	app.Patch("/tickets/:id<int>/assign-technician", ticketQueryHand.AssignTechToTicket)
@@ -184,6 +192,15 @@ func main() {
 	deviceInstanceServ := deviceInstanceServ.NewDeviceInstanceService(deviceInstanceRepo)
 	deviceInstanceHandler := deviceInstanceHand.NewDeviceInstanceHandler(deviceInstanceServ)
 	app.Get("/device-instances", deviceInstanceHandler.GetAllDeviceInstance)
+
+	deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
+	_ = deviceInstanceQueryRepo
+
+	row, err := deviceInstanceQueryRepo.CheckSerialNumber("ABC1234")
+	if err != nil {
+		fmt.Println("errnaja", err)
+	}
+	fmt.Println("ropooowoeqoe", row)
 	// Issue
 	issueRepo := issueRepo.NewIssueRepository(db)
 	issueServ := issueServ.NewIssueService(issueRepo)

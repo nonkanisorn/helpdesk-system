@@ -48,15 +48,17 @@ function Detailcase() {
         },
       })
       .then(function (response) {
-        setTickets([response.data.result]);
-        // console.log("response", response.data.result);
+        const r = response.data.result; // r เป็น object
+        setTickets([r]); // ✅ ครอบเป็น array เพื่อให้ map ได้
+
+        console.log("response", response.data.result);
       })
       .catch(function (error) {
-        // console.log(error);
+        console.log(error);
       })
       .finally(function () {});
   }, []);
-  // console.log("casedaaaa", tickets);
+  console.log("casedaaaa", tickets);
   return (
     <Box sx={{ overflowY: "scroll", height: "100vh" }}>
       <Box sx={{ marginX: "25%", mt: 2 }}>

@@ -1,5 +1,7 @@
 package service
 
+import "github.com/nonkanisorn/helpdesk-system/internal/domain"
+
 type DeviceInstanceResponse struct {
 	DeviceInstanceID *int   `db:"instance_id"`
 	DeviceID         *int   `db:"device_id"`
@@ -9,4 +11,8 @@ type DeviceInstanceResponse struct {
 }
 type DeviceInstanceService interface {
 	GetAllDeviceInstance() ([]DeviceInstanceResponse, error)
+}
+
+type DeviceInstanceQueryService interface {
+	CheckSerialNumber(string) (*domain.DeviceInstanceResponse, error)
 }
