@@ -32,11 +32,11 @@ function Adduser() {
     formData.append("username", username);
     formData.append("userpassword", userpassword);
     formData.append("role_id", selectRole);
-    formData.append("name", name);
-    formData.append("user_email", useremail);
-    formData.append("user_phone", userphone);
+    formData.append("full_name", name);
+    formData.append("email", useremail);
+    formData.append("phone", userphone);
     formData.append("user_img", fileimg);
-    formData.append("dep_id", selectDepName);
+    formData.append("department_id", selectDepName);
     axios
       .post(`${apiUrl}/register`, formData, {
         headers: {
@@ -44,8 +44,8 @@ function Adduser() {
         },
       })
       .then((response) => {
-
-
+        console.log("เพิ่มสมาชิกสำเร็จ");
+        console.log(response);
         navigate("/admin/manageuser ");
       })
       .catch((error) => {
@@ -62,20 +62,20 @@ function Adduser() {
     setSelectDepName(event.target.value);
   };
   const handlefile = (e) => {
-
+    console.log(e.target.files[0]);
     setFileimg(e.target.files[0]);
   };
-
+  console.log(selectRole);
   useEffect(() => {
     axios.get(`${apiUrl}/roles`).then((res) => {
       setRole(res.data);
-
+      console.log(res.data);
     });
     axios.get(`${apiUrl}/departments`).then((res) => {
       setDepName(res.data);
     });
   }, []);
-  
+  console.log(userphone);
   return (
     <Paper sx={{ pb: 3 }}>
       <Button
@@ -122,27 +122,27 @@ function Adduser() {
         <Typography sx={{ mt: 5 }}>Phone</Typography>
         <TextField onChange={(e) => setUserPhone(e.target.value)}></TextField>
         <Typography sx={{ mt: 5 }}>แผนก</Typography>
-        {/* <Select value={selectDepName} onChange={handleSelectDepName}> */}
-        {/*   {depName.map((item, idx) => ( */}
-        {/*     <MenuItem key={item.id} value={item.dep_id}> */}
-        {/*       {item.dep_name} */}
-        {/*     </MenuItem> */}
-        {/*   ))} */}
-        {/* </Select> */}
+        <Select value={selectDepName} onChange={handleSelectDepName}>
+          {depName.map((item, idx) => (
+            <MenuItem key={item.id} value={item.dep_id}>
+              {item.dep_name}
+            </MenuItem>
+          ))}
+        </Select>
         <Typography sx={{ mt: 5 }}>บทบาท</Typography>
-        {/* <Select */}
-        {/*   labelId="demo-simple-select-label" */}
-        {/*   id="demo-simple-select" */}
-        {/*   label="role" */}
-        {/*   value={selectRole} */}
-        {/*   onChange={handlechangerole} */}
-        {/* > */}
-        {/*   {role.map((role) => ( */}
-        {/*     <MenuItem key={role.id} value={role.role_id}> */}
-        {/*       {role.role_name} */}
-        {/*     </MenuItem> */}
-        {/*   ))} */}
-        {/* </Select> */}
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          label="role"
+          value={selectRole}
+          onChange={handlechangerole}
+        >
+          {role.map((role) => (
+            <MenuItem key={role.id} value={role.role_id}>
+              {role.role_name}
+            </MenuItem>
+          ))}
+        </Select>
         <br />
         <Typography sx={{ mt: 5 }}>รุปผู้ใช้</Typography>
         <Input type="file" onChange={handlefile}></Input>

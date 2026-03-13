@@ -1,0 +1,166 @@
+import React, { useEffect, useState } from "react";
+
+import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
+import { Box, IconButton, Typography, useTheme, Badge } from "@mui/material";
+import { Link } from "react-router-dom";
+
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
+import ConstructionOutlinedIcon from "@mui/icons-material/ConstructionOutlined";
+import { useSelector } from "react-redux";
+import axios from "axios";
+
+const Sidebarmanager = () => {
+  const [isCollapsed, setisCollapsed] = useState(false);
+  const [toggled, setToggled] = useState(false);
+  const [broken, setBroken] = useState(false);
+  const name = useSelector((state) => state.user.name);
+  const users_id = useSelector((state) => state.user.users_id);
+  const [url, setUrl] = useState("");
+  const token = useSelector((state) => state.user.token);
+
+  useEffect(() => {
+    if (users_id) {
+      const fetchdata = async () => {
+        const response = await axios.get(
+          `http://localhost:5011/users/${users_id}`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        console.log("res", response.data.result);
+        if (
+          !response.data.result.avatar_path ||
+          response.data.result.avatar_path.data.length === 0
+        ) {
+          setUrl("/assets/user.png");
+        } else {
+          const user = response.data.result;
+          // console.log(response);
+          const array = new Uint8Array(user.avatar_path.data);
+          const blob = new Blob([array], { type: "image/jpeg" });
+          const url = URL.createObjectURL(blob);
+          setUrl(url);
+        }
+      };
+
+      fetchdata();
+    }
+  }, [users_id]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        height: "100%",
+      }}
+    >
+      <Sidebar
+        collapsed={isCollapsed}
+        toggled={toggled}
+        onBackdropClick={() => setToggled(false)}
+        onBreakPoint={setBroken}
+        // image="/assets/123.jpg"
+        breakPoint="md"
+        backgroundColor="#234"
+        style={{ height: "100%" }}
+      >
+        <div
+          style={{ display: "flex", flexDirection: "column", height: "100%" }}
+        >
+          <div style={{ flex: 1, marginBottom: "32px" }}>
+            <Menu iconShape="square">
+              {/* LOGO */}
+              <MenuItem
+                onClick={() => setisCollapsed(!isCollapsed)}
+                icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+                style={{
+                  margin: "10px 0 20px 0",
+                }}
+              >
+                {!isCollapsed && (
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    ml="15px"
+                  >
+                    <Typography sx={{ color: "white" }}>REPAIR APP</Typography>
+                    <IconButton onClick={() => setisCollapsed(!isCollapsed)}>
+                      <MenuOutlinedIcon sx={{ color: "white" }} />
+                    </IconButton>
+                  </Box>
+                )}
+              </MenuItem>
+              {!isCollapsed && (
+                <Box mb="25px">
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <img
+                      alt="profile-user"
+                      width="100px"
+                      height="100px"
+                      src={url}
+                      style={{ cursor: "pointer", borderRadius: "50%" }}
+                    />
+                  </Box>
+                  <Box textAlign="center">
+                    <Typography sx={{ m: "10px 0 0 0", color: "white" }}>
+                      {name}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+              <Link to="/manager/index" className="menu-bars">
+                <MenuItem
+                  icon={<HomeOutlinedIcon />}
+                  style={{ color: "white" }}
+                >
+                  หน้าหลัก
+                </MenuItem>
+              </Link>
+              <Link to="/manager/reportcase" className="menu-bars">
+                <MenuItem
+                  icon={<ConstructionOutlinedIcon />}
+                  style={{ color: "white" }}
+                >
+                  รายการแจ้งซ่อม
+                </MenuItem>
+              </Link>
+              <Link to="/manager/statuscase" className="menu-bars">
+                <MenuItem
+                  icon={<HistoryToggleOffIcon />}
+                  style={{ color: "white" }}
+                >
+                  สถานะการซ่อม
+                </MenuItem>
+              </Link>
+              <Link to="/manager/manage/device" className="menu-bars">
+                <MenuItem
+                  icon={<HistoryToggleOffIcon />}
+                  style={{ color: "white" }}
+                >
+                  จัดการอุปกรณ์
+                </MenuItem>
+              </Link>
+            </Menu>
+          </div>
+        </div>
+      </Sidebar>
+      <main>
+        <div style={{ padding: "16px 2px ", color: "#44596e" }}>
+          <div style={{ marginBottom: "16px" }}>
+            {broken && (
+              <IconButton onClick={() => setToggled(!toggled)}>
+                <MenuOutlinedIcon />
+              </IconButton>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+export default Sidebarmanager;

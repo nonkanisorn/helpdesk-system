@@ -12,48 +12,47 @@ import { Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 function Statuscase() {
-  // TODO: เพิ่ม update closed-date ที่ต้องส่งใไปใน updatestatuscase
-  const [caseId, setCaseId] = useState();
-  const [caseDeviceId, setCaseDeviceId] = useState();
-  const user_id = useSelector((state) => state.user.users_id);
+  const [ticketId, setticketId] = useState();
+  const [ticketDeviceId, setticketDeviceId] = useState();
+  const user_id = useSelector((state) => state.user.user_id);
   const status_id = 6;
-  const [caseData, setcaseData] = useState([]);
+  const [ticketData, setticketData] = useState([]);
   const [reFresh, setRefresh] = useState(true);
   const navigate = useNavigate();
-  // console.log("deviceid", caseDeviceId);
-  // console.log("caseData: ", caseData);
-  // console.log("id", caseId);
-  const topagedetail = (case_id) => {
-    navigate(`/user/Detailcase/${case_id}`);
+  console.log("deviceid", ticketDeviceId);
+  console.log("ticketData: ", ticketData);
+  console.log("id", ticketId);
+  const topagedetail = (ticket_id) => {
+    navigate(`/user/Detailticket/${ticket_id}`);
   };
-  const updatestatuscase = (case_id, case_device_id) => {
+  const updatestatusticket = (ticket_id, ticket_device_id) => {
     axios
-      .patch(`http://localhost:5011/case/${user_id}/${case_id}`, {
-        case_id: caseId,
-        case_device_id,
+      .patch(`http://localhost:5011/ticket/${user_id}/${ticket_id}`, {
+        ticket_id: ticketId,
+        ticket_device_id,
         user_id,
         status_id,
       })
       .then((result) => {
-        // console.log(result);
+        console.log(result);
         setRefresh((prev) => !prev);
       })
       .catch((err) => {
-        // console.log(err);
+        console.log(err);
       });
   };
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5011/caseuserstatus/${user_id}`)
-      .then(function(response) {
-        // setcaseData(response.data);
-        // console.log(response.data);
+      .get(`http://localhost:5011/ticketuserstatus/${user_id}`)
+      .then(function (response) {
+        setticketData(response.data);
+        console.log(response.data);
       })
-      .catch(function(error) {
-        // console.log(error);
+      .catch(function (error) {
+        console.log(error);
       })
-      .finally(function() { });
+      .finally(function () {});
   }, [reFresh]);
 
   return (
@@ -72,7 +71,7 @@ function Statuscase() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {caseData.map((item, index) =>
+            {ticketData.map((item, index) =>
               item.status_id === 6 ? null : (
                 <TableRow
                   key={index}
@@ -80,15 +79,15 @@ function Statuscase() {
                 >
                   <TableCell>{index + 1}</TableCell>
                   <TableCell component="th" scope="row">
-                    {item.case_title}
+                    {item.title}
                   </TableCell>
 
-                  <TableCell>{item.case_detail}</TableCell>
+                  <TableCell>{item.description}</TableCell>
                   <TableCell>{item.status_name}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
-                      onClick={() => topagedetail(item.case_id)}
+                      onClick={() => topagedetail(item.ticket_id)}
                     >
                       เพิ่มเติม
                     </Button>
@@ -98,8 +97,11 @@ function Statuscase() {
                       <Button
                         onClick={() => {
                           if (window.confirm("ยืนยันการซ่อม")) {
-                            updatestatuscase(item.case_id, item.case_device_id);
-                            setCaseId(item.case_id);
+                            updatestatusticket(
+                              item.ticket_id,
+                              item.ticket_device_id,
+                            );
+                            setticketId(item.ticket_id);
                           }
                         }}
                         variant="contained"

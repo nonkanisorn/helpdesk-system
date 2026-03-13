@@ -15,17 +15,15 @@ const Sidebarmanager = () => {
   const [isCollapsed, setisCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [broken, setBroken] = useState(false);
-  const name = useSelector((state) => state.user.name);
-  const users_id = useSelector((state) => state.user.users_id);
+  const full_name = useSelector((state) => state.user.full_name);
+  const user_id = useSelector((state) => state.user.user_id);
   const [url, setUrl] = useState("");
-  const token = useSelector((state) => state.user.token);
 
   useEffect(() => {
-    if (users_id) {
+    if (user_id) {
       const fetchdata = async () => {
         const response = await axios.get(
-          `http://localhost:5011/users/${users_id}`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          `http://localhost:5011/users/${user_id}`,
         );
         if (
           !response.data[0].user_img ||
@@ -34,7 +32,7 @@ const Sidebarmanager = () => {
           setUrl("/assets/user.png");
         } else {
           const user = response.data[0];
-          // console.log(response);
+          console.log(response);
           const array = new Uint8Array(user.user_img.data);
           const blob = new Blob([array], { type: "image/jpeg" });
           const url = URL.createObjectURL(blob);
@@ -44,7 +42,7 @@ const Sidebarmanager = () => {
 
       fetchdata();
     }
-  }, [users_id]);
+  }, [user_id]);
 
   return (
     <div
@@ -83,7 +81,9 @@ const Sidebarmanager = () => {
                     alignItems="center"
                     ml="15px"
                   >
-                    <Typography sx={{ color: "white" }}>REPAIR APP</Typography>
+                    <Typography sx={{ color: "white" }}>
+                      HELPDESK APP
+                    </Typography>
                     <IconButton onClick={() => setisCollapsed(!isCollapsed)}>
                       <MenuOutlinedIcon sx={{ color: "white" }} />
                     </IconButton>
@@ -107,7 +107,7 @@ const Sidebarmanager = () => {
                   </Box>
                   <Box textAlign="center">
                     <Typography sx={{ m: "10px 0 0 0", color: "white" }}>
-                      {name}
+                      {full_name}
                     </Typography>
                   </Box>
                 </Box>
@@ -120,7 +120,7 @@ const Sidebarmanager = () => {
                   หน้าหลัก
                 </MenuItem>
               </Link>
-              <Link to="/manager/reportcase" className="menu-bars">
+              <Link to="/manager/reportticket" className="menu-bars">
                 <MenuItem
                   icon={<ConstructionOutlinedIcon />}
                   style={{ color: "white" }}
@@ -128,7 +128,7 @@ const Sidebarmanager = () => {
                   รายการแจ้งซ่อม
                 </MenuItem>
               </Link>
-              <Link to="/manager/statuscase" className="menu-bars">
+              <Link to="/manager/statusticket" className="menu-bars">
                 <MenuItem
                   icon={<HistoryToggleOffIcon />}
                   style={{ color: "white" }}

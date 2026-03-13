@@ -21,26 +21,85 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import { lightGreen, grey } from "@mui/material/colors";
 import HandymanIcon from "@mui/icons-material/Handyman";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+
 function Detailcase() {
   const { ticket_id } = useParams();
   const navigate = useNavigate();
+<<<<<<< Updated upstream
   const [tickets, setTickets] = useState([]);
   const role_id = useSelector((state) => state.user.role_id);
   const user_id = useSelector((state) => state.user.users_id);
+=======
+  const [ticketData, setTicketData] = useState([]);
+  const role_id = useSelector((state) => state.user.role);
+  const user_id = useSelector((state) => state.user.user_id);
+>>>>>>> Stashed changes
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = useSelector((state) => state.user.token);
-  const handleUpdateStatusCaseByUser = (status_id) => {
+  console.log("role", role_id);
+  const waitingForPartButton = async (ticket_id) => {
     try {
+<<<<<<< Updated upstream
       axios.patch(`${apiUrl}/case/${user_id}/${ticket_id}`, {
         status_id,
       });
       // .then((response) => console.log(response));
+=======
+      await axios.patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
+        status_id: 6,
+      });
+>>>>>>> Stashed changes
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
-  // TODO: ticketbyid , work_completed_at
+  const startJobForTechnician = async (ticket_id) => {
+    try {
+      if (window.confirm("เริ่มการทำงาน?")) {
+        await axios.patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
+          status_id: 3,
+        });
+        await fetchDetail(); // 👈 รีโหลดข้อมูลใหม่ทันที
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const formatDateTime = (iso) => {
+    if (!iso) return "-";
+
+    return new Date(iso).toLocaleString("th-TH", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+  const handleUpdateStatusTicketByUser = (status_id) => {
+    try {
+      if (window.confirm("ยืนยันการซ่อม")) {
+        axios
+          .patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
+            status_id,
+          })
+          .then(() => navigate(-1));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchDetail = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/ticket/detail/${ticket_id}`);
+      setTicketData(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
+<<<<<<< Updated upstream
     axios
       .get(`http://localhost:5011/tickets/${ticket_id}`, {
         headers: {
@@ -59,6 +118,22 @@ function Detailcase() {
       .finally(function () {});
   }, []);
   console.log("casedaaaa", tickets);
+=======
+    fetchDetail();
+  }, [ticket_id]);
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:5011/ticket/detail/${ticket_id}`)
+  //     .then(function (response) {
+  //       setTicketData(response.data);
+  //       console.log("response", response.data);
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     })
+  //     .finally(function () {});
+  // }, [ticket_id]);
+>>>>>>> Stashed changes
   return (
     <Box sx={{ overflowY: "scroll", height: "100vh" }}>
       <Box sx={{ marginX: "25%", mt: 2 }}>
@@ -68,218 +143,277 @@ function Detailcase() {
         <Typography variant="subtitle1" color="grey">
           ข้อมูลและสถานะการดำเนินการ
         </Typography>
-        {Array.isArray(tickets) &&
-          tickets.map((items, _) => (
+        {ticketData.map((items, index) => (
+          <Grid container spacing={2}>
+            <Grid item md={8}>
+              <Paper sx={{ p: 4, mt: 3, borderRadius: 3 }}>
+                <Typography variant="h5" fontWeight="fontWeightBold">
+                  {items.title}
+                </Typography>
+                <Box sx={{ p: 2 }}>
+                  <Grid container>
+                    <Grid item md={6}>
+                      <Stack direction="row" spacing={2}>
+                        {
+                          <DateRangeRoundedIcon
+                            sx={{ color: "grey", fontSize: 30 }}
+                          />
+                        }
+
+                        <Stack>
+                          <Typography color="grey" alignContent="center">
+                            วันที่แจ้ง
+                          </Typography>
+                          <Typography>
+                            {new Date(items.created_at).toLocaleString(
+                              "th-TH",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                    <Grid item md={6}>
+                      <Stack direction="row">
+                        <OutlinedFlagRoundedIcon sx={{ color: "grey" }} />
+                        <Stack>
+                          <Typography color="grey">ประเภทของปัญหา</Typography>
+                          <Typography>
+                            {items.issues_categories_name}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Box>
+                <hr />
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="fontWeightBold"
+                  sx={{ p: 1 }}
+                >
+                  รายละเอียดปัญหา
+                </Typography>
+                <Typography sx={{ p: 1, color: "grey" }}>
+                  {items.description}
+                </Typography>
+              </Paper>
+            </Grid>
+            {/*บนขวา*/}
+            <Grid item md={4}>
+              <Paper sx={{ mt: 3, p: 4 }}>
+                <Typography variant="subtitle1" fontWeight="fontWeightBold">
+                  ข้อมูลผู้แจ้ง
+                </Typography>
+                <Stack direction="row" spacing={2}>
+                  <AccountCircleRoundedIcon
+                    sx={{ fontSize: 50, color: lightBlue[400] }}
+                  />
+                  <Stack>
+                    <Typography>{items.name}</Typography>
+                    <Typography color="grey">{items.dep_name}</Typography>
+                  </Stack>
+                </Stack>
+              </Paper>
+            </Grid>
+            {/* ล่างซ้าย */}
             <Grid container spacing={2}>
               <Grid item md={8}>
-                <Paper sx={{ p: 4, mt: 3, borderRadius: 3 }}>
+                <Paper
+                  sx={{
+                    ml: 2,
+                    p: 4,
+                    mt: 3,
+                    borderRadius: 3,
+                    pb: 14,
+                  }}
+                >
                   <Typography variant="h5" fontWeight="fontWeightBold">
-                    {items.title}
+                    ประวัติการดำเนินงาน
                   </Typography>
-                  <Box sx={{ p: 2 }}>
-                    <Grid container>
-                      <Grid item md={6}>
-                        <Stack direction="row" spacing={2}>
-                          {
-                            <DateRangeRoundedIcon
-                              sx={{ color: "grey", fontSize: 30 }}
-                            />
-                          }
-
-                          <Stack>
-                            <Typography color="grey" alignContent="center">
-                              วันที่แจ้ง
-                            </Typography>
-                            <Typography>
-                              {new Date(items.created_at).toLocaleString(
-                                "th-TH",
-                                {
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                },
-                              )}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      </Grid>
-                      <Grid item md={6}>
-                        <Stack direction="row">
-                          <OutlinedFlagRoundedIcon sx={{ color: "grey" }} />
-                          <Stack>
-                            <Typography color="grey">ประเภทของปัญหา</Typography>
-                            {/* <Typography>{items.issues_name}</Typography> */}
-                          </Stack>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                  <hr />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight="fontWeightBold"
-                    sx={{ p: 1 }}
-                  >
-                    รายละเอียดปัญหา
-                  </Typography>
-                  <Typography sx={{ p: 1, color: "grey" }}>
-                    {items.description}
-                  </Typography>
-                </Paper>
-              </Grid>
-              {/*บนขวา*/}
-              <Grid item md={4}>
-                <Paper sx={{ mt: 3, p: 4 }}>
-                  <Typography variant="subtitle1" fontWeight="fontWeightBold">
-                    ข้อมูลผู้แจ้ง
-                  </Typography>
-                  <Stack direction="row" spacing={2}>
-                    <AccountCircleRoundedIcon
-                      sx={{ fontSize: 50, color: lightBlue[400] }}
-                    />
-                    <Stack>
-                      {/* <Typography>{items.first_name}</Typography> */}
-                      {/* <Typography color="grey">{items.dep_name}</Typography> */}
-                    </Stack>
-                  </Stack>
-                </Paper>
-              </Grid>
-              {/* ล่างซ้าย */}
-              <Grid container spacing={2}>
-                <Grid item md={8}>
-                  <Paper
+                  <Timeline
+                    position="right" // ✅ ให้เส้นอยู่ซ้าย + ข้อความอยู่ขวา
                     sx={{
-                      ml: 2,
-                      p: 4,
-                      mt: 3,
-                      borderRadius: 3,
-                      pb: 14,
+                      overflow: "visible", // ป้องกันโดนตัดขอบล่าง
+                      "& .MuiTimelineItem-root": {
+                        minHeight: "unset", // ยกเลิกความสูงบังคับของแต่ละ item
+                      },
+                      "& .MuiTimelineItem-root:before": {
+                        flex: 0,
+                        padding: 0, // ตัดเส้น/padding ฝั่งซ้ายของ item
+                      },
                     }}
                   >
-                    <Typography variant="h5" fontWeight="fontWeightBold">
-                      ประวัติการดำเนินการ
-                    </Typography>
-                    <Timeline
-                      position="right" // ✅ ให้เส้นอยู่ซ้าย + ข้อความอยู่ขวา
-                      sx={{
-                        overflow: "visible", // ป้องกันโดนตัดขอบล่าง
-                        "& .MuiTimelineItem-root": {
-                          minHeight: "unset", // ยกเลิกความสูงบังคับของแต่ละ item
-                        },
-                        "& .MuiTimelineItem-root:before": {
-                          flex: 0,
-                          padding: 0, // ตัดเส้น/padding ฝั่งซ้ายของ item
-                        },
-                      }}
-                    >
-                      <TimelineItem>
-                        <TimelineSeparator>
-                          <TimelineDot
-                            sx={{ bgcolor: grey[100], color: amber[500] }}
-                          >
-                            <ErrorOutlineRoundedIcon />
-                          </TimelineDot>
-                          <TimelineConnector></TimelineConnector>
-                        </TimelineSeparator>
-                        <TimelineContent sx={{ py: 1 }}>
-                          <Typography>สร้างรายการแจ้งซ่อม</Typography>
-                          <Typography>โดย: </Typography>
-                          <Typography>date</Typography>
-                          {items.created_date && (
-                            <Typography>วันที่: {items.created_at}</Typography>
-                          )}
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimelineSeparator>
-                          <TimelineDot
-                            sx={{ bgcolor: grey[100], color: indigo[500] }}
-                          >
-                            {" "}
-                            <AccessTimeRoundedIcon />
-                          </TimelineDot>
-                          <TimelineConnector></TimelineConnector>
-                        </TimelineSeparator>
-                        <TimelineContent sx={{ py: 1 }}>
-                          <Typography>มอบหมายงานให้ช่าง</Typography>
-                          <Typography>โดย: </Typography>
-                          {items.assigned_date && (
-                            <Typography>วันที่: {items.assigned_at}</Typography>
-                          )}
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimelineSeparator>
-                          <TimelineDot sx={{ bgcolor: grey[100] }}>
-                            <HandymanIcon sx={{ color: "red" }} />
-                          </TimelineDot>
-                          <TimelineConnector></TimelineConnector>
-                        </TimelineSeparator>
-                        <TimelineContent sx={{ py: 1 }}>
-                          <Typography>ช่างซ่อมเสร็จสิ้น</Typography>
-                          <Typography>โดย: </Typography>
-                          {items.completed_at && (
-                            <Typography>
-                              วันที่: {items.completed_at}
-                            </Typography>
-                          )}
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimelineSeparator>
-                          <TimelineDot sx={{ bgcolor: grey[100] }}>
-                            <CheckCircleOutlineRoundedIcon
-                              sx={{ color: lightGreen[700] }}
-                            />
-                          </TimelineDot>
-                        </TimelineSeparator>
-                        <TimelineContent sx={{ py: 1 }}>
-                          <Typography>ยืนยันโดยผู้ใช้ / เสร็จสิ้น</Typography>
-                          <Typography>โดย: </Typography>
+                    <TimelineItem>
+                      <TimelineSeparator>
+                        <TimelineDot
+                          sx={{ bgcolor: grey[100], color: amber[500] }}
+                        >
+                          <ErrorOutlineRoundedIcon />
+                        </TimelineDot>
+                        <TimelineConnector></TimelineConnector>
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ py: 1 }}>
+                        <Typography>เปิดงาน</Typography>
+                        {items.created_at && (
                           <Typography>
-                            {(items.closed_at && (
-                              <Typography>
-                                วันที่ : {items.closed_at}
-                              </Typography>
-                            )) || <Typography></Typography>}
+                            วันที่: {formatDateTime(items.created_at)}
                           </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </Timeline>
-                  </Paper>
-                </Grid>
-                {/* ล่างขวา*/}
-                <Grid item md={4}>
-                  <Paper sx={{ mt: 3, p: 4, borderRadius: 3 }}>
-                    <Typography variant="subtitle1" fontWeight="fontWeightBold">
-                      การดำเนินการ
-                    </Typography>
-                    {(role_id === 3 && (
-                      <Link
-                        to={{
-                          pathname: `/technician/cases/${ticket_id}/repair`,
-                        }}
-                      >
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                    <TimelineItem>
+                      <TimelineSeparator>
+                        <TimelineDot
+                          sx={{ bgcolor: grey[100], color: indigo[500] }}
+                        >
+                          {" "}
+                          <AccessTimeRoundedIcon />
+                        </TimelineDot>
+                        <TimelineConnector></TimelineConnector>
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ py: 1 }}>
+                        <Typography>มอบหมายแล้ว</Typography>
+                        {items.assigned_at && (
+                          <Typography>
+                            วันที่: {formatDateTime(items.assigned_at)}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                    <TimelineItem>
+                      <TimelineSeparator>
+                        <TimelineDot sx={{ bgcolor: grey[100] }}>
+                          <HandymanIcon sx={{ color: "red" }} />
+                        </TimelineDot>
+                        <TimelineConnector></TimelineConnector>
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ py: 1 }}>
+                        <Typography>กำลังดำเนินการ</Typography>
+                        {items.started_at && (
+                          <Typography>
+                            วันที่: {formatDateTime(items.started_at)}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                    <TimelineItem>
+                      <TimelineSeparator>
+                        <TimelineDot sx={{ bgcolor: grey[100] }}>
+                          <HourglassEmptyIcon sx={{ color: "purple" }} />
+                        </TimelineDot>
+                        <TimelineConnector></TimelineConnector>
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ py: 1 }}>
+                        <Typography>รอผู้ใช้ยืนยัน</Typography>
+                        {items.work_completed_at && (
+                          <Typography>
+                            วันที่: {formatDateTime(items.work_completed_at)}
+                          </Typography>
+                        )}
+                      </TimelineContent>
+                    </TimelineItem>
+                    <TimelineItem>
+                      <TimelineSeparator>
+                        <TimelineDot sx={{ bgcolor: grey[100] }}>
+                          <CheckCircleOutlineRoundedIcon
+                            sx={{ color: lightGreen[700] }}
+                          />
+                        </TimelineDot>
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ py: 1 }}>
+                        <Typography>เสร็จสิ้น</Typography>
+                        <Typography>
+                          {(items.closed_at && (
+                            <Typography>
+                              วันที่ : {formatDateTime(items.closed_at)}
+                            </Typography>
+                          )) || <Typography></Typography>}
+                        </Typography>
+                      </TimelineContent>
+                    </TimelineItem>
+                  </Timeline>
+                </Paper>
+              </Grid>
+              <Grid item md={4}>
+                <Paper sx={{ mt: 3, p: 4, borderRadius: 3 }}>
+                  <Typography variant="subtitle1" fontWeight="fontWeightBold">
+                    การดำเนินการ
+                  </Typography>
+
+                  {/* Technician */}
+                  {role_id === 3 && items.status_id === 2 && (
+                    <Button
+                      variant="contained"
+                      onClick={() => startJobForTechnician(ticket_id)}
+                    >
+                      เริ่มงาน
+                    </Button>
+                  )}
+
+                  {role_id === 3 && items.status_id === 3 && (
+                    <>
+                      <Link to={`/technician/ticket/${ticket_id}/repair`}>
                         <Button variant="contained">บันทึกการซ่อม</Button>
                       </Link>
-                    )) ||
-                      (role_id === 4 && (
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={() => handleUpdateStatusCaseByUser(6)}
-                        >
-                          ยืนยันการซ่อม
-                        </Button>
-                      )) ||
-                      (role_id === 2 && <Button>manager</Button>)}
-                  </Paper>
-                </Grid>
+                      <Button
+                        onClick={() => waitingForPartButton(ticket_id)}
+                        sx={{ mt: 2 }}
+                        variant="contained"
+                        color="secondary"
+                      >
+                        รออะไหล่
+                      </Button>
+                    </>
+                  )}
+                  {role_id === 3 && items.status_id === 5 && (
+                    <>
+                      <Button variant="contained" disabled>
+                        บันทึกการซ่อม
+                      </Button>
+                    </>
+                  )}
+                  {role_id === 3 && items.status_id === 6 && (
+                    <>
+                      <Button variant="contained" disabled>
+                        บันทึกการซ่อม
+                      </Button>
+                    </>
+                  )}
+                  {/* User confirm */}
+
+                  {role_id === 4 && items.status_id === 4 && (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => handleUpdateStatusTicketByUser(5)}
+                    >
+                      ยืนยันการซ่อม
+                    </Button>
+                  )}
+                  {/* Manager */}
+                  {role_id === 2 && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() =>
+                        navigate(`/manager/ticket/assign/${ticket_id}`)
+                      }
+                    >
+                      มอบหมายงาน
+                    </Button>
+                  )}
+                </Paper>
               </Grid>
             </Grid>
-          ))}
+          </Grid>
+        ))}
       </Box>
     </Box>
   );

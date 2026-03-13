@@ -17,14 +17,14 @@ function Editstatus() {
     axios
       .put(`${apiUrl}/Status/${status_id}/${newName}`, formData)
       .then(() => {
-
+        console.log(`Updated device name to: ${newName}`);
         navigate("/admin/Managestatus");
       })
       .catch((error) => {
         console.error("Error updateing data: ", error);
       });
   };
-
+  console.log(newName);
   return (
     <Paper sx={{ pb: 5 }}>
       <Typography variant="h3" textAlign="center">

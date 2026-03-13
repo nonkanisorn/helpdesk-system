@@ -8,7 +8,13 @@ import HandymanIcon from "@mui/icons-material/Handyman";
 import PendingActionsRoundedIcon from "@mui/icons-material/PendingActionsRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
+import FiberNewIcon from "@mui/icons-material/FiberNew";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from "axios";
+
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -16,22 +22,32 @@ import { useSelector } from "react-redux";
 import Paperui from "../ui/Paperui";
 import { Link } from "react-router-dom";
 import { amber, indigo } from "@mui/material/colors";
+import { AssignmentInd, PrecisionManufacturing } from "@mui/icons-material";
 
 function User() {
-  const [casedata, setcasedata] = useState([]);
-  // console.log(casedata);
-  const user_id = useSelector((state) => state.user.users_id);
-  // console.log(casedata);
-
+  const [ticketdata, setTicketdata] = useState([]);
+  console.log(process.env.REACT_APP_API_URL);
+  console.log(ticketdata);
+  const user_id = useSelector((state) => state.user.user_id);
+  console.log(ticketdata);
+  const userStatusMap = {
+    1: "เปิดงาน",
+    2: "กำลังจัดสรรช่าง",
+    3: "กำลังดำเนินการ",
+    4: "ช่างซ่อมเสร็จแล้ว",
+    5: "รอการยืนยันจากคุณ",
+    6: "ปิดงานแล้ว",
+    7: "รออะไหล่",
+  };
   useEffect(() => {
     const fetchdata = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5011/case/lasted/${user_id}`,
+          `http://localhost:5011/ticket/lasted/${user_id}`,
         );
-        setcasedata(response.data);
+        setTicketdata(response.data);
       } catch (error) {
-        // console.log(error);
+        console.log(error);
       }
     };
     fetchdata();
@@ -74,27 +90,6 @@ function User() {
               </Link>
             </Paper>
           </Grid>
-          {/* <Grid item md={4}> */}
-          {/*   <Paper square sx={{ height: 250, p: 2, borderRadius: 3 }}> */}
-          {/*     <SearchRoundedIcon sx={{ color: "orange", fontSize: "4vw" }} /> */}
-          {/*     <Typography variant="h6" fontWeight="fontWeightBold" mt={2}> */}
-          {/*       ติดตามสถานะ */}
-          {/*     </Typography> */}
-          {/*     <Typography color="grey">แจ้งปัญหาและขอรับบริการซ่อม</Typography> */}
-          {/*     <Button */}
-          {/*       variant="contained" */}
-          {/*       sx={{ */}
-          {/*         mt: 3, */}
-          {/*         width: "100%", */}
-          {/*         borderRadius: 3, */}
-          {/*         color: "black", */}
-          {/*         bgcolor: "#F8F8F7", */}
-          {/*       }} */}
-          {/*     > */}
-          {/*       เลือก */}
-          {/*     </Button> */}
-          {/*   </Paper> */}
-          {/* </Grid> */}
           <Grid item md={6}>
             <Paper square sx={{ height: 250, p: 2, borderRadius: 3 }}>
               <HistoryRoundedIcon sx={{ color: "green", fontSize: "4vw" }} />
@@ -134,51 +129,55 @@ function User() {
         </Link>
       </Box>
       <Grid container spacing={12}>
-        {casedata.map((items, index) => (
+        {ticketdata.map((items, index) => (
           <Grid item md={6}>
             <Paper sx={{ height: 160, borderRadius: 3, p: 4 }}>
               <Grid container>
                 <Grid item md={6}>
                   {" "}
-                  <Typography fontWeight="bold">{items.case_title}</Typography>
+                  <Typography fontWeight="bold">{items.title}</Typography>
                   <Typography mt={4} color="grey">
                     เวลาที่แจ้ง:{" "}
-                    {new Date(items.created_date).toLocaleString("th-TH")}
+                    {new Date(items.created_at).toLocaleString("th-TH")}
                   </Typography>
                 </Grid>
                 <Grid item md={6}>
                   <Typography justifySelf="right">
                     {(items.status_id === 1 && (
                       <>
-                        <ErrorOutlineIcon sx={{ color: amber[400] }} />
-                        <Typography sx={{ mt: 3 }}>รอดำเนินการ</Typography>
+                        <FiberNewIcon sx={{ color: amber[400] }} />
+                        <Typography sx={{ mt: 3 }}>เปิดงาน</Typography>
                       </>
                     )) ||
                       (items.status_id === 2 && (
                         <>
-                          <HandymanIcon sx={{ color: "red" }} />
-                          <Typography sx={{ mt: 3 }}>กำลังดำเนินการ</Typography>
+                          <AssignmentInd sx={{ color: "red" }} />
+                          <Typography sx={{ mt: 3 }}>
+                            กำลังจัดสรรช่าง
+                          </Typography>
                         </>
                       )) ||
                       (items.status_id === 3 && (
                         <>
-                          <PendingActionsRoundedIcon
-                            sx={{ color: indigo[600] }}
-                          />
-                          <Typography sx={{ mt: 3 }}>ยืนยันการซ่อม</Typography>
+                          <AutorenewIcon sx={{ color: indigo[600] }} />
+                          <Typography sx={{ mt: 3 }}>
+                            กำลังดำเนินการการ
+                          </Typography>
                         </>
                       )) ||
                       (items.status_id === 4 && (
                         <>
-                          <AccessTimeRoundedIcon sx={{ color: "violet" }} />
-                          <Typography sx={{ mt: 3 }}>รออะไหล่</Typography>
+                          <HourglassEmptyIcon sx={{ color: "red" }} />
+                          <Typography sx={{ mt: 3 }}>
+                            รอการยืนยันจากคุณ
+                          </Typography>
                         </>
                       )) ||
                       (items.status_id === 5 && (
                         <>
-                          <AccessTimeRoundedIcon sx={{ color: "red" }} />
+                          <HourglassEmptyIcon sx={{ color: "red" }} />
                           <Typography sx={{ mt: 3 }}>
-                            เลยกำหนดการซ่อม
+                            รอการยืนยันจากคุณ
                           </Typography>
                         </>
                       )) ||
@@ -187,7 +186,13 @@ function User() {
                           <CheckCircleOutlineRoundedIcon
                             sx={{ color: "green" }}
                           />
-                          <Typography sx={{ mt: 3 }}>เสร็จสิ้น</Typography>
+                          <Typography sx={{ mt: 3 }}>ปิดงานแล้ว</Typography>
+                        </>
+                      )) ||
+                      (items.status_id === 7 && (
+                        <>
+                          <PrecisionManufacturing sx={{ color: "green" }} />
+                          <Typography sx={{ mt: 3 }}>รออะไหล่</Typography>
                         </>
                       ))}
                   </Typography>

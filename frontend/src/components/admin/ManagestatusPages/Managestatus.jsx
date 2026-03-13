@@ -10,13 +10,19 @@ import Paper from "@mui/material/Paper";
 import { Button } from "@mui/material";
 
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import AddStatusDialog from "../dialog/AddDialog/AddStatusDialog";
 
 function Managestatus() {
   const [statusData, setStatusdata] = useState([]);
-  const token = useSelector((state) => state.user.token);
 
+  const [openAddStatusDialog, setOpenStatusDialog] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const handleOpenAddStatusDialog = () => {
+    setOpenStatusDialog(true);
+  };
+  const handleCloseAddStatusDialog = () => {
+    setOpenStatusDialog(false);
+  };
   const Deletestatus = async (status_id) => {
     const shouldDelete = window.confirm("คุณต้องการลบอุปกรณ์นี้หรือไม่?");
     if (!shouldDelete) {
@@ -24,19 +30,11 @@ function Managestatus() {
     }
 
     axios
-      .delete(`${apiUrl}/status/${status_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .delete(`${apiUrl}/status/${status_id}`)
       .then((response) => {
         console.log(response.data);
         axios
-          .get(`${apiUrl}/status`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+          .get(`${apiUrl}/status`)
           .then((response) => {
             setStatusdata(response.data);
             console.log(response);
@@ -50,13 +48,21 @@ function Managestatus() {
       });
   };
 
+  const fetctStatus = () => {
+    axios
+      .get(`${apiUrl}/status`)
+      .then(function (response) {
+        setStatusdata(response.data);
+        console.log(statusData);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .finally(function () {});
+  };
   useEffect(() => {
     axios
-      .get(`${apiUrl}/status`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get(`${apiUrl}/status`)
       .then(function (response) {
         setStatusdata(response.data);
         console.log(statusData);
@@ -71,11 +77,18 @@ function Managestatus() {
     <div>
       <h1>
         จัดการสถานะ {"\u00A0"}
-        <Link to="/admin/Addstatus">
-          <Button variant="contained" size="small">
-            +ADD
-          </Button>
-        </Link>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={handleOpenAddStatusDialog}
+        >
+          +ADD
+        </Button>
+        <AddStatusDialog
+          open={openAddStatusDialog}
+          onClose={handleCloseAddStatusDialog}
+          onSuccess={fetctStatus}
+        />
       </h1>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">

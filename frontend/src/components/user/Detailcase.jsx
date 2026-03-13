@@ -9,14 +9,14 @@ import OutlinedFlagRoundedIcon from "@mui/icons-material/OutlinedFlagRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import { lightBlue } from "@mui/material/colors";
 function Detailcase() {
-  const { case_id } = useParams();
+  const { ticket_id } = useParams();
   const navigate = useNavigate();
-  const [caseData, setcaseData] = useState([]);
+  const [ticketData, setticketData] = useState([]);
   useEffect(() => {
     axios
-      .get(`http://localhost:5011/case/detail/${case_id}`)
+      .get(`http://localhost:5011/ticket/detail/${ticket_id}`)
       .then(function (response) {
-        setcaseData(response.data);
+        setticketData(response.data);
         console.log("response", response.data);
       })
       .catch(function (error) {
@@ -24,7 +24,7 @@ function Detailcase() {
       })
       .finally(function () {});
   }, []);
-  console.log("casedaaaa", caseData);
+  console.log("ticketdaaaa", ticketData);
   return (
     <Box sx={{ marginX: "25%", mt: 5 }}>
       <Typography variant="h4" fontWeight="fontWeightBold">
@@ -33,12 +33,12 @@ function Detailcase() {
       <Typography variant="subtitle1" color="grey">
         ข้อมูลและสถานะการดำเนินการ
       </Typography>
-      {caseData.map((items, index) => (
+      {ticketData.map((items, index) => (
         <Grid container spacing={2}>
           <Grid item md={8}>
             <Paper sx={{ p: 4, mt: 3, borderRadius: 3 }}>
               <Typography variant="h5" fontWeight="fontWeightBold">
-                {items.case_title}
+                {items.title}
               </Typography>
               <Box sx={{ p: 2 }}>
                 <Grid container>
@@ -55,16 +55,13 @@ function Detailcase() {
                           วันที่แจ้ง
                         </Typography>
                         <Typography>
-                          {new Date(items.created_date).toLocaleString(
-                            "th-TH",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            },
-                          )}
+                          {new Date(items.created_at).toLocaleString("th-TH", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -74,7 +71,7 @@ function Detailcase() {
                       <OutlinedFlagRoundedIcon sx={{ color: "grey" }} />
                       <Stack>
                         <Typography color="grey">ประเภทของปัญหา</Typography>
-                        <Typography>{items.categories_name}</Typography>
+                        <Typography>{items.issues_categories_name}</Typography>
                       </Stack>
                     </Stack>
                   </Grid>
@@ -89,7 +86,7 @@ function Detailcase() {
                 รายละเอียดปัญหา
               </Typography>
               <Typography sx={{ p: 1, color: "grey" }}>
-                {items.case_detail}
+                {items.description}
               </Typography>
             </Paper>
           </Grid>

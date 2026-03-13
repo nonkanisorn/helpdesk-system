@@ -7,36 +7,36 @@ import { Box, Paper, Typography, Grid, Chip } from "@mui/material";
 import Button from "@mui/material/Button";
 
 function History() {
-  const { case_id } = useParams();
-  const [casedatabyID, setcasedatabyID] = useState([]);
+  const { ticket_id } = useParams();
+  const [ticketdatabyID, setticketdatabyID] = useState([]);
   const [imgurl, setImgUrls] = useState([]);
 
   const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get(`http://localhost:5011/caseid/${case_id}`)
-      .then(function(response) {
+      .get(`http://localhost:5011/ticketid/${ticket_id}`)
+      .then(function (response) {
         // console.log(response)
-        setcasedatabyID(response.data);
-        // console.log("case", casedatabyID);
-        const urls = response.data.map((casedata) => {
-          const bufferData = new Uint8Array(casedata.case_img.data);
+        setticketdatabyID(response.data);
+        console.log("ticket", ticketdatabyID);
+        const urls = response.data.map((ticketdata) => {
+          const bufferData = new Uint8Array(ticketdata.ticket_img.data);
           const blob = new Blob([bufferData], { type: "image/jpeg" });
 
           return URL.createObjectURL(blob);
         });
         setImgUrls(urls);
       })
-      .catch(function(error) {
-        // console.log(error);
+      .catch(function (error) {
+        console.log(error);
       })
-      .finally(function() { });
-  }, [case_id]);
-  // console.log(casedatabyID);
-  // console.log("ddd");
+      .finally(function () {});
+  }, [ticket_id]);
+  console.log(ticketdatabyID);
+  console.log("ddd");
   return (
     <Box sx={{ p: 3 }}>
-      {casedatabyID.map((data, index) => (
+      {ticketdatabyID.map((data, index) => (
         <Paper
           key={data.id}
           sx={{
@@ -58,7 +58,7 @@ function History() {
               <Typography variant="subtitle2" color="text.secondary">
                 ชื่องาน
               </Typography>
-              <Typography variant="body1">{data.case_title}</Typography>
+              <Typography variant="body1">{data.ticket_title}</Typography>
             </Grid>
 
             {/* รายละเอียดงาน */}
@@ -66,7 +66,7 @@ function History() {
               <Typography variant="subtitle2" color="text.secondary">
                 รายละเอียดงาน
               </Typography>
-              <Typography variant="body1">{data.case_detail}</Typography>
+              <Typography variant="body1">{data.ticket_detail}</Typography>
             </Grid>
 
             {/* เวลาแจ้ง */}
@@ -75,7 +75,7 @@ function History() {
                 เวลาแจ้ง
               </Typography>
               <Typography variant="body1">
-                {new Date(data.created_date).toLocaleString("th-TH", {
+                {new Date(data.created_at).toLocaleString("th-TH", {
                   dateStyle: "short",
                   timeStyle: "medium",
                 })}
@@ -88,7 +88,7 @@ function History() {
                 เวลาที่มอบหมายงาน
               </Typography>
               <Typography variant="body1">
-                {new Date(data.assigned_date).toLocaleString("th-TH", {
+                {new Date(data.assigned_at).toLocaleString("th-TH", {
                   dateStyle: "short",
                   timeStyle: "medium",
                 })}
@@ -100,9 +100,9 @@ function History() {
               <Typography variant="subtitle2" color="text.secondary">
                 วันที่ช่างทำเสร็จ
               </Typography>
-              {data.work_completed_date ? (
+              {data.work_completed_at ? (
                 <Chip
-                  label={new Date(data.work_completed_date).toLocaleString(
+                  label={new Date(data.work_completed_at).toLocaleString(
                     "th-TH",
                     {
                       dateStyle: "short",
@@ -121,9 +121,9 @@ function History() {
               <Typography variant="subtitle2" color="text.secondary">
                 การยืนยันการซ่อม
               </Typography>
-              {data.closed_date ? (
+              {data.closed_at ? (
                 <Chip
-                  label={new Date(data.closed_date).toLocaleString("th-TH", {
+                  label={new Date(data.closed_at).toLocaleString("th-TH", {
                     dateStyle: "short",
                     timeStyle: "medium",
                   })}
@@ -146,7 +146,7 @@ function History() {
                   key={idx}
                   component="img"
                   src={url}
-                  alt={`case-img-${idx}`}
+                  alt={`ticket-img-${idx}`}
                   sx={{
                     maxWidth: "100%",
                     borderRadius: 2,
@@ -162,21 +162,21 @@ function History() {
     </Box>
     // <Box>
     //   <Paper sx={{ height: 500, width: "100%" }}>
-    //     {casedatabyID.map((data, index) => (
+    //     {ticketdatabyID.map((data, index) => (
     //       <Box key={data.id}>
     //         <Typography align="center" variant="h3" mb={3}>
     //           รายละเอียดเคส
     //         </Typography>
     //         <Box ml={3}>
     //           <Typography variant="h6" sx={{ mb: 2 }}>
-    //             ชื่องาน:{data.case_title}
+    //             ชื่องาน:{data.ticket_title}
     //           </Typography>
     //           <Typography variant="h6" sx={{ mb: 2 }}>
-    //             รายละเอียดงาน:{data.case_detail}
+    //             รายละเอียดงาน:{data.ticket_detail}
     //           </Typography>
     //           <Typography variant="h6" sx={{ mb: 2 }}>
     //             เวลาที่แจ้ง:
-    //             {new Date(data.created_date).toLocaleString("th-TH", {
+    //             {new Date(data.created_at).toLocaleString("th-TH", {
     //               dateStyle: "short",
     //               timeStyle: "medium",
     //             })}
@@ -184,7 +184,7 @@ function History() {
     //
     //           <Typography variant="h6" sx={{ mb: 2 }}>
     //             เวลาที่มอบหมายงานให้ช่าง:
-    //             {new Date(data.assigned_date).toLocaleString("th-TH", {
+    //             {new Date(data.assigned_at).toLocaleString("th-TH", {
     //               dateStyle: "short",
     //               timeStyle: "medium",
     //             })}
@@ -193,16 +193,16 @@ function History() {
     //             วันที่ช่างทำเสร็จ:
     //             {data.completed_date === null
     //               ? "ยังไม่เสร็จ"
-    //               : new Date(data.work_completed_date).toLocaleString("th-TH", {
+    //               : new Date(data.work_completed_at).toLocaleString("th-TH", {
     //                 dateStyle: "short",
     //                 timeStyle: "medium",
     //               })}
     //           </Typography>
     //           <Typography variant="h6" sx={{ mb: 2 }}>
     //             วันที่ได้รับการยืนยันว่าซ่อมแล้ว:
-    //             {data.closed_date === null
+    //             {data.closed_at === null
     //               ? "ยังไม่ได้รับการยืนยัน"
-    //               : new Date(data.closed_date).toLocaleString("th-TH", {
+    //               : new Date(data.closed_at).toLocaleString("th-TH", {
     //                 dateStyle: "short",
     //                 timeStyle: "medium",
     //               })}

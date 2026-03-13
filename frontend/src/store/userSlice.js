@@ -1,11 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-  users_id: "",
-  first_name: "",
-  last_name: "",
-  role_id: "",
+  username: "",
+  role: "",
   token: "",
-  dep_id: "",
+  // users_id: null,
 };
 
 const userSlice = createSlice({
@@ -13,40 +11,42 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      const { first_name, last_name, role_id, token, users_id, dep_id } =
+      const { username, role, token, full_name, user_id, department_id } =
         action.payload;
-      state.users_id = users_id;
-      state.first_name = first_name;
-      state.last_name = last_name;
-      state.role_id = role_id;
+      state.username = username;
+      state.role = role;
       state.token = token;
-      state.dep_id = dep_id;
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          users_id: state.users_id,
-          first_name: state.first_name,
-          last_name: state.last_name,
-          role_id: state.role_id,
-          token: state.token,
-          dep_id: state.dep_id,
-        }),
-      );
+      state.full_name = full_name;
+      state.user_id = user_id;
+      state.department_id = department_id;
+
+      localStorage.setItem("user", JSON.stringify(action.payload));
     },
     logout: (state) => {
-      state.users_id = "";
-      state.first_name = "";
-      state.last_name = "";
-      state.role_id = "";
+      state.username = "";
+      state.role = "";
       state.token = "";
-      state.dep_id = "";
+      state.full_name = "";
+      state.user_id = "";
+      state.department_id = "";
 
       localStorage.removeItem("user");
       // navigate("/login");
       // window.location.reload();
     },
+    loadUserFromStorage: (state, action) => {
+      const userData = action.payload;
+      if (userData) {
+        state.username = userData.username;
+        state.role = userData.role;
+        state.token = userData.token;
+        state.full_name = userData.full_name;
+        state.user_id = userData.user_id;
+        state.department_id = userData.department_id;
+      }
+    },
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, loadUserFromStorage } = userSlice.actions;
 export default userSlice.reducer;

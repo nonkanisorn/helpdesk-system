@@ -1,14 +1,12 @@
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import Typography from "@mui/material/Typography";
 import { blue } from "@mui/material/colors";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import {
   Paper,
   Box,
@@ -19,35 +17,68 @@ import {
 } from "@mui/material";
 
 function Detailcasetech() {
-  const { case_id } = useParams();
+  const { ticket_id } = useParams();
   const navigate = useNavigate();
+<<<<<<< Updated upstream
   const [caseDatabyId, setCaseDatabyId] = useState({});
   const user_id = useSelector((state) => state.user.users_id);
   const token = useSelector((state) => state.user.token);
   const status_id = 3;
+=======
+  const user_id = useSelector((state) => state.user.user_id);
+
+  const [ticketDatabyId, setticketDatabyId] = useState({});
+  const [noSerial, setNoSerial] = useState(false);
+
+  const status_id = 4;
+>>>>>>> Stashed changes
 
   const {
     register,
     handleSubmit,
-    watch,
+    setValue,
     formState: { errors },
-  } = useForm();
-  const workComplete = (data) => {
-    // console.log("data", data);
-    axios
-      .patch(`http://localhost:5011/case/${user_id}/${case_id}`, {
-        status_id,
-        serial_number: data.serial_number,
-        case_resolution: data.case_resolution,
-      })
-      .then(() => navigate(-2))
-      .catch((error) => {
-        if (error) {
-          // console.log("error", error.response.data);
-          alert("กรุณาใส่รหัสอุปกรณ์ให้ถูกต้อง");
-        }
-      });
+  } = useForm({
+    defaultValues: {
+      serial_number: "",
+      ticket_resolution: "",
+    },
+  });
+
+  // ติ๊กแล้วล้างค่า serial กันค้าง
+  useEffect(() => {
+    if (noSerial) {
+      setValue("serial_number", "");
+    }
+  }, [noSerial, setValue]);
+
+  const workComplete = async (data) => {
+    // ✅ ถ้าไม่ติ๊ก และไม่ได้กรอก serial → alert และหยุด
+    if (
+      !noSerial &&
+      (!data.serial_number || data.serial_number.trim() === "")
+    ) {
+      alert("กรุณาระบุรหัสอุปกรณ์ หรือเลือก 'ไม่ระบุรหัสอุปกรณ์'");
+      return;
+    }
+
+    try {
+      await axios.patch(
+        `http://localhost:5011/ticket/${user_id}/${ticket_id}`,
+        {
+          status_id,
+          serial_number: noSerial ? null : data.serial_number.trim(),
+          ticket_resolution: data.ticket_resolution,
+        },
+      );
+
+      navigate(-2);
+    } catch (error) {
+      console.log("error", error.response?.data || error);
+      alert("กรุณาใส่รหัสอุปกรณ์ให้ถูกต้อง");
+    }
   };
+
   const handleCancel = () => {
     navigate(-2);
   };
@@ -56,31 +87,41 @@ function Detailcasetech() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
+<<<<<<< Updated upstream
           `http://localhost:5011/tickets/${case_id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
+=======
+          `http://localhost:5011/ticket/${ticket_id}`,
+>>>>>>> Stashed changes
         );
         if (response.data && response.data.length > 0) {
-          setCaseDatabyId(response.data[0]);
-          // console.log("Response data:", response.data[0]);
+          setticketDatabyId(response.data[0]);
+          console.log("Response data:", response.data[0]);
         } else {
-          console.error("No data found for this case ID");
+          console.error("No data found for this ticket ID");
         }
       } catch (error) {
-        console.error("Error fetching case data:", error);
+        console.error("Error fetching ticket data:", error);
       }
     };
 
     fetchData();
+<<<<<<< Updated upstream
   }, [case_id]);
   console.log("caxcasd");
+=======
+  }, [ticket_id]);
+
+>>>>>>> Stashed changes
   return (
     <Box sx={{ marginX: "25%" }}>
       <Typography variant="h4" fontWeight="fontWeightBold">
         บันทึกการซ่อม
       </Typography>
       <Typography color="grey">กรอกข้อมูลผลการซ่อมอุปกรณ์</Typography>
+
       <Paper sx={{ p: 5, mt: 4 }}>
         <Stack direction="row">
           <AssignmentIcon
@@ -95,27 +136,44 @@ function Detailcasetech() {
           <Stack sx={{ ml: 2 }}>
             <Typography variant="h5" fontWeight="fontWeightBold">
               ฟอร์มบันทึกการซ่อม
-            </Typography>{" "}
+            </Typography>
             <Typography color="grey">กรุณากรอกข้อมูลให้ครบถ้วน</Typography>
           </Stack>
         </Stack>
+
         <form onSubmit={handleSubmit(workComplete)}>
           <Stack sx={{ mt: 4 }}>
             <Typography sx={{ mb: 2 }} fontWeight="fontWeightBold">
               รหัสอุปกรณ์
             </Typography>
+
             <TextField
               variant="outlined"
+              label="กรอกเฉพาะกรณีอุปกรณ์ Hardware"
+              disabled={noSerial}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "10px",
                 },
               }}
               {...register("serial_number")}
-            ></TextField>
+            />
+
+            <FormControlLabel
+              sx={{ mt: 1 }}
+              control={
+                <Checkbox
+                  checked={noSerial}
+                  onChange={(e) => setNoSerial(e.target.checked)}
+                />
+              }
+              label="ไม่ระบุรหัสอุปกรณ์"
+            />
+
             <Typography sx={{ mt: 3, mb: 2 }} fontWeight="fontWeightBold">
               ผลการซ่อม
             </Typography>
+
             <TextareaAutosize
               minRows={10}
               style={{
@@ -124,9 +182,18 @@ function Detailcasetech() {
                 resize: "vertical",
                 border: "1px solid #ccc",
               }}
-              {...register("case_resolution")}
-            ></TextareaAutosize>
+              {...register("ticket_resolution", {
+                required: "กรุณาระบุผลการซ่อม",
+              })}
+            />
+
+            {errors.ticket_resolution && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                {errors.ticket_resolution.message}
+              </Typography>
+            )}
           </Stack>
+
           <Stack
             direction="row"
             justifyContent="center"
@@ -140,6 +207,7 @@ function Detailcasetech() {
             >
               ยืนยัน
             </Button>
+
             <Button
               variant="contained"
               sx={{
@@ -148,8 +216,8 @@ function Detailcasetech() {
                 bgcolor: "#f5f5f5",
                 color: "black",
               }}
-              type="reset"
-              onClick={() => handleCancel()}
+              type="button"
+              onClick={handleCancel}
             >
               ยกเลิก
             </Button>

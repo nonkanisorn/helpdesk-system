@@ -23,42 +23,41 @@ function LoginPage() {
     watch,
   } = useForm();
   const handleLogin = async (data) => {
-    // console.log(data);
+    console.log(data);
     event.preventDefault();
     try {
       const response = await axios.post("http://localhost:5011/login", {
         username: data.username,
-        password: data.password,
+        userpassword: data.password,
       });
       // ดำเนินการหลังจากเข้าสู่ระบบสำเร็จ
-      // console.log(response);
-      const is_active = response.data.user.is_active;
+      const is_active = response.data.payload.user.is_active;
       if (is_active === 0) {
         return alert("คุณไม่มีสิทธื์เข้า");
       }
       dispatch(
         login({
-          users_id: response.data.user.id,
-          first_name: response.data.user.first_name,
-          last_name: response.data.user.last_name,
-          role: response.data.user.role_id,
+          // username: response.data.payload.user,
+          role: response.data.payload.user.role,
           token: response.data.token,
-          dep_id: response.data.user.department_id,
+          full_name: response.data.payload.user.full_name,
+          user_id: response.data.payload.user.user_id,
+          department_id: response.data.payload.user.department_id,
         }),
       );
       localStorage.setItem(
         "user",
         JSON.stringify({
-          users_id: response.data.user.id,
-          first_name: response.data.user.first_name,
-          last_name: response.data.user.last_name,
-          role_id: response.data.user.role_id,
+          // username: response.data.payload.user,
+          full_name: response.data.payload.user.full_name,
+          role: response.data.payload.user.role,
           token: response.data.token,
-          dep_id: response.data.user.department_id,
+          user_id: response.data.payload.user.user_id,
+          department_id: response.data.payload.user.department_id,
         }),
       );
       // localStorage.setItem("token", response.data.token)
-      roleRedirects(response.data.user.role_id);
+      roleRedirects(response.data.payload.user.role);
     } catch (error) {
       // ดำเนินการเมื่อมีข้อผิดพลาดเกิดขึ้นในการเข้าสู่ระบบ
       console.error("There was an error logging in!", error);
@@ -68,13 +67,13 @@ function LoginPage() {
   const roleRedirects = (role) => {
     // console.log(role)
     if (role === 1) {
-      window.location.href = "/admin/index";
+      navigate("/admin/index");
     } else if (role == 2) {
-      window.location.href = "/manager/index";
+      navigate("/manager/index");
     } else if (role == 3) {
-      window.location.href = "/technician/index";
+      navigate("/technician/index");
     } else {
-      window.location.href = "/user/index";
+      navigate("/user");
     }
   };
   // useEffect(() => {
@@ -109,7 +108,7 @@ function LoginPage() {
               textAlign="center"
               sx={{ mt: 3, fontStyle: "italic" }}
             >
-              Sing in
+              {/* Sing in */}
             </Typography>
             <Typography
               sx={{}}
@@ -127,14 +126,16 @@ function LoginPage() {
                   label="Username"
                 ></TextField>
                 <TextField
-                  {...register("password")}
-                  //                  {/* {...register("password", { */}
-                  //                {/*   minLength: { */}
-                  //              {/*     value: 6, */}
-                  //            {/*     message: "Password should be at least 6 characters", */}
-                  //          {/*   }, */}
-                  //        {/* })} */}
                   label="Password"
+                  type="password"
+                  {...register("password")}
+                  // {...register("password", {
+                  //   minLength: {
+                  //     value: 6,
+                  //     message: "Password should be at least 6 characters",
+                  //   },
+                  // })}
+                  // label="Password"
                 ></TextField>
                 {/* {errors.password && ( */}
                 {/*   <Typography>{errors.password.message}</Typography> */}

@@ -16,25 +16,18 @@ import Detailcasetechfinish from "../components/technician/Detailcasetechfinish"
 import Managedevice from "../components/technician/Managedevice.jsx";
 import DeviceDetailPages from "../components/technician/DeviceDetailPages";
 import Detailcase from "../components/Detailcase";
+import InstanceDeviceHistoryPage from "../components/technician/InstanceDeviceHistoryPage";
 const TechnicianRoute = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => ({ ...state }));
   console.log("tech", user);
-  const hasSavedUser = !!localStorage.getItem("user");
-  if (!user?.token && hasSavedUser) return null; // หรือใส่ Loading
-
-  // ✅ ถ้าไม่มี token จริงๆ ให้ไป login (ใช้ Navigate จะนิ่งกว่า useEffect)
-  if (!user?.token) return <Navigate to="/login" replace />;
-
-  // ✅ ถ้า role ไม่ใช่ช่าง
-  if (user.role_id !== 3) return <Notfound404 text="No permission" />;
-  // useEffect(() => {
-  //   if (!user || !user.token) {
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate]);
-  // const text = "No permission";
-  return (
+  useEffect(() => {
+    if (!user || !user.token) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+  const text = "No permission";
+  return user && user.token && user.role === 3 ? (
     <div className="app">
       <Sidebartech />
       <main className="content" style={{ backgroundColor: "#F5F6Fa" }}>
@@ -45,26 +38,33 @@ const TechnicianRoute = () => {
               <Route path="index" element={<TechnicianPage />} />
               <Route path="*" element={<Notfound404 />} />
               <Route path="repairs/:ticket_id" element={<Detailcase />} />
-              <Route path="reportcasetech" element={<Reportcasetech />} />
+              <Route path="reporttickettech" element={<Reportcasetech />} />
               <Route path="device" element={<Managedevice />} />
               <Route
                 path="device/detail/:dev_id"
                 element={<DeviceDetailPages />}
               />
               <Route
-                path="cases/:case_id/repair"
+                path="instance/:instance_id/history"
+                element={<InstanceDeviceHistoryPage />}
+              />
+
+              <Route
+                path="ticket/:ticket_id/repair"
                 element={<Detailcasetech />}
               />
               <Route
-                path="detailcasetechfinish/:case_id"
+                path="detailtickettechfinish/:ticket_id"
                 element={<Detailcasetechfinish />}
               />
-              <Route path="historycase" element={<Histoyrycase />} />
+              <Route path="historyticket" element={<Histoyrycase />} />
             </Routes>
           </Box>
         </Box>
       </main>
     </div>
+  ) : (
+    <Notfound404 text={text} />
   );
 };
 

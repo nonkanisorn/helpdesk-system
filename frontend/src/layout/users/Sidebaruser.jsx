@@ -13,13 +13,13 @@ const Sidebaruser = () => {
   const [isCollapsed, setisCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [broken, setBroken] = useState(false);
-  const userName = useSelector((state) => state.user.name);
-  const users_id = useSelector((state) => state.user.users_id);
+  const full_name = useSelector((state) => state.user.full_name);
+  const user_id = useSelector((state) => state.user.user_id);
   const [url, setUrl] = useState("");
   const [checkurl, setcheckurl] = useState("");
 
   useEffect(() => {
-    if (users_id) {
+    if (user_id) {
       const fetchdata = async () => {
         const response = await axios.get(
           `http://localhost:5011/users/${users_id}`,
@@ -41,7 +41,7 @@ const Sidebaruser = () => {
 
       fetchdata();
     }
-  }, [users_id]);
+  }, [user_id]);
   useEffect(() => {}, [url]);
   return (
     <div
@@ -104,7 +104,7 @@ const Sidebaruser = () => {
                   </Box>
                   <Box textAlign="center">
                     <Typography sx={{ m: "10px 0 0 0", color: "#fff" }}>
-                      {userName}
+                      {full_name}
                     </Typography>
                   </Box>
                 </Box>
@@ -114,7 +114,7 @@ const Sidebaruser = () => {
                   หน้าหลัก
                 </MenuItem>
               </Link>
-              <Link to="/user/Addcase" className="menu-bars">
+              <Link to="/user/Addticket" className="menu-bars">
                 <MenuItem
                   style={{ color: "#fff" }}
                   icon={<ConstructionOutlinedIcon />}
@@ -122,7 +122,7 @@ const Sidebaruser = () => {
                   แจ้งซ่อม
                 </MenuItem>
               </Link>
-              <Link to="/user/statuscase" className="menu-bars">
+              <Link to="/user/statusticket" className="menu-bars">
                 <MenuItem
                   style={{ color: "#fff" }}
                   icon={<ConstructionOutlinedIcon />}

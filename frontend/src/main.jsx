@@ -1,9 +1,10 @@
+import "@mui/material/styles/styled";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
-import "@emotion/styled"; // ✅ Force Vite to include it
+// import "@emotion/styled"; // ✅ Force Vite to include it
 // import styled from "styled-components";
 
 import { store } from "./store/store";

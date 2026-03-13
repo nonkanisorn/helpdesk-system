@@ -29,11 +29,11 @@ const UserRoute = ({ children }) => {
             <Route path="" element={<User />} />
             <Route path="repair-request" element={<Addcase />} />
             <Route path="repair-history" element={<Historyrepair />} />
-            <Route path="deletecase" element={<Deletecase />} />
-            <Route path="statuscase" element={<Statuscase />} />
-            <Route path="repair-detail/:case_id" element={<Detailcase />} />
+            <Route path="deleteticket" element={<Deletecase />} />
+            <Route path="statusticket" element={<Statuscase />} />
+            <Route path="repair-detail/:ticket_id" element={<Detailcase />} />
             <Route
-              path="Detailcasefinish/:case_id"
+              path="Detailticketfinish/:ticket_id"
               element={<Detailcasefinish />}
             />
             <Route path="*" element={<Notfound404 />} />
