@@ -27,9 +27,15 @@ function Detailcase() {
   const { ticket_id } = useParams();
   const navigate = useNavigate();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   const [tickets, setTickets] = useState([]);
   const role_id = useSelector((state) => state.user.role_id);
   const user_id = useSelector((state) => state.user.users_id);
+=======
+  const [ticketData, setTicketData] = useState([]);
+  const role_id = useSelector((state) => state.user.role);
+  const user_id = useSelector((state) => state.user.user_id);
+>>>>>>> Stashed changes
 =======
   const [ticketData, setTicketData] = useState([]);
   const role_id = useSelector((state) => state.user.role);
@@ -40,10 +46,16 @@ function Detailcase() {
   const waitingForPartButton = async (ticket_id) => {
     try {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       axios.patch(`${apiUrl}/case/${user_id}/${ticket_id}`, {
         status_id,
       });
       // .then((response) => console.log(response));
+=======
+      await axios.patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
+        status_id: 6,
+      });
+>>>>>>> Stashed changes
 =======
       await axios.patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
         status_id: 6,
@@ -100,6 +112,7 @@ function Detailcase() {
 
   useEffect(() => {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     axios
       .get(`http://localhost:5011/tickets/${ticket_id}`, {
         headers: {
@@ -119,6 +132,8 @@ function Detailcase() {
   }, []);
   console.log("casedaaaa", tickets);
 =======
+=======
+>>>>>>> Stashed changes
     fetchDetail();
   }, [ticket_id]);
   // useEffect(() => {
@@ -133,6 +148,9 @@ function Detailcase() {
   //     })
   //     .finally(function () {});
   // }, [ticket_id]);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   return (
     <Box sx={{ overflowY: "scroll", height: "100vh" }}>

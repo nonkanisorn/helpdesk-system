@@ -20,17 +20,23 @@ function Detailcasetech() {
   const { ticket_id } = useParams();
   const navigate = useNavigate();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   const [caseDatabyId, setCaseDatabyId] = useState({});
   const user_id = useSelector((state) => state.user.users_id);
   const token = useSelector((state) => state.user.token);
   const status_id = 3;
 =======
+=======
+>>>>>>> Stashed changes
   const user_id = useSelector((state) => state.user.user_id);
 
   const [ticketDatabyId, setticketDatabyId] = useState({});
   const [noSerial, setNoSerial] = useState(false);
 
   const status_id = 4;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
   const {
@@ -88,10 +94,14 @@ function Detailcasetech() {
       try {
         const response = await axios.get(
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           `http://localhost:5011/tickets/${case_id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
+=======
+          `http://localhost:5011/ticket/${ticket_id}`,
+>>>>>>> Stashed changes
 =======
           `http://localhost:5011/ticket/${ticket_id}`,
 >>>>>>> Stashed changes
@@ -109,8 +119,13 @@ function Detailcasetech() {
 
     fetchData();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   }, [case_id]);
   console.log("caxcasd");
+=======
+  }, [ticket_id]);
+
+>>>>>>> Stashed changes
 =======
   }, [ticket_id]);
 
