@@ -1,5 +1,6 @@
 package main
 
+import "github.com/gofiber/fiber/v2/middleware/logger"
 import (
 	"fmt"
 
@@ -70,12 +71,12 @@ type Role struct {
 func main() {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{AllowOrigins: "http://localhost:5173"}))
-	app.Use(func(c *fiber.Ctx) error {
-		fmt.Println("HIT:", c.Method(), c.Path())
-		return c.Next()
-	})
+	// app.Use(func(c *fiber.Ctx) error {
+	// 	fmt.Println("HIT:", c.Method(), c.Path())
+	// 	return c.Next()
+	// })
 
-	// app.Use(logger.New())
+	app.Use(logger.New())
 	db, err := sqlx.Open("mysql", "root:@tcp(localhost:3306)/helpdesk_system?parseTime=true&loc=Local")
 	if err != nil {
 		panic(err)
@@ -112,15 +113,13 @@ func main() {
 	}
 
 	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo)
-	// err = ticketQueryServ.UpdateStatusCompleteByTechnician("ABC1234")
-	// if err != nil {
-	// 	fmt.Println("err1 ", err)
-	// }
 	ticketQueryHand := ticketQueryHand.NewTicketQueryHandlers(ticketQueryServ)
+
 	app.Post("/tickets/status", ticketQueryHand.UpdateStatusTicket)
 	app.Patch("/tickets/:id<int>/assign-technician", ticketQueryHand.AssignTechToTicket)
 	app.Get("/technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
 	app.Get("/tickets/:ticketID<int>/technician", ticketQueryHand.GetTicketForTechnicianByTicketID)
+	app.Get("/tickets/:userID<int>/latest/:limit<int>", ticketQueryHand.GetLatestTickets)
 
 	ticketRepo := ticketRepo.NewTicketRepository(db)
 	ticketServ := ticketServ.NewTicketService(ticketRepo)

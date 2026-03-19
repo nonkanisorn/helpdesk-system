@@ -13,4 +13,5 @@ type TicketQueryService interface {
 	AssignTechToTicket(int, int, int) error
 	GetTicketForTechnicianByTicketID(int) (*domain.TicketsForTechnicianResponse, error)
 	UpdateStatusCompleteByTechnician(string) error
+	GetLatestTickets(int, int) ([]domain.TicketsResponse, error)
 }

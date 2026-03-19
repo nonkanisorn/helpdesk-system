@@ -34,12 +34,6 @@ const Headerbartech = () => {
 
       {/* icons */}
       <Box display="flex">
-        <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
         <IconButton onClick={handleMenu}>
           <AccountCircleIcon />
           <Menu

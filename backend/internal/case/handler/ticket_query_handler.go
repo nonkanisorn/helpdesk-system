@@ -17,6 +17,27 @@ func NewTicketQueryHandlers(ticketQueryServ service.TicketQueryService) ticketsQ
 	return ticketsQueryHandler{ticketQueryServ: ticketQueryServ}
 }
 
+func (t ticketsQueryHandler) GetLatestTickets(c *fiber.Ctx) error {
+	limit, err := strconv.Atoi(c.Params("limit", "2"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	userID, err := strconv.Atoi(c.Params("userID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	tickets, err := t.ticketQueryServ.GetLatestTickets(userID, limit)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"result":  tickets,
+	})
+}
 func (t ticketsQueryHandler) GetTicketsByTechnicianID(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

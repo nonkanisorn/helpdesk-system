@@ -11,25 +11,33 @@ import { Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 function Statuscase() {
-  const [caseData, setcaseData] = useState([]);
+  const [ticketData, setticketData] = useState([]);
   const navigate = useNavigate();
-  const topagedetail = (case_id) => {
-    navigate(`/manager/casedetail/${case_id}`);
+  const topagedetail = (ticket_id) => {
+    navigate(`/manager/ticketdetail/${ticket_id}`);
   };
-  console.log(caseData);
+  console.log(ticketData);
   useEffect(() => {
     axios
-      .get(`http://localhost:5011/casestatus`)
-      .then(function(response) {
-        setcaseData(response.data);
+      .get(`http://localhost:5011/ticketstatus`)
+      .then(function (response) {
+        setticketData(response.data);
         console.log(response);
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       })
-      .finally(function() { });
+      .finally(function () {});
   }, []);
 
+  const managerStatusMap = {
+    1: "รอมอบหมาย",
+    2: "มอบหมายแล้ว",
+    3: "อยู่ระหว่างดำเนินการ",
+    4: "รอการยืนยันจากผู้ใช้",
+    5: "ปิดเคสแล้ว",
+    6: "ชะลอ – รออะไหล่",
+  };
   return (
     <>
       <Typography variant="h3">สถานะการซ่อม</Typography>
@@ -46,27 +54,27 @@ function Statuscase() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {caseData.map((item, index) => (
+            {ticketData.map((item, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell>{index + 1}</TableCell>
                 <TableCell component="th" scope="row">
-                  {item.case_title}
+                  {item.title}
                 </TableCell>
 
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{item.status_name}</TableCell>
+                <TableCell>{managerStatusMap[item.status_id]}</TableCell>
                 <TableCell>
-                  {new Date(item.created_date).toLocaleString("th-TH", {
+                  {new Date(item.created_at).toLocaleString("th-TH", {
                     dateStyle: "long",
                     timeStyle: "medium",
                   })}
                 </TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => topagedetail(item.case_id)}
+                    onClick={() => topagedetail(item.ticket_id)}
                     variant="contained"
                     color="success"
                   >

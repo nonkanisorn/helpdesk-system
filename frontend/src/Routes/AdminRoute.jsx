@@ -27,38 +27,33 @@ import Editstatus from "../components/admin/ManagestatusPages/Editstatus";
 import Adduser from "../components/admin/ManageuserPages/Adduser";
 import Edituser from "../components/admin/ManageuserPages/Edituser";
 import Addtypedevice from "../components/admin/ManagedevicePages/Addtypedevice";
+import ManageissuesPages from "../components/admin/Manageissues/ManageissuesPages";
 const AdminRoute = ({ children }) => {
   const { user } = useSelector((state) => ({ ...state }));
   const [ok, setOk] = useState(false);
   const [loading, setLoading] = useState(true); // เพิ่ม state สำหรับตรวจสอบการโหลด
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userFromLocalStorage = localStorage.getItem("user");
-  if (userFromLocalStorage) {
-    const { token } = JSON.parse(userFromLocalStorage);
-    console.log(token);
-  } else {
-    console.log("not found user");
-  }
   const currentAdmin = async (idToken) => {
     try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/admin/ping`,
+      const res = await axios.post(
+        // `${process.env.REACT_APP_API_URL}/current-admin`,
+        `${process.env.REACT_APP_API_URL}/current-admin`,
+        {},
         {
           headers: {
-            Authorization: `Bearer ${idToken}`,
+            authtoken: idToken,
           },
         },
       );
       console.log(res);
       return res.data;
     } catch (error) {
-      console.log("err", error);
+      console.log(error);
       throw error;
     }
   };
 
-  console.log("usertoken", user.token);
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
@@ -106,6 +101,7 @@ const AdminRoute = ({ children }) => {
               <Route path="index" element={<Adminpages />} />
               <Route path="managestatus" element={<Managestatus />} />
               <Route path="managedepartment" element={<Managedepartment />} />
+              {/* <Route path="" element={<Managedepartment />} /> */}
               <Route path="adddevice" element={<Adddevice />} />
               <Route path="edituser/:users_id" element={<Edituser />} />
               <Route
@@ -128,6 +124,10 @@ const AdminRoute = ({ children }) => {
                 element={<Editdepartment />}
               />
               <Route path="managetypedevice" element={<Addtypedevice />} />
+              <Route
+                path="manage/issues-categories"
+                element={<ManageissuesPages />}
+              />
               <Route path="adduser" element={<Adduser />} />
               <Route path="*" element={<Notfound404 text="ไม่มีpathนี้" />} />
             </Routes>

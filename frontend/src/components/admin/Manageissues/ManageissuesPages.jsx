@@ -11,32 +11,48 @@ import { Button } from "@mui/material";
 
 import { Link } from "react-router-dom";
 import AddStatusDialog from "../dialog/AddDialog/AddStatusDialog";
+import AddIssuesCategoriesDialog from "../dialog/AddDialog/AddIssuesCategoriesDialog";
+import EditIssuesCategoriesDialog from "../dialog/EditDialog/EditIssuesCategories";
 
-function Managestatus() {
-  const [statusData, setStatusdata] = useState([]);
-
-  const [openAddStatusDialog, setOpenStatusDialog] = useState(false);
+function ManageissuesPages() {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const [issuesCategoriesData, setIssuesCategoriesData] = useState([]);
+
+  const [openAddIssuesCategoriesDialog, setOpenAddIssuesCategoriesDialog] =
+    useState(false);
+  const [openEditIssuesCategoriesDialog, setOpenEditIssuesCategoriesDialog] =
+    useState(false);
+
+  const [selectedIssuesCategoriesID, setSelectedIssuesCategoriesID] =
+    useState(null);
+
   const handleOpenAddStatusDialog = () => {
-    setOpenStatusDialog(true);
+    setOpenAddIssuesCategoriesDialog(true);
   };
   const handleCloseAddStatusDialog = () => {
-    setOpenStatusDialog(false);
+    setOpenAddIssuesCategoriesDialog(false);
   };
-  const Deletestatus = async (status_id) => {
+  const handleOpenEditIssuesCategoriesDialog = (id) => {
+    setSelectedIssuesCategoriesID(id);
+    setOpenEditIssuesCategoriesDialog(true);
+  };
+  const handleCloseEditIssuesCategoriesDialog = () => {
+    setOpenEditIssuesCategoriesDialog(false);
+  };
+  const deleteIssuesCategories = async (issues_categories_id) => {
     const shouldDelete = window.confirm("คุณต้องการลบอุปกรณ์นี้หรือไม่?");
     if (!shouldDelete) {
       return;
     }
 
     axios
-      .delete(`${apiUrl}/status/${status_id}`)
+      .delete(`${apiUrl}/issues-categories/${issues_categories_id}`)
       .then((response) => {
         console.log(response.data);
         axios
-          .get(`${apiUrl}/status`)
+          .get(`${apiUrl}/issues-categories`)
           .then((response) => {
-            setStatusdata(response.data);
+            setIssuesCategoriesData(response.data);
             console.log(response);
           })
           .catch((error) => {
@@ -48,11 +64,11 @@ function Managestatus() {
       });
   };
 
-  const fetctStatus = () => {
+  const fetchIssuesCategories = () => {
     axios
-      .get(`${apiUrl}/status`)
+      .get(`${apiUrl}/issues-categories`)
       .then(function (response) {
-        setStatusdata(response.data);
+        setIssuesCategoriesData(response.data);
         console.log(statusData);
       })
       .catch(function (error) {
@@ -62,9 +78,9 @@ function Managestatus() {
   };
   useEffect(() => {
     axios
-      .get(`${apiUrl}/status`)
+      .get(`${apiUrl}/issues-categories`)
       .then(function (response) {
-        setStatusdata(response.data);
+        setIssuesCategoriesData(response.data);
         console.log(statusData);
       })
       .catch(function (error) {
@@ -75,8 +91,15 @@ function Managestatus() {
 
   return (
     <div>
+      <EditIssuesCategoriesDialog
+        open={openEditIssuesCategoriesDialog}
+        onClose={handleCloseEditIssuesCategoriesDialog}
+        onSuccess={fetchIssuesCategories}
+        id={selectedIssuesCategoriesID}
+      />
+
       <h1>
-        จัดการสถานะ {"\u00A0"}
+        จัดการประเภทของปัญหา {"\u00A0"}
         <Button
           variant="contained"
           size="small"
@@ -84,23 +107,23 @@ function Managestatus() {
         >
           +ADD
         </Button>
-        <AddStatusDialog
-          open={openAddStatusDialog}
+        <AddIssuesCategoriesDialog
+          open={openAddIssuesCategoriesDialog}
           onClose={handleCloseAddStatusDialog}
-          onSuccess={fetctStatus}
+          onSuccess={fetchIssuesCategories}
         />
       </h1>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>สถานะ</TableCell>
-              <TableCell>แก้ไข / ลบ</TableCell>
+              <TableCell>ลำดับ</TableCell>
+              <TableCell>ประเภท</TableCell>
+              <TableCell>จัดการ</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {statusData.map((item, index) => (
+            {issuesCategoriesData.map((item, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -108,23 +131,26 @@ function Managestatus() {
                 {/* <TableCell component="th" scope="row">
                   {item.dev_id}
                 </TableCell> */}
-                <TableCell>{item.status_id} </TableCell>
+                <TableCell>{item.issues_categories_id} </TableCell>
 
-                <TableCell>{item.status_name}</TableCell>
+                <TableCell>{item.issues_categories_name}</TableCell>
                 <TableCell>
-                  <Link
-                    to={`/admin/Editstatus/${item.status_id}/${item.status_name}`}
+                  <Button
+                    variant="contained"
+                    sx={{ fontSize: "12px", backgroundColor: "#FF9933" }}
+                    onClick={() =>
+                      handleOpenEditIssuesCategoriesDialog(
+                        item.issues_categories_id,
+                      )
+                    }
                   >
-                    <Button
-                      variant="contained"
-                      sx={{ fontSize: "12px", backgroundColor: "#FF9933" }}
-                    >
-                      แก้ไข
-                    </Button>
-                  </Link>
+                    แก้ไข
+                  </Button>
 
                   <Button
-                    onClick={() => Deletestatus(item.status_id)}
+                    onClick={() =>
+                      deleteIssuesCategories(item.issues_categories_id)
+                    }
                     variant="contained"
                     sx={{
                       fontSize: "12px",
@@ -143,4 +169,4 @@ function Managestatus() {
     </div>
   );
 }
-export default Managestatus;
+export default ManageissuesPages;

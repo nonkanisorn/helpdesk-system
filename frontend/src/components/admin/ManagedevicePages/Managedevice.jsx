@@ -10,11 +10,9 @@ import Paper from "@mui/material/Paper";
 import { Button } from "@mui/material";
 
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 function Managedevice() {
   const [deviceData, setDevicedata] = useState([]);
-  const token = useSelector((state) => state.user.token);
   const apiUrl = process.env.REACT_APP_API_URL;
   const Deletedevice = async (dev_id) => {
     try {
@@ -24,19 +22,11 @@ function Managedevice() {
       }
       /** */
       axios
-        .delete(`${apiUrl}/devices/${dev_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .delete(`${apiUrl}/Device/${dev_id}`)
         .then((response) => {
           console.log(response.data);
           axios
-            .get(`${apiUrl}/devices`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            })
+            .get(`${apiUrl}/Device`)
             .then((response) => {
               setDevicedata(response.data);
               console.log(response);
@@ -54,11 +44,7 @@ function Managedevice() {
   };
   useEffect(() => {
     axios
-      .get(`${apiUrl}/devices`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get(`${apiUrl}/Device`)
       .then(function (response) {
         setDevicedata(response.data);
         console.log(response);

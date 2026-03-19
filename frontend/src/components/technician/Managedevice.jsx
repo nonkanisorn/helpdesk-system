@@ -25,9 +25,8 @@ import {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
-const Managedevice = () => {
+const ManageDevice = () => {
   const [device, setDevice] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectItem, setSelectItem] = useState();
@@ -37,12 +36,11 @@ const Managedevice = () => {
   const [refresh, setRefresh] = useState(false);
   const [inputNewDeviceName, setInputNewDeviceName] = useState("");
   const [inputNewDeviceDetail, setInputNewDeviceDetail] = useState("");
-  const token = useSelector((state) => state.user.token);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const tesnum = 1;
   const [selectTypeDevice, setSelectTypeDevice] = useState("");
-  // console.log(typeof selectTypeDevice);
+  console.log(typeof selectTypeDevice);
   const handleSelectTypeDevice = (event) => {
     setSelectTypeDevice(event.target.value);
   };
@@ -61,7 +59,7 @@ const Managedevice = () => {
       })
       .catch((error) => {
         if (error) {
-          // console.log(error);
+          console.log(error);
         }
       });
     handleCloseAddDevice();
@@ -71,11 +69,11 @@ const Managedevice = () => {
     axios
       .delete(`${apiUrl}/device/${dev_id}`)
       .then((response) => {
-        // console.log(response);
+        console.log(response);
         setRefresh((prev) => !prev);
       })
       .catch((error) => {
-        // console.log(error);
+        console.log(error);
       });
   };
   const handleOpenDialog = (item) => {
@@ -86,46 +84,43 @@ const Managedevice = () => {
     setOpenDialog(false);
   };
   const handleSubmit = (dev_id) => {
-    // console.log(dev_id);
+    console.log(dev_id);
     axios
       .put(`${apiUrl}/device/${dev_id}`, {
         newdevicename: inputUpdateDevice,
       })
       .then((response) => {
-        // console.log(response);
+        console.log(response);
         setRefresh((prev) => !prev);
       })
       .catch((error) => {
-        // console.log(error);
+        console.log(error);
       });
     handleCloseDialog();
   };
   useEffect(() => {
     const fetchTypeDevice = () => {
-      axios.get(`${apiUrl}/device-types`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      axios.get(`${apiUrl}/device/type`).then((response) => {
+        console.log(response.data);
+        setTypeDevice(response.data);
       });
-      // .then((response) => {
-      //   console.log(response.data);
-      setTypeDevice(response.data);
-      // });
     };
     fetchTypeDevice();
   }, []);
   useEffect(() => {
     const fetchdevice = () => {
-      axios.get(`${apiUrl}/device`).then((response) => {
-        setDevice(response.data);
-      });
-      // .catch((error) => {
-      //   console.log(error);
-      // });
+      axios
+        .get(`${apiUrl}/device`)
+        .then((response) => {
+          setDevice(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     };
     fetchdevice();
   }, [refresh]);
-  // console.log(device);
+  console.log(device);
   return (
     <>
       <Box>
@@ -199,12 +194,13 @@ const Managedevice = () => {
             </form>
           </DialogContent>
         </Dialog>
-        <TableContainer component={Paper}>
-          <Table>
+        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+          <Table sx={{ m: 2 }}>
             <TableHead>
               <TableRow>
                 <TableCell>ลำดับ</TableCell>
                 <TableCell>ชื่ออุปกรณ์</TableCell>
+                <TableCell>ประเภทอุปกรณ์</TableCell>
                 <TableCell align="center">จำนวน</TableCell>
                 <TableCell align="center">จัดการ</TableCell>
               </TableRow>
@@ -214,11 +210,16 @@ const Managedevice = () => {
                 <TableRow>
                   <TableCell>{idx + 1}</TableCell>
                   <TableCell>{items.dev_name}</TableCell>
+
+                  <TableCell>
+                    <Chip label={items.devicetype_name}></Chip>
+                  </TableCell>
+
                   <TableCell sx={{ display: "flex", justifyContent: "center" }}>
                     <Chip
-                      variant="filled"
+                      variant="outlined"
                       color="info"
-                      label={tesnum}
+                      label={items.numberofinstancedevice}
                       sx={{ width: 50 }}
                     ></Chip>
                   </TableCell>
@@ -293,7 +294,7 @@ const Managedevice = () => {
                         color="success"
                         sx={{ ml: 2 }}
                       >
-                        จัดการ
+                        รายการอุปกรณ์
                       </Button>
                     </Link>
                   </TableCell>
@@ -307,4 +308,4 @@ const Managedevice = () => {
   );
 };
 
-export default Managedevice;
+export default ManageDevice;

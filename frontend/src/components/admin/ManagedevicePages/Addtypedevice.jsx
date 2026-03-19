@@ -19,34 +19,53 @@ import {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import AddDeviceTypeDialog from "../dialog/AddDialog/AddDeviceTypeDialog";
+import EditDeviceTypeDialog from "../dialog/EditDialog/EditDeviceTypeDialog";
 const Addtypedevice = () => {
   const [typeDevice, setTypeDevice] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectItem, setSelectItem] = useState(null);
+  const [openAddDeviceType, setOpenAddDeviceType] = useState(false);
+  const [openEditDeviceTypeDialog, setOpenEditDeviceTypeDialog] =
+    useState(false);
+
+  const [selectedDeviceTypeID, setSelectedDeviceTypeID] = useState(null);
   const [inputNewType, setInputNewType] = useState("");
-  const token = useSelector((state) => state.user.token);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const handleOpenDialog = (item) => {
-    setSelectItem(item);
-    setOpenDialog(true);
+  const deleteTypeDevice = (devicetype_id) => {
+    try {
+      const shouldDelete = window.confirm(
+        "คุณต้องการลบปรเภทอุปกรณ์นี้หรือไม่?",
+      );
+      if (!shouldDelete) {
+        return;
+      }
+      axios.delete(`${apiUrl}/device/type/${devicetype_id}`).then(() => {
+        fetchtypedevice();
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleOpenAddDeviceType = () => {
+    setOpenAddDeviceType(true);
   };
+  const handleCloseAddDeviceType = () => {
+    setOpenAddDeviceType(false);
+  };
+  const handleOpenEditDeviceTypeDialog = (id) => {
+    setSelectedDeviceTypeID(id);
+    setOpenEditDeviceTypeDialog(true);
+  };
+  const handleCloseEditDeviceTypeDialog = () => {
+    setOpenEditDeviceTypeDialog(false);
+  };
+
   const handleSubmit = (devicetype_id) => {
     axios
-      .patch(
-        `${apiUrl}/device=types/${devicetype_id}`,
-        {
-          devicetype_name: inputNewType,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      .patch(`${apiUrl}/device/type/${devicetype_id}`, {
+        devicetype_name: inputNewType,
+      })
       .then((response) => {
         console.log(response);
       })
@@ -56,26 +75,31 @@ const Addtypedevice = () => {
     handleCloseDialog();
   };
   console.log(inputNewType);
+  const fetchtypedevice = () => {
+    axios
+      .get(`${apiUrl}/device/type`)
+      .then((response) => {
+        setTypeDevice(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   useEffect(() => {
-    const fetchtypedevice = () => {
-      axios
-        .get(`${apiUrl}/device-types`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          setTypeDevice(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
     fetchtypedevice();
   }, []);
-  console.log(typeDevice);
+  console.log("okgkk");
   return (
+    // TODO: แก้ไขประเภทอุปกรณ์ pass
+    //  TODO: สร้างหน้า ประเภทปัญหา  pass
+    //  TODO: update ui profile pass
     <>
+      <EditDeviceTypeDialog
+        open={openEditDeviceTypeDialog}
+        onClose={handleCloseEditDeviceTypeDialog}
+        onSuccess={fetchtypedevice}
+        id={selectedDeviceTypeID}
+      />
       <Box>
         <Box sx={{ display: "flex" }}>
           <Typography variant="h3">จัดการประเภทอุปกรณ์</Typography>
@@ -83,10 +107,16 @@ const Addtypedevice = () => {
             variant="contained"
             color="primary"
             sx={{ width: 50, height: 30, mt: 2, ml: 3 }}
+            onClick={handleOpenAddDeviceType}
           >
             Add+
           </Button>
         </Box>
+        <AddDeviceTypeDialog
+          open={openAddDeviceType}
+          onClose={handleCloseAddDeviceType}
+          onSuccess={fetchtypedevice}
+        />
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -106,7 +136,9 @@ const Addtypedevice = () => {
                       <Button
                         variant="contained"
                         sx={{ fontSize: "12px", backgroundColor: "#FF9933" }}
-                        onClick={() => handleOpenDialog(items.devicetype_name)}
+                        onClick={() =>
+                          handleOpenEditDeviceTypeDialog(items.devicetype_id)
+                        }
                       >
                         แก้ไข
                       </Button>
@@ -155,6 +187,7 @@ const Addtypedevice = () => {
                         backgroundColor: "red",
                         marginLeft: 3,
                       }}
+                      onClick={() => deleteTypeDevice(items.devicetype_id)}
                     >
                       ลบ
                     </Button>

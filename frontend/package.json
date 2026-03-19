@@ -13,8 +13,8 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^5.15.6",
-    "@mui/lab": "^5.0.0-alpha.129",
-    "@mui/material": "^5.17.1",
+    "@mui/lab": "^5.0.0-alpha.125",
+    "@mui/material": "^5.18.0",
     "@mui/styled-engine-sc": "^7.1.0",
     "@react-buddy/ide-toolbox": "^2.4.0",
     "@react-buddy/palette-mui": "^5.0.1",
@@ -33,7 +33,7 @@
     "react-scripts": "^5.0.1",
     "styled-components": "^6.1.18",
     "universal-cookie": "^7.0.2",
-    "vite": "^6.3.6"
+    "vite": "^6.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

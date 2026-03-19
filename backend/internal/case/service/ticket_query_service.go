@@ -125,3 +125,11 @@ func (t ticketQueryService) UpdateStatusCompleteByTechnician(serialNumber string
 	fmt.Println(deviceInstanceRow)
 	return nil
 }
+func (t ticketQueryService) GetLatestTickets(userID int, limit int) ([]domain.TicketsResponse, error) {
+	tickets, err := t.ticketRepo.GetLatestTickets(userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	ticketsResponse, err := toRes(tickets)
+	return ticketsResponse, nil
+}

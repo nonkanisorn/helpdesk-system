@@ -99,3 +99,12 @@ func (t ticketQueryRepository) UpdateStatusCompleteByTechnician(ticket *TicketRo
 	}
 	return nil
 }
+func (t ticketQueryRepository) GetLatestTickets(userID int, limit int) ([]TicketRow, error) {
+	var tickets []TicketRow
+	query := "SELECT * FROM tickets WHERE user_id = ?  ORDER BY created_at DESC LIMIT ? "
+	err := t.db.Select(&tickets, query, userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
+}
