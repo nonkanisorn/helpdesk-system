@@ -48,7 +48,7 @@ import (
 	registerServ "github.com/nonkanisorn/helpdesk-system/internal/auth/register/service"
 	ticketHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
 	ticketQueryHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
-	"github.com/nonkanisorn/helpdesk-system/internal/case/repository"
+	// "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryServ "github.com/nonkanisorn/helpdesk-system/internal/case/service"
@@ -100,18 +100,7 @@ func main() {
 	// case
 	// ticket
 	// note := "testeiei"
-	instanceID := 98
-	tick := repository.TicketRow{
-		TicketID: 44,
-		// ResolutionNote: &note,
-		InstanceID: &instanceID,
-	}
 	ticketQueryRepo := ticketQueryRepo.NewTicketQueryRepository(db)
-	err = ticketQueryRepo.UpdateStatusTicketByTechnician(&tick)
-	if err != nil {
-		fmt.Println("errrr", err)
-	}
-
 	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo)
 	ticketQueryHand := ticketQueryHand.NewTicketQueryHandlers(ticketQueryServ)
 
@@ -120,13 +109,16 @@ func main() {
 	app.Get("/technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
 	app.Get("/tickets/:ticketID<int>/technician", ticketQueryHand.GetTicketForTechnicianByTicketID)
 	app.Get("/tickets/:userID<int>/latest/:limit<int>", ticketQueryHand.GetLatestTickets)
+	app.Get("/tickets/status/:statusID<int>", ticketQueryHand.GetTicketsByStatusID)
 
 	ticketRepo := ticketRepo.NewTicketRepository(db)
 	ticketServ := ticketServ.NewTicketService(ticketRepo)
+
 	ticketHand := ticketHand.NewTicketHandler(ticketServ)
+
 	app.Get("/tickets", ticketHand.GetAllTickets)
-	app.Get("/tickets/:id<int>", ticketHand.GetTicketByID)
 	app.Post("/tickets", ticketHand.CreateTicket)
+	app.Get("/tickets/:ticketID<int>", ticketHand.GetTicketByID)
 	// User
 	userRepo := userRepo.NewUserRepository(db)
 	userServ := userServ.NewUserService(userRepo)
@@ -144,7 +136,7 @@ func main() {
 	userQueryRepo := userQueryRepo.NewUserQueryRepository(db)
 	userQueryServ := userQueryServ.NewUserQueryService(userQueryRepo)
 	userQueryHandler := userQueryHand.NewUserQueryHandler(userQueryServ)
-	app.Get("/users/:id<int>/role", userQueryHandler.GetUserByRolesID)
+	app.Get("/users/by-role/:roleID<int>", userQueryHandler.GetUserByRolesID)
 	app.Get("/users/view", userQueryHandler.GetUserWithRolesName)
 	app.Get("/current-user/:id<int>", userQueryHandler.GetCurrentUser)
 	// admin
