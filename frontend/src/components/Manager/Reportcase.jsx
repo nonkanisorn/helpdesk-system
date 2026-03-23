@@ -17,11 +17,15 @@ import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 // import Detailticket from "./Detailcase";
 import { Typography } from "@mui/material";
+import { useSelector } from "react-redux";
 
 function Reportcase() {
   const [nametech, setNametech] = useState([]);
   const [selectedTechnicians, setSelectedTechnicians] = useState({});
   const [ticketData, setticketData] = useState([]);
+  const token = useSelector((state) => state.user.token);
+  const statusID = 1
+
   const navigate = useNavigate();
   const departmentMap = {
     1: "ไอที",
@@ -58,15 +62,19 @@ function Reportcase() {
   };
   useEffect(() => {
     axios
-      .get("http://localhost:5011/ticket/status/open")
+      .get(`http://localhost:5011/tickets/status/${statusID}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
       .then(function (response) {
-        setticketData(response.data);
+        setticketData(response.data.result);
         console.log(ticketData);
       })
       .catch(function (error) {
         console.log(error);
       })
-      .finally(function () {});
+      .finally(function () { });
   }, []);
   console.log("dsadas", ticketData);
   const managerStatusMap = {
