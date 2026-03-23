@@ -133,3 +133,28 @@ func (t ticketsQueryHandler) GetTicketForTechnicianByTicketID(c *fiber.Ctx) erro
 		"result":  ticket,
 	})
 }
+
+func (t ticketsQueryHandler) GetTicketsByStatusID(c *fiber.Ctx) error {
+	var statusID []int
+
+	statusIDParams, err := strconv.Atoi(c.Params("statusID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return nil
+	// tickets, err := t.ticketQueryServ.GetTicketsByStatusID(statusIDParams)
+	// if err != nil {
+	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	// 		"success": false,
+	// 		"error":   err.Error(),
+	// 	})
+
+	// }
+	// return c.Status(fiber.StatusOK).JSON(fiber.Map{
+	// 	"success": true,
+	// 	"result":  tickets,
+	// })
+}

@@ -133,3 +133,14 @@ func (t ticketQueryService) GetLatestTickets(userID int, limit int) ([]domain.Ti
 	ticketsResponse, err := toRes(tickets)
 	return ticketsResponse, nil
 }
+func (t ticketQueryService) GetTicketsByStatusID(statusID int) ([]domain.TicketsResponse, error) {
+	ticketsFromDB, err := t.ticketRepo.GetTicketsByStatusID(statusID)
+	if err != nil {
+		return nil, err
+	}
+	tickets, err := toRes(ticketsFromDB)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
+}

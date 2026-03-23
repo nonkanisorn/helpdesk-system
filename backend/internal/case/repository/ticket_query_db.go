@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	// "github.com/pelletier/go-toml/query"
 )
 
 type ticketQueryRepository struct {
@@ -103,6 +104,16 @@ func (t ticketQueryRepository) GetLatestTickets(userID int, limit int) ([]Ticket
 	var tickets []TicketRow
 	query := "SELECT * FROM tickets WHERE user_id = ?  ORDER BY created_at DESC LIMIT ? "
 	err := t.db.Select(&tickets, query, userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
+}
+
+func (t ticketQueryRepository) GetTicketsByStatusID(statusID int) ([]TicketRow, error) {
+	var tickets []TicketRow
+	query := "SELECT * FROM tickets WHERE status_id = ? "
+	err := t.db.Select(&tickets, query, statusID)
 	if err != nil {
 		return nil, err
 	}
