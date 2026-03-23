@@ -18,23 +18,26 @@ export const Detailcase = () => {
   const { ticket_id } = useParams();
   const [ticketdatabyID, setticketdatabyID] = useState([]);
   const [imgurl, setImgUrls] = useState([]);
-  const status_id = 2;
+  const roleTechnician = 3
   const [technician, settechnician] = useState([]);
   const [selectedTechnicians, setSelectedTechnicians] = useState({});
   const { ticketData } = location.state || {};
   const [refresh, setRefresh] = useState(false);
   const manager_id = useSelector((state) => state.user.user_id);
+  const token = useSelector((state) => state.user.token);
   const [ticketById, setticketById] = useState();
-  console.log("ticket_id", ticket_id);
   const sendtech = async (ticket_id, techid) => {
     await axios
-      .patch(`http://localhost:5011/addtechticket/${ticket_id}`, {
+      .patch(`http://localhost:5011/tickets/${ticket_id}/assign-technician`, {
         technician_id: techid,
         manager_id,
-        status_id,
-
-        // ticket_device_id: ticketData[0].ticket_device_id,
-      })
+      },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      )
       .then(() => {
         setSelectedTechnicians({});
         setRefresh(true); // ตั้งค่า refresh ให้เป็น true หลังจากการส่งข้อมูลสำเร็จ
@@ -48,13 +51,17 @@ export const Detailcase = () => {
     const fetchdata = async () => {
       try {
         const technicianResponse = await axios.get(
-          "http://localhost:5011/technicians/role",
+          `http://localhost:5011/users/by-role/${roleTechnician}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
         );
-        const technicianData = await technicianResponse.data.map(
+        const technicianData = await technicianResponse.data.result.map(
           (technician) => ({
             id: technician.user_id,
-            full_name: technician.full_name,
-            user_img: technician.user_img,
+            full_name: `${technician.first_name || ""} ${technician.last_name || ""}`.trim(),
+            user_img: technician.avatar_path,
             email: technician.email,
             phone: technician.phone,
           }),
@@ -80,7 +87,11 @@ export const Detailcase = () => {
       // const { ticket_id } = useParams();
       try {
         const res = await axios.get(
-          `http://localhost:5011/ticketid/${ticket_id}`,
+          `http://localhost:5011/tickets/${ticket_id}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
         );
         console.log(res.data[0]);
       } catch (error) {
