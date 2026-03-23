@@ -43,7 +43,7 @@ import Testapi from "./components/Testapi";
 function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const role_id = useSelector((state) => state.user.role);
+  const role_id = useSelector((state) => state.user.role_id);
   const [loading, setLoading] = useState(true); // เพิ่ม state สำหรับตรวจสอบการโหลด
   const checktimerepair = async () => {
     try {
