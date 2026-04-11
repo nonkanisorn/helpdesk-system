@@ -17,6 +17,7 @@ import {
 function Historyrepair() {
   const now = new Date();
 
+  const token = useSelector((state) => state.user.token);
   const formatted = (date) => {
     return new Date(date).toLocaleString("th-TH", {
       year: "numeric",
@@ -79,9 +80,11 @@ function Historyrepair() {
     if (!user_id) return;
 
     axios
-      .get(`http://localhost:5011/ticketuser/${user_id}`)
+      .get(`http://localhost:5011/tickets/users/${user_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
-        setticketData(response.data);
+        setticketData(response.data.result);
       })
       .catch((error) => {
         console.log(error);

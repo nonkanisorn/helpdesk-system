@@ -15,6 +15,7 @@ import { Typography } from "@mui/material";
 function Reportcasetech() {
   const navigate = useNavigate();
   const technician_id = useSelector((state) => state.user.user_id);
+  const token = useSelector((state) => state.user.token);
   const [ticketData, setticketData] = useState([]);
   const status_id = 4;
   const [refresh, setRefresh] = useState(false);
@@ -40,15 +41,19 @@ function Reportcasetech() {
   };
   useEffect(() => {
     axios
-      .get(`${apiUrl}/tickettech/${technician_id}`)
-      .then(function (response) {
-        setticketData(response.data);
+      .get(`${apiUrl}/technician/${technician_id}/tickets`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      .then(function(response) {
+        setticketData(response.data.result);
         console.log(response);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log(error);
       })
-      .finally(function () {});
+      .finally(function() { });
   }, [refresh]);
 
   return (

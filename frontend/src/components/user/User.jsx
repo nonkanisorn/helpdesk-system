@@ -26,7 +26,7 @@ import { AssignmentInd, PrecisionManufacturing } from "@mui/icons-material";
 
 function User() {
   const [ticketdata, setTicketdata] = useState([]);
-  const limit = 2
+  const limit = 2;
   console.log(process.env.REACT_APP_API_URL);
   console.log(ticketdata);
   const user_id = useSelector((state) => state.user.user_id);
@@ -45,11 +45,12 @@ function User() {
     const fetchdata = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5011/tickets/${user_id}/latest/${limit}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+          `http://localhost:5011/tickets/${user_id}/latest/${limit}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         setTicketdata(response.data.result);
       } catch (error) {
@@ -58,34 +59,230 @@ function User() {
     };
     fetchdata();
   }, []);
+  // return (
+  //   <Box sx={{ ml: "10%", mr: "10%" }}>
+  //     <Box>
+  //       <Typography variant="h4" align="center" sx={{ mt: 10 }}>
+  //         ยินดีต้อนรับสู่ระบบแจ้งซ่อม
+  //       </Typography>
+  //       <Typography color="grey" align="center">
+  //         เราพร้อมให้บริการและดูแลปัญหาของคุณอย่างรวดเร็วและมีประสิทธิภาพ
+  //       </Typography>
+  //     </Box>
+  //     <Box>
+  //       <Typography fontWeight="fontWeightBold" sx={{ mt: 12 }} variant="h5">
+  //         เริ่มต้นใช้งาน
+  //       </Typography>
+  //       <Grid container spacing={2} sx={{ mt: 1 }}>
+  //         <Grid item md={6}>
+  //           <Paper square sx={{ height: 250, p: 2, borderRadius: 3 }}>
+  //             <AddBoxRoundedIcon sx={{ color: "#2A66EA", fontSize: "4vw" }} />
+  //             <Typography variant="h6" fontWeight="fontWeightBold" mt={2}>
+  //               แจ้งซ่อม
+  //             </Typography>
+  //             <Typography color="grey">แจ้งปัญหาและขอรับบริการซ่อม</Typography>
+  //             <Link to={{ pathname: "/user/repair-request" }}>
+  //               <Button
+  //                 variant="contained"
+  //                 sx={{
+  //                   mt: 3,
+  //                   width: "100%",
+  //                   borderRadius: 3,
+  //                   color: "black",
+  //                   bgcolor: "#F8F8F7",
+  //                 }}
+  //               >
+  //                 เลือก
+  //               </Button>
+  //             </Link>
+  //           </Paper>
+  //         </Grid>
+  //         <Grid item md={6}>
+  //           <Paper square sx={{ height: 250, p: 2, borderRadius: 3 }}>
+  //             <HistoryRoundedIcon sx={{ color: "green", fontSize: "4vw" }} />
+  //             <Typography variant="h6" fontWeight="fontWeightBold" mt={2}>
+  //               ติดตามสถานะ/ประวัติการซ่อมของฉัน
+  //             </Typography>
+  //             <Typography color="grey">ดูรายการซ่อมทั้งหมดของคุณ</Typography>
+  //             <Link to={{ pathname: "/user/repair-history" }}>
+  //               <Button
+  //                 variant="contained"
+  //                 sx={{
+  //                   mt: 3,
+  //                   width: "100%",
+  //                   borderRadius: 3,
+  //                   color: "black",
+  //                   bgcolor: "#F8F8F7",
+  //                 }}
+  //               >
+  //                 เลือก
+  //               </Button>
+  //             </Link>
+  //           </Paper>
+  //         </Grid>
+  //       </Grid>
+  //     </Box>
+  //     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+  //       <Typography fontWeight="fontWeightBold" sx={{ mt: 5 }} variant="h5">
+  //         รายการล่าสุด
+  //       </Typography>
+  //       <Link to={{ pathname: "/user/repair-history" }}>
+  //         <Button>
+  //           {" "}
+  //           <Typography sx={{ mt: 6, mb: 2 }} variant="subtitle1">
+  //             ดูทั้งหมด
+  //           </Typography>
+  //         </Button>
+  //       </Link>
+  //     </Box>
+  //     <Grid container spacing={12}>
+  //       {ticketdata.map((items, index) => (
+  //         <Grid item xs={12} md={6}>
+  //           <Paper sx={{ height: 160, borderRadius: 3, p: 4 }}>
+  //             <Grid container>
+  //               <Grid item md={6}>
+  //                 {" "}
+  //                 <Typography fontWeight="bold">{items.title}</Typography>
+  //                 <Typography mt={4} color="grey">
+  //                   เวลาที่แจ้ง:{" "}
+  //                   {new Date(items.created_at).toLocaleString("th-TH")}
+  //                 </Typography>
+  //               </Grid>
+  //               <Grid item md={6}>
+  //                 <Typography justifySelf="right">
+  //                   {(items.status_id === 1 && (
+  //                     <>
+  //                       <FiberNewIcon sx={{ color: amber[400] }} />
+  //                       <Typography sx={{ mt: 3 }}>เปิดงาน</Typography>
+  //                     </>
+  //                   )) ||
+  //                     (items.status_id === 2 && (
+  //                       <>
+  //                         <AssignmentInd sx={{ color: "red" }} />
+  //                         <Typography sx={{ mt: 3 }}>
+  //                           กำลังจัดสรรช่าง
+  //                         </Typography>
+  //                       </>
+  //                     )) ||
+  //                     (items.status_id === 3 && (
+  //                       <>
+  //                         <AutorenewIcon sx={{ color: indigo[600] }} />
+  //                         <Typography sx={{ mt: 3 }}>
+  //                           กำลังดำเนินการการ
+  //                         </Typography>
+  //                       </>
+  //                     )) ||
+  //                     (items.status_id === 4 && (
+  //                       <>
+  //                         <HourglassEmptyIcon sx={{ color: "red" }} />
+  //                         <Typography sx={{ mt: 3 }}>
+  //                           รอการยืนยันจากคุณ
+  //                         </Typography>
+  //                       </>
+  //                     )) ||
+  //                     (items.status_id === 5 && (
+  //                       <>
+  //                         <HourglassEmptyIcon sx={{ color: "red" }} />
+  //                         <Typography sx={{ mt: 3 }}>
+  //                           รอการยืนยันจากคุณ
+  //                         </Typography>
+  //                       </>
+  //                     )) ||
+  //                     (items.status_id === 6 && (
+  //                       <>
+  //                         <CheckCircleOutlineRoundedIcon
+  //                           sx={{ color: "green" }}
+  //                         />
+  //                         <Typography sx={{ mt: 3 }}>ปิดงานแล้ว</Typography>
+  //                       </>
+  //                     )) ||
+  //                     (items.status_id === 7 && (
+  //                       <>
+  //                         <PrecisionManufacturing sx={{ color: "green" }} />
+  //                         <Typography sx={{ mt: 3 }}>รออะไหล่</Typography>
+  //                       </>
+  //                     ))}
+  //                 </Typography>
+  //               </Grid>
+  //             </Grid>
+  //           </Paper>
+  //         </Grid>
+  //       ))}
+  //     </Grid>
+  //   </Box>
+  // );
   return (
-    <Box sx={{ ml: "10%", mr: "10%" }}>
-      <Box>
-        <Typography variant="h4" align="center" sx={{ mt: 10 }}>
+    <Box
+      sx={{
+        height: "100vh",
+        overflowY: "auto",
+        overflowX: "hidden",
+        px: { xs: 2, sm: 3, md: 5, lg: "10%" },
+        py: { xs: 3, md: 5 },
+        boxSizing: "border-box",
+      }}
+    >
+      {/* ===== Header ===== */}
+      <Box sx={{ mb: { xs: 4, md: 6 } }}>
+        <Typography
+          variant="h4"
+          align="center"
+          sx={{
+            mt: { xs: 1, sm: 2, md: 4 },
+            fontSize: { xs: "1.75rem", sm: "2rem", md: "2.5rem" },
+          }}
+        >
           ยินดีต้อนรับสู่ระบบแจ้งซ่อม
         </Typography>
-        <Typography color="grey" align="center">
+
+        <Typography
+          color="grey"
+          align="center"
+          sx={{
+            mt: 1,
+            mx: "auto",
+            maxWidth: 720,
+          }}
+        >
           เราพร้อมให้บริการและดูแลปัญหาของคุณอย่างรวดเร็วและมีประสิทธิภาพ
         </Typography>
       </Box>
-      <Box>
-        <Typography fontWeight="fontWeightBold" sx={{ mt: 12 }} variant="h5">
+
+      {/* ===== Menu ===== */}
+      <Box sx={{ mb: { xs: 4, md: 6 } }}>
+        <Typography fontWeight="bold" variant="h5" sx={{ mb: 2 }}>
           เริ่มต้นใช้งาน
         </Typography>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item md={6}>
-            <Paper square sx={{ height: 250, p: 2, borderRadius: 3 }}>
-              <AddBoxRoundedIcon sx={{ color: "#2A66EA", fontSize: "4vw" }} />
-              <Typography variant="h6" fontWeight="fontWeightBold" mt={2}>
-                แจ้งซ่อม
-              </Typography>
-              <Typography color="grey">แจ้งปัญหาและขอรับบริการซ่อม</Typography>
-              <Link to={{ pathname: "/user/repair-request" }}>
+
+        <Grid container spacing={2}>
+          {/* แจ้งซ่อม */}
+          <Grid item xs={12} sm={6}>
+            <Paper
+              sx={{
+                minHeight: 220,
+                p: 2,
+                borderRadius: 3,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box>
+                <AddBoxRoundedIcon sx={{ color: "#2A66EA", fontSize: 40 }} />
+                <Typography variant="h6" fontWeight="bold" mt={2}>
+                  แจ้งซ่อม
+                </Typography>
+                <Typography color="grey">
+                  แจ้งปัญหาและขอรับบริการซ่อม
+                </Typography>
+              </Box>
+
+              <Link to="/user/repair-request">
                 <Button
+                  fullWidth
                   variant="contained"
                   sx={{
                     mt: 3,
-                    width: "100%",
                     borderRadius: 3,
                     color: "black",
                     bgcolor: "#F8F8F7",
@@ -96,19 +293,33 @@ function User() {
               </Link>
             </Paper>
           </Grid>
-          <Grid item md={6}>
-            <Paper square sx={{ height: 250, p: 2, borderRadius: 3 }}>
-              <HistoryRoundedIcon sx={{ color: "green", fontSize: "4vw" }} />
-              <Typography variant="h6" fontWeight="fontWeightBold" mt={2}>
-                ติดตามสถานะ/ประวัติการซ่อมของฉัน
-              </Typography>
-              <Typography color="grey">ดูรายการซ่อมทั้งหมดของคุณ</Typography>
-              <Link to={{ pathname: "/user/repair-history" }}>
+
+          {/* ประวัติ */}
+          <Grid item xs={12} sm={6}>
+            <Paper
+              sx={{
+                minHeight: 220,
+                p: 2,
+                borderRadius: 3,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box>
+                <HistoryRoundedIcon sx={{ color: "green", fontSize: 40 }} />
+                <Typography variant="h6" fontWeight="bold" mt={2}>
+                  ติดตามสถานะ/ประวัติการซ่อมของฉัน
+                </Typography>
+                <Typography color="grey">ดูรายการซ่อมทั้งหมดของคุณ</Typography>
+              </Box>
+
+              <Link to="/user/repair-history">
                 <Button
+                  fullWidth
                   variant="contained"
                   sx={{
                     mt: 3,
-                    width: "100%",
                     borderRadius: 3,
                     color: "black",
                     bgcolor: "#F8F8F7",
@@ -121,87 +332,99 @@ function User() {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography fontWeight="fontWeightBold" sx={{ mt: 5 }} variant="h5">
+
+      {/* ===== Header ล่าสุด ===== */}
+      <Box
+        sx={{
+          mb: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography fontWeight="bold" variant="h5">
           รายการล่าสุด
         </Typography>
-        <Link to={{ pathname: "/user/repair-history" }}>
-          <Button>
-            {" "}
-            <Typography sx={{ mt: 6, mb: 2 }} variant="subtitle1">
-              ดูทั้งหมด
-            </Typography>
+
+        <Link to="/user/repair-history">
+          <Button sx={{ p: 0 }}>
+            <Typography variant="subtitle1">ดูทั้งหมด</Typography>
           </Button>
         </Link>
       </Box>
-      <Grid container spacing={12}>
+
+      {/* ===== รายการ ===== */}
+      <Grid container spacing={2} sx={{ pb: 4, mb: 5 }}>
         {ticketdata.map((items, index) => (
-          <Grid item md={6}>
-            <Paper sx={{ height: 160, borderRadius: 3, p: 4 }}>
-              <Grid container>
-                <Grid item md={6}>
-                  {" "}
+          <Grid item xs={12} md={6} key={index}>
+            <Paper sx={{ borderRadius: 3, p: 3 }}>
+              <Grid container spacing={2}>
+                {/* ซ้าย */}
+                <Grid item xs={12} sm={7}>
                   <Typography fontWeight="bold">{items.title}</Typography>
-                  <Typography mt={4} color="grey">
+
+                  <Typography mt={2} color="grey">
                     เวลาที่แจ้ง:{" "}
                     {new Date(items.created_at).toLocaleString("th-TH")}
                   </Typography>
                 </Grid>
-                <Grid item md={6}>
-                  <Typography justifySelf="right">
-                    {(items.status_id === 1 && (
+
+                {/* ขวา */}
+                <Grid
+                  item
+                  xs={12}
+                  sm={5}
+                  sx={{
+                    display: "flex",
+                    justifyContent: { xs: "flex-start", sm: "flex-end" },
+                    alignItems: "center",
+                  }}
+                >
+                  <Box textAlign={{ xs: "left", sm: "right" }}>
+                    {items.status_id === 1 && (
                       <>
                         <FiberNewIcon sx={{ color: amber[400] }} />
-                        <Typography sx={{ mt: 3 }}>เปิดงาน</Typography>
+                        <Typography mt={1}>เปิดงาน</Typography>
                       </>
-                    )) ||
-                      (items.status_id === 2 && (
-                        <>
-                          <AssignmentInd sx={{ color: "red" }} />
-                          <Typography sx={{ mt: 3 }}>
-                            กำลังจัดสรรช่าง
-                          </Typography>
-                        </>
-                      )) ||
-                      (items.status_id === 3 && (
-                        <>
-                          <AutorenewIcon sx={{ color: indigo[600] }} />
-                          <Typography sx={{ mt: 3 }}>
-                            กำลังดำเนินการการ
-                          </Typography>
-                        </>
-                      )) ||
-                      (items.status_id === 4 && (
-                        <>
-                          <HourglassEmptyIcon sx={{ color: "red" }} />
-                          <Typography sx={{ mt: 3 }}>
-                            รอการยืนยันจากคุณ
-                          </Typography>
-                        </>
-                      )) ||
-                      (items.status_id === 5 && (
-                        <>
-                          <HourglassEmptyIcon sx={{ color: "red" }} />
-                          <Typography sx={{ mt: 3 }}>
-                            รอการยืนยันจากคุณ
-                          </Typography>
-                        </>
-                      )) ||
-                      (items.status_id === 6 && (
-                        <>
-                          <CheckCircleOutlineRoundedIcon
-                            sx={{ color: "green" }}
-                          />
-                          <Typography sx={{ mt: 3 }}>ปิดงานแล้ว</Typography>
-                        </>
-                      )) ||
-                      (items.status_id === 7 && (
-                        <>
-                          <PrecisionManufacturing sx={{ color: "green" }} />
-                          <Typography sx={{ mt: 3 }}>รออะไหล่</Typography>
-                        </>
-                      ))}
-                  </Typography>
+                    )}
+
+                    {items.status_id === 2 && (
+                      <>
+                        <AssignmentInd sx={{ color: "red" }} />
+                        <Typography mt={1}>กำลังจัดสรรช่าง</Typography>
+                      </>
+                    )}
+
+                    {items.status_id === 3 && (
+                      <>
+                        <AutorenewIcon sx={{ color: indigo[600] }} />
+                        <Typography mt={1}>กำลังดำเนินการ</Typography>
+                      </>
+                    )}
+
+                    {items.status_id === 4 && (
+                      <>
+                        <HourglassEmptyIcon sx={{ color: "red" }} />
+                        <Typography mt={1}>รอการยืนยันจากคุณ</Typography>
+                      </>
+                    )}
+
+                    {items.status_id === 6 && (
+                      <>
+                        <CheckCircleOutlineRoundedIcon
+                          sx={{ color: "green" }}
+                        />
+                        <Typography mt={1}>ปิดงานแล้ว</Typography>
+                      </>
+                    )}
+
+                    {items.status_id === 7 && (
+                      <>
+                        <PrecisionManufacturing sx={{ color: "green" }} />
+                        <Typography mt={1}>รออะไหล่</Typography>
+                      </>
+                    )}
+                  </Box>
                 </Grid>
               </Grid>
             </Paper>
@@ -211,4 +434,5 @@ function User() {
     </Box>
   );
 }
+
 export default User;

@@ -27,7 +27,7 @@ const TechnicianRoute = () => {
     }
   }, [user, navigate]);
   const text = "No permission";
-  return user && user.token && user.role === 3 ? (
+  return user && user.token && user.role_id === 3 ? (
     <div className="app">
       <Sidebartech />
       <main className="content" style={{ backgroundColor: "#F5F6Fa" }}>

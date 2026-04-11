@@ -96,7 +96,11 @@ function Addcase() {
           width: "100%",
           display: "flex",
           justifyContent: "center",
-          mt: 5,
+          pt: 5,
+          pb: 4,
+          height: "calc(100vh - 64px)",
+          overflowY: "auto",
+          boxSizing: "border-box",
         }}
       >
         <Box sx={{ maxWidth: 600, width: "100%" }}>

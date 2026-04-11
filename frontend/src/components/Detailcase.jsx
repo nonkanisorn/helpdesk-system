@@ -44,9 +44,13 @@ function Detailcase() {
   const startJobForTechnician = async (ticket_id) => {
     try {
       if (window.confirm("เริ่มการทำงาน?")) {
-        await axios.patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
-          status_id: 3,
-        });
+        await axios.patch(
+          `${apiUrl}/ticket/${user_id}/${ticket_id}`,
+          { headers: { Authorization: `Bearer ${token}` } },
+          {
+            status_id: 3,
+          },
+        );
         await fetchDetail(); // 👈 รีโหลดข้อมูลใหม่ทันที
       }
     } catch (error) {
@@ -79,14 +83,16 @@ function Detailcase() {
   };
   const fetchDetail = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/tickets/${ticket_id}`, { headers: { "Authorization": `Bearer ${token}` } });
+      const res = await axios.get(`${apiUrl}/tickets/${ticket_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setTicketData(res.data.result);
     } catch (err) {
       console.log(err);
     }
   };
 
-  console.log("ticccc", ticketData)
+  console.log("ticccc", ticketData);
   useEffect(() => {
     fetchDetail();
   }, [ticket_id]);
