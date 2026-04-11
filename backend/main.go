@@ -1,6 +1,5 @@
 package main
 
-import "github.com/gofiber/fiber/v2/middleware/logger"
 import (
 	"fmt"
 
@@ -48,6 +47,7 @@ import (
 	registerServ "github.com/nonkanisorn/helpdesk-system/internal/auth/register/service"
 	ticketHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
 	ticketQueryHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
+
 	// "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
@@ -71,17 +71,15 @@ type Role struct {
 func main() {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{AllowOrigins: "http://localhost:5173"}))
-	// app.Use(func(c *fiber.Ctx) error {
-	// 	fmt.Println("HIT:", c.Method(), c.Path())
-	// 	return c.Next()
-	// })
-
-	app.Use(logger.New())
+	app.Use(func(c *fiber.Ctx) error {
+		fmt.Println("HITTTss:", c.Method(), c.Path())
+		return c.Next()
+	})
+	// app.Use(logger.New())
 	db, err := sqlx.Open("mysql", "root:@tcp(localhost:3306)/helpdesk_system?parseTime=true&loc=Local")
 	if err != nil {
 		panic(err)
 	}
-
 	h := wire.NewHandlers(db)
 	routes.RegisterLogin(app, h)
 	// Auth
@@ -106,9 +104,10 @@ func main() {
 
 	app.Post("/tickets/status", ticketQueryHand.UpdateStatusTicket)
 	app.Patch("/tickets/:id<int>/assign-technician", ticketQueryHand.AssignTechToTicket)
-	app.Get("/technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
+	app.Get("technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
 	app.Get("/tickets/:ticketID<int>/technician", ticketQueryHand.GetTicketForTechnicianByTicketID)
 	app.Get("/tickets/:userID<int>/latest/:limit<int>", ticketQueryHand.GetLatestTickets)
+	app.Get("/tickets/users/:userID<int>", ticketQueryHand.GetTicketsByUsersID)
 	app.Get("/tickets/status/:statusID<int>", ticketQueryHand.GetTicketsByStatusID)
 
 	ticketRepo := ticketRepo.NewTicketRepository(db)
@@ -153,8 +152,8 @@ func main() {
 	roleService := roleServ.NewRoleService(roleReposityDB)
 	roleHandler := roleHand.NewRoleHandler(roleService)
 	app.Get("/roles", roleHandler.GetRole)
-	app.Get("/roles/:id<int>", roleHandler.GetRoleByID())
 	app.Post("/roles", roleHandler.CreateRoles)
+	app.Get("/roles/:id<int>", roleHandler.GetRoleByID())
 	app.Delete("/roles/:id<int>", roleHandler.DeleteRolesByID)
 
 	// department

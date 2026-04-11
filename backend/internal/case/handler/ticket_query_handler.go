@@ -38,6 +38,7 @@ func (t ticketsQueryHandler) GetLatestTickets(c *fiber.Ctx) error {
 		"result":  tickets,
 	})
 }
+
 func (t ticketsQueryHandler) GetTicketsByTechnicianID(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -121,7 +122,6 @@ func (t ticketsQueryHandler) GetTicketForTechnicianByTicketID(c *fiber.Ctx) erro
 		})
 	}
 	ticket, err := t.ticketQueryServ.GetTicketForTechnicianByTicketID(id)
-
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"success": false,
@@ -135,7 +135,7 @@ func (t ticketsQueryHandler) GetTicketForTechnicianByTicketID(c *fiber.Ctx) erro
 }
 
 func (t ticketsQueryHandler) GetTicketsByStatusID(c *fiber.Ctx) error {
-	var statusID []int
+	// var statusID []int
 
 	statusIDParams, err := strconv.Atoi(c.Params("statusID"))
 	if err != nil {
@@ -144,17 +144,37 @@ func (t ticketsQueryHandler) GetTicketsByStatusID(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-	return nil
-	// tickets, err := t.ticketQueryServ.GetTicketsByStatusID(statusIDParams)
-	// if err != nil {
-	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-	// 		"success": false,
-	// 		"error":   err.Error(),
-	// 	})
+	// return nil
+	tickets, err := t.ticketQueryServ.GetTicketsByStatusID(statusIDParams)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"result":  tickets,
+	})
+}
 
-	// }
-	// return c.Status(fiber.StatusOK).JSON(fiber.Map{
-	// 	"success": true,
-	// 	"result":  tickets,
-	// })
+func (t ticketsQueryHandler) GetTicketsByUsersID(c *fiber.Ctx) error {
+	userID, err := strconv.Atoi(c.Params("userID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	tickets, err := t.ticketQueryServ.GetTicketsByUsersID(userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"result":  tickets,
+	})
 }

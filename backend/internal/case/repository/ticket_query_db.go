@@ -28,7 +28,13 @@ func (t ticketQueryRepository) GetTicketsByTechnicianID(techID int) ([]TicketRow
 }
 
 func (t ticketQueryRepository) GetTicketsByUsersID(usersID int) ([]TicketRow, error) {
-	return nil, nil
+	var tickets []TicketRow
+	query := "select * from tickets where user_id = ? "
+	err := t.db.Select(&tickets, query, usersID)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
 }
 
 func (t ticketQueryRepository) UpdateStatusTicket(updateTicketRow *UpdateTicketRow) error {
@@ -70,6 +76,7 @@ func (t ticketQueryRepository) GetTicketForTechnicianByTicketID(ticketID int) (*
 	}
 	return &ticket, nil
 }
+
 func (t ticketQueryRepository) UpdateStatusTicketByTechnician(ticket *TicketRow) error {
 	if ticket.ResolutionNote != nil {
 		query := "UPDATE  tickets SET resolution_note = ? ,instance_id = ?,status_id = ? ,completed_at = ?  WHERE ticket_id = ? "
@@ -90,8 +97,8 @@ func (t ticketQueryRepository) UpdateStatusTicketByTechnician(ticket *TicketRow)
 		return err
 	}
 	return nil
-
 }
+
 func (t ticketQueryRepository) UpdateStatusCompleteByTechnician(ticket *TicketRow) error {
 	query := "UPDATE  tickets SET resolution_note = ? ,instance_id = ?,status_id = ? ,completed_at = ?  WHERE ticket_id = ? "
 	_, err := t.db.Exec(query, ticket.ResolutionNote, ticket.InstanceID, ticket.StatusID, ticket.CompletedAt, ticket.TicketID)
@@ -100,6 +107,7 @@ func (t ticketQueryRepository) UpdateStatusCompleteByTechnician(ticket *TicketRo
 	}
 	return nil
 }
+
 func (t ticketQueryRepository) GetLatestTickets(userID int, limit int) ([]TicketRow, error) {
 	var tickets []TicketRow
 	query := "SELECT * FROM tickets WHERE user_id = ?  ORDER BY created_at DESC LIMIT ? "

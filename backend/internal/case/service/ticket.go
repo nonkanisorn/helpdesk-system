@@ -15,4 +15,5 @@ type TicketQueryService interface {
 	UpdateStatusCompleteByTechnician(string) error
 	GetLatestTickets(int, int) ([]domain.TicketsResponse, error)
 	GetTicketsByStatusID(int) ([]domain.TicketsResponse, error)
+	GetTicketsByUsersID(int) ([]domain.TicketsResponse, error)
 }

@@ -79,7 +79,6 @@ func (t ticketQueryService) UpdateStatusTicket(updateTicketRequest *domain.Updat
 	err := t.ticketRepo.UpdateStatusTicket(updateStatusTicket)
 	if err != nil {
 		return err
-
 	}
 	return nil
 }
@@ -92,7 +91,6 @@ func (t ticketQueryService) AssignTechToTicket(technicianID int, managerID int, 
 	}
 
 	return nil
-
 }
 
 func (t ticketQueryService) GetTicketForTechnicianByTicketID(ticketID int) (*domain.TicketsForTechnicianResponse, error) {
@@ -117,6 +115,7 @@ func (t ticketQueryService) GetTicketForTechnicianByTicketID(ticketID int) (*dom
 	}
 	return &ticketRes, nil
 }
+
 func (t ticketQueryService) UpdateStatusCompleteByTechnician(serialNumber string) error {
 	deviceInstanceRow, err := t.deviceInstanceQueryRepo.CheckSerialNumber(serialNumber)
 	if err != nil {
@@ -125,6 +124,7 @@ func (t ticketQueryService) UpdateStatusCompleteByTechnician(serialNumber string
 	fmt.Println(deviceInstanceRow)
 	return nil
 }
+
 func (t ticketQueryService) GetLatestTickets(userID int, limit int) ([]domain.TicketsResponse, error) {
 	tickets, err := t.ticketRepo.GetLatestTickets(userID, limit)
 	if err != nil {
@@ -133,6 +133,7 @@ func (t ticketQueryService) GetLatestTickets(userID int, limit int) ([]domain.Ti
 	ticketsResponse, err := toRes(tickets)
 	return ticketsResponse, nil
 }
+
 func (t ticketQueryService) GetTicketsByStatusID(statusID int) ([]domain.TicketsResponse, error) {
 	ticketsFromDB, err := t.ticketRepo.GetTicketsByStatusID(statusID)
 	if err != nil {
@@ -143,4 +144,16 @@ func (t ticketQueryService) GetTicketsByStatusID(statusID int) ([]domain.Tickets
 		return nil, err
 	}
 	return tickets, nil
+}
+
+func (t ticketQueryService) GetTicketsByUsersID(usersID int) ([]domain.TicketsResponse, error) {
+	ticketsFromRepo, err := t.ticketRepo.GetTicketsByUsersID(usersID)
+	if err != nil {
+		return nil, err
+	}
+	ticketRes, err := toRes(ticketsFromRepo)
+	if err != nil {
+		return nil, err
+	}
+	return ticketRes, nil
 }
