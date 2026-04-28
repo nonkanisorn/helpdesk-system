@@ -13,52 +13,131 @@ import {
   ToggleButton,
   Chip,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+
 function Historyrepair() {
-  const [caseData, setcaseData] = useState([]);
-  const user_id = useSelector((state) => state.user.users_id);
-  const navigate = useNavigate();
-  const [selected, setSelected] = useState("1");
-  const [controlShowData, setControlShowData] = useState(0);
+  const now = new Date();
 
-  // console.log("datacas", caseData);
-  const handleChange = (event, newSelected) => {
-    if (newSelected !== null) {
-      setSelected(event.target.value);
-    }
-  };
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5011/caseuser/${user_id}`)
-      .then(function (response) {
-        setcaseData(response.data);
-        // console.log(response);
-      })
-      .catch(function (error) {
-        // console.log(error);
-      })
-      .finally(function () {});
-  }, []);
-  // console.log(
-  //   "casesta1",
-  //   caseData.filter((items) => items.status_id === 1),
-  // );
-  const status_6 = caseData.filter((item) => item.status_id === 6).length;
-  const status_5 = caseData.filter((item) => item.status_id === 5).length;
-  const status_4 = caseData.filter((item) => item.status_id === 4).length;
-  const status_3 = caseData.filter((item) => item.status_id === 3).length;
-  const status_2 = caseData.filter((item) => item.status_id === 2).length;
-  const status_1 = caseData.filter((item) => item.status_id === 1).length;
-  const allStatus =
-    status_1 + status_2 + status_3 + status_4 + status_5 + status_6;
-
-  const filterStatus = () => {
-    return caseData.filter((item) => {
-      if (controlShowData === 0) return true;
-      return item.status_id === controlShowData;
+  const token = useSelector((state) => state.user.token);
+  const formatted = (date) => {
+    return new Date(date).toLocaleString("th-TH", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
   };
-  // console.log("fil", filterStatus());
+  const [ticketData, setticketData] = useState([]);
+  const user_id = useSelector((state) => state.user.user_id);
+
+  // ✅ เปลี่ยนเป็น key ของกลุ่มสถานะ (อ่านง่าย + filter ถูก)
+  const [groupKey, setGroupKey] = useState("all");
+
+  // ✅ กลุ่มสถานะสำหรับ USER (ตรงกับ DB)
+  // 1 Open, 2 Assigned, 3 In Progress, 4 Technician Complete, 5 Waiting for User Confirmation, 6 Closed, 7 Waiting for Parts
+  const userStatusGroups = {
+    all: { label: "ทั้งหมด", ids: null },
+
+    // Open + Assigned
+    pending: { label: "รอดำเนินการ", ids: [1, 2] },
+
+    // In Progress + Waiting for Parts
+    progress: { label: "อยู่ระหว่างซ่อม", ids: [3, 6] },
+
+    // Waiting for User Confirmation
+    confirm: { label: "รอการยืนยันจากคุณ", ids: [4] },
+
+    // Closed
+    done: { label: "เสร็จสิ้นแล้ว", ids: [5] },
+  };
+
+  // ✅ label สำหรับ chip (รองรับครบทุกสถานะที่ user เห็น)
+  const userStatusLabelMap = {
+    1: "รอดำเนินการ",
+    2: "รอดำเนินการ",
+    3: "อยู่ระหว่างซ่อม",
+    4: "รอการยืนยันจากคุณ",
+    5: "เสร็จสิ้น",
+    6: "อยู่ระหว่างซ่อม",
+  };
+
+  // ✅ helper นับ + กรอง
+  const countByGroup = (key) => {
+    const ids = userStatusGroups[key].ids;
+    if (!ids) return ticketData.length;
+    return ticketData.filter((t) => ids.includes(t.status_id)).length;
+  };
+
+  const filterByGroup = (key) => {
+    const ids = userStatusGroups[key].ids;
+    if (!ids) return ticketData;
+    return ticketData.filter((t) => ids.includes(t.status_id));
+  };
+
+  // ✅ โหลดข้อมูล (ใส่ user_id ใน dependency)
+  useEffect(() => {
+    if (!user_id) return;
+
+    axios
+      .get(`http://localhost:5011/tickets/users/${user_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setticketData(response.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [user_id]);
+
+  // ✅ ใช้ในการ render
+  const filteredTickets = filterByGroup(groupKey);
+
+  // ✅ ฟังก์ชัน style ของ chip ตาม status
+  const chipStyleByStatus = (status_id) => {
+    // Done
+    if (status_id === 6) {
+      return {
+        bgcolor: "#E8F9EE",
+        border: 1,
+        borderColor: "#C1EED2",
+        color: "#2BC764",
+      };
+    }
+
+    // Progress / Waiting parts
+    if (status_id === 3 || status_id === 7) {
+      return {
+        bgcolor: "#FDF5E6",
+        border: 1,
+        borderColor: "#FBE5BB",
+        color: "#F7B543",
+      };
+    }
+    if (status_id === 4 || status_id === 5) {
+      return {
+        bgcolor: "#E8F1FF",
+        border: 1,
+        borderColor: "#BFD8FF",
+        color: "#2F6FED",
+      };
+    }
+    // Confirm
+
+    // Pending (Open/Assigned)
+    if (status_id === 1 || status_id === 2) {
+      return {
+        bgcolor: "#F3F4F6",
+        border: 1,
+        borderColor: "#E5E7EB",
+        color: "#374151",
+      };
+    }
+
+    return {};
+  };
+
   return (
     <>
       <Box
@@ -82,29 +161,31 @@ function Historyrepair() {
               <Typography variant="h4" fontWeight="fontWeightBold">
                 ประวัติการซ่อมของฉัน
               </Typography>
-              <Typography variant="subtitle1" color=" grey">
+              <Typography variant="subtitle1" color="grey">
                 รายการคำขอซ่อมทั้งหมดของคุณ
               </Typography>
+
+              {/* ✅ Summary Cards */}
               <Stack
                 direction="row"
                 spacing={2}
                 sx={{
-                  flexWrap: "wrap", // ให้ห่อบรรทัดเมื่อจอแคบ
+                  flexWrap: "wrap",
                   justifyContent: "space-between",
                   mt: 4,
                 }}
               >
                 {[
-                  ["ทั้งหมด", allStatus],
-                  ["รอรับเรื่อง", status_1],
-                  ["อยู่ระหว่างซ่อม", status_2],
-                  ["ยืนยันการซ่อม", status_3],
-                  ["เสร็จสิ้น", status_6],
+                  ["ทั้งหมด", countByGroup("all")],
+                  ["รอดำเนินการ", countByGroup("pending")],
+                  ["อยู่ระหว่างซ่อม", countByGroup("progress")],
+                  ["รอการยืนยันจากคุณ", countByGroup("confirm")],
+                  ["เสร็จสิ้นแล้ว", countByGroup("done")],
                 ].map(([label, count]) => (
                   <Paper
                     key={label}
                     sx={{
-                      flex: "1 1 100px", // แต่ละกล่องกว้างอย่างน้อย 200px
+                      flex: "1 1 100px",
                       height: 120,
                       borderRadius: 3,
                       p: 2,
@@ -119,6 +200,8 @@ function Historyrepair() {
                   </Paper>
                 ))}
               </Stack>
+
+              {/* ✅ Filter Tabs */}
               <Paper
                 sx={{
                   width: "55%",
@@ -128,180 +211,94 @@ function Historyrepair() {
                 }}
               >
                 <ToggleButtonGroup
-                  value={selected}
+                  value={groupKey}
+                  exclusive
                   color="primary"
-                  onChange={handleChange}
+                  onChange={(e, newValue) => {
+                    if (newValue !== null) setGroupKey(newValue);
+                  }}
                   sx={{ gap: 1, p: 2, height: 50 }}
                 >
-                  <ToggleButton
-                    onClick={() => setControlShowData(0)}
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
+                  <ToggleButton value="all" sx={{ whiteSpace: "nowrap" }}>
                     ทั้งหมด
                   </ToggleButton>
-                  <ToggleButton
-                    onClick={() => setControlShowData(1)}
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
-                    รอรับเรื่อง
+                  <ToggleButton value="pending" sx={{ whiteSpace: "nowrap" }}>
+                    รอดำเนินการ
                   </ToggleButton>
-                  <ToggleButton
-                    onClick={() => setControlShowData(2)}
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
+                  <ToggleButton value="progress" sx={{ whiteSpace: "nowrap" }}>
                     อยู่ระหว่างซ่อม
                   </ToggleButton>
-                  <ToggleButton
-                    onClick={() => setControlShowData(3)}
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
+                  <ToggleButton value="confirm" sx={{ whiteSpace: "nowrap" }}>
                     ยืนยันการซ่อม
                   </ToggleButton>
-                  <ToggleButton
-                    onClick={() => setControlShowData(6)}
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
+                  <ToggleButton value="done" sx={{ whiteSpace: "nowrap" }}>
                     เสร็จสิ้น
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Paper>
 
-              <Grid
-                container
-                spacing={2}
-                sx={{
-                  alignContent: "flex-start",
-                }}
-              >
-                {filterStatus().map((items, index) => (
-                  <Grid item xs={12} md={6}>
-                    <Paper
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        minHeight: 200,
-                      }}
-                    >
-                      <Stack
-                        sx={{ p: 2 }}
-                        direction="row"
-                        justifyContent="space-between"
-                      >
-                        <Typography>{items.case_title}</Typography>
-                        {items.status_id === 6 ? (
-                          <Chip
-                            label={items.status_name}
-                            // color="#E8F9EE"
-                            // variant="outlined"
-                            sx={{
-                              bgcolor: "#E8F9EE",
-                              border: 1,
-                              borderColor: "#C1EED2",
-                              color: "#2BC764",
-                            }}
-                          ></Chip>
-                        ) : items.status_id === 5 ? (
-                          <Chip
-                            label={items.status_name}
-                            // color="#E8F9EE"
-                            // variant="outlined"
-                            sx={{
-                              bgcolor: "#E8F9EE",
-                              border: 1,
-                              borderColor: "#C1EED2",
-                              color: "#2BC764",
-                            }}
-                          ></Chip>
-                        ) : items.status_id === 4 ? (
-                          <Chip
-                            label={items.status_name}
-                            // color="#E8F9EE"
-                            // variant="outlined"
-                            sx={{
-                              bgcolor: "#E8F9EE",
-                              border: 1,
-                              borderColor: "#C1EED2",
-                              color: "#2BC764",
-                            }}
-                          ></Chip>
-                        ) : items.status_id === 3 ? (
-                          <Chip
-                            label="ยืนยันการซ่อม"
-                            // color="#E8F9EE"
-                            // variant="outlined"
-                            sx={{
-                              bgcolor: "#FDF5E6",
-                              border: 1,
-                              borderColor: "#FBE5BB",
-                              color: "#F7B543",
-                            }}
-                          ></Chip>
-                        ) : items.status_id === 2 ? (
-                          <Chip
-                            label="อยู่ระหว่างซ่อม"
-                            // color="#E8F9EE"
-                            // variant="outlined"
-                            sx={{
-                              bgcolor: "#E9EFFC",
-                              border: 1,
-                              borderColor: "#C6D6F8",
-                              color: "#3E76EE",
-                            }}
-                          ></Chip>
-                        ) : items.status_id === 1 ? (
-                          <Chip
-                            label="รอรับเรื่อง"
-                            // color="#E8F9EE"
-                            // variant="outlined"
-                            sx={{
-                              bgcolor: "#E8F9EE",
-                              border: 1,
-                              borderColor: "#C1EED2",
-                              color: "#2BC764",
-                            }}
-                          ></Chip>
-                        ) : null}
-                      </Stack>
-                      <Box sx={{ p: 2 }}>
-                        <Typography>{items.case_detail}</Typography>
-                        <Typography>แจ้งเมื่อ</Typography>
-                      </Box>
-                      <Box
+              {/* ✅ List */}
+              <Grid container spacing={2} sx={{ alignContent: "flex-start" }}>
+                {filteredTickets.map((items) => {
+                  const chipLabel = userStatusLabelMap[items.status_id];
+
+                  return (
+                    <Grid key={items.ticket_id} item xs={12} md={6}>
+                      <Paper
                         sx={{
                           display: "flex",
-                          justifyContent: "center",
-                          marginX: "5%",
+                          flexDirection: "column",
+                          minHeight: 200,
                         }}
                       >
-                        <Button
-                          component={Link}
-                          to={{
-                            pathname: `/user/repair-detail/${items.case_id}`,
-                          }}
+                        <Stack
+                          sx={{ p: 2 }}
+                          direction="row"
+                          justifyContent="space-between"
+                        >
+                          <Typography>{items.title}</Typography>
+
+                          {chipLabel ? (
+                            <Chip
+                              label={chipLabel}
+                              sx={chipStyleByStatus(items.status_id)}
+                            />
+                          ) : null}
+                        </Stack>
+
+                        <Box sx={{ p: 2 }}>
+                          <Typography>{items.description}</Typography>
+                          <Typography>
+                            แจ้งเมื่อ : {formatted(items.created_at)}
+                          </Typography>
+                        </Box>
+
+                        <Box
                           sx={{
-                            bgcolor: "#FAFAFA",
-                            border: 1,
-                            borderRadius: 3,
-                            width: "100%",
+                            display: "flex",
+                            justifyContent: "center",
+                            marginX: "5%",
+                            pb: 2,
                           }}
                         >
-                          ดูลายละเอียด
-                        </Button>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                ))}
+                          <Button
+                            component={Link}
+                            to={`/user/repair-detail/${items.ticket_id}`}
+                            sx={{
+                              bgcolor: "#FAFAFA",
+                              border: 1,
+                              borderRadius: 3,
+                              width: "100%",
+                            }}
+                          >
+                            ดูรายละเอียด
+                          </Button>
+                        </Box>
+                      </Paper>
+                    </Grid>
+                  );
+                })}
               </Grid>
-              {/* <Grid */}
-              {/*   container */}
-              {/*   spacing={2} */}
-              {/*   sx={{ */}
-              {/*     alignContent: "flex-start", */}
-              {/*   }} */}
-              {/* > */}
-              {/*   {caseData.map((items, index) => ( */}
-              {/*   ))} */}
-              {/* </Grid> */}
             </Box>
           </Box>
         </Box>
@@ -309,4 +306,5 @@ function Historyrepair() {
     </>
   );
 }
+
 export default Historyrepair;

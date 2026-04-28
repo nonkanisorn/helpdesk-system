@@ -13,6 +13,20 @@ function Devicehistory() {
   const { dev_id } = useParams();
   const [deviceData, setDeviceData] = useState([]);
   console.log("devid", dev_id);
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "-";
+
+    const date = new Date(dateString);
+
+    return date.toLocaleString("th-TH", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  };
   const statusmap = {
     1: "รอดำเนินการ",
     2: "กำลังดำเนินการ",
@@ -64,9 +78,9 @@ function Devicehistory() {
                 <TableRow key={idx}>
                   {item.status_to === 3 ? (
                     <>
-                      <TableCell align="center">{item.case_id}</TableCell>
+                      <TableCell align="center">{item.ticket_id}</TableCell>
                       <TableCell align="center">
-                        {item.case_device_id}
+                        {item.ticket_device_id}
                       </TableCell>
                       <TableCell align="center">
                         {statusmap[item.status_from]}
@@ -79,7 +93,7 @@ function Devicehistory() {
                         {eventmap[item.event_type]}
                       </TableCell>
                       <TableCell align="center">
-                        {item.case_resolution}
+                        {item.ticket_resolution}
                       </TableCell>
                       <TableCell align="center">
                         {new Date(item.occurred_at).toLocaleString("th-TH", {
@@ -90,9 +104,9 @@ function Devicehistory() {
                     </>
                   ) : (
                     <>
-                      <TableCell align="center">{item.case_id}</TableCell>
+                      <TableCell align="center">{item.ticket_id}</TableCell>
                       <TableCell align="center">
-                        {item.case_device_id}
+                        {item.ticket_device_id}
                       </TableCell>
                       <TableCell align="center">
                         {statusmap[item.status_from]}

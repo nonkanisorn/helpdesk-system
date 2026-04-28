@@ -56,6 +56,13 @@ type TicketQueryRepository interface {
 	GetTicketsByTechnicianID(int) ([]TicketRow, error)
 	GetTicketForTechnicianByTicketID(int) (*TicketsForTechnicianRow, error)
 	GetTicketsByUsersID(int) ([]TicketRow, error)
+	UpdateStatusTicketByTechnician(*TicketRow) error
+	UpdateStatusCompleteByTechnician(*TicketRow) error
+	StartJobByTechnicianID(int) error
+	CompletedJobByTechnician(int, int, string) error
+	ConfirmAndCloseTicketByUser(int) error
+	GetLatestTickets(int, int) ([]TicketRow, error)
+	GetTicketsByStatusID(int) ([]TicketRow, error)
 }
 type TicketRepository interface {
 	GetAllTickets() ([]TicketRow, error)

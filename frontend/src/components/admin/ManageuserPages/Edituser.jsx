@@ -14,9 +14,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useSelector } from "react-redux";
 function Edituser() {
-  const token = useSelector((state) => state.user.token);
   const navigate = useNavigate();
   const { users_id } = useParams();
   const [userData, setUserData] = useState([]);
@@ -32,24 +30,23 @@ function Edituser() {
   const [user_phone, setUserPhone] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
   const formData = new FormData();
-  formData.append("name", newName);
+  formData.append("full_name", newName);
   formData.append("username", newUsername);
   formData.append("userpassword", newUserpassword);
   formData.append("role_id", newRolename);
-  formData.append("dep_id", newDepname);
+  formData.append("department_id", newDepname);
   formData.append("user_img", newProfile);
-  formData.append("user_email", user_email);
-  formData.append("user_phone", user_phone);
+  formData.append("email", user_email);
+  formData.append("phone", user_phone);
   const handleSubmit = () => {
     axios
       .patch(`${apiUrl}/userupdate/${users_id}`, formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       })
       .then(() => {
-
+        console.log("updatesuccess");
         setNewUsername(" ");
         setNewName(" ");
         setNewUserpassword(" ");
@@ -67,12 +64,9 @@ function Edituser() {
         const response = await axios.get(
           // `http://localhost:5011/userbyid/${users_id}`,
           `http://localhost:5011/users/${users_id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
         );
         setUserData(response.data);
-
+        console.log("userdata", userData);
       } catch (error) {
         console.log(error);
       }
@@ -83,11 +77,7 @@ function Edituser() {
   useEffect(() => {
     const fetchRoleData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5011/roles`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(`http://localhost:5011/roles`);
         setRoleData(response.data);
       } catch (error) {
         console.log(error);
@@ -95,11 +85,7 @@ function Edituser() {
     };
     const fetchDepData = async () => {
       try {
-        const response = await axios.get("http://localhost:5011/departments", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get("http://localhost:5011/departments");
         setDepName(response.data);
       } catch (error) {
         console.log(error);
@@ -110,11 +96,11 @@ function Edituser() {
     fetchDepData();
   }, []);
 
-
+  console.log("depname", depName);
   if (!userData || userData.length === 0) {
     return null;
   }
-
+  console.log("userdata", userData);
   console.log("roledata", roleData);
   console.log(
     "alldata",
@@ -136,7 +122,7 @@ function Edituser() {
           <img width="200px" height="200px" src="/assets/user.png" />
         </Box>
         <Box ml={5} mt={5}>
-          {/* <Typography>ชื่อผู้ใช้เดิม: {userData[0].username}</Typography> */}
+          <Typography>ชื่อผู้ใช้เดิม: {userData[0].username}</Typography>
           <Box mt={3}>
             <Typography component="span">ชื่อผู้ใช้ใหม่ : </Typography>
             <TextField
@@ -156,7 +142,9 @@ function Edituser() {
           </Box>
           <br />
           <Box>
-            {/* <Typography>ชื่อนามสกุลผู้ใช้เดิม : {userData[0].name}</Typography> */}
+            <Typography>
+              ชื่อนามสกุลผู้ใช้เดิม : {userData[0].full_name}
+            </Typography>
             <Typography component="span">ชื่อนามสกุลผู้ใช้ใหม่ : </Typography>
             <TextField
               value={newName}
@@ -164,52 +152,50 @@ function Edituser() {
             ></TextField>
           </Box>
           <Box>
-            {/* <Typography component="span">Email: {userData[0].email}</Typography> */}
+            <Typography component="span">Email: {userData[0].email}</Typography>
             <TextField
               onChange={(e) => setUserEmail(e.target.value)}
             ></TextField>
           </Box>
 
           <Box>
-            <Typography component="span">
-              {/* Phone: {userData[0].user_phone} */}
-            </Typography>
+            <Typography component="span">Phone: {userData[0].phone}</Typography>
             <TextField
               onChange={(e) => setUserPhone(e.target.value)}
             ></TextField>
           </Box>
           <Box>
             <Typography>
-              {/* แผนกผู้ใช้เดิม : {userData[0].dep_name || "ยังไม่มีแผนก"} */}
+              แผนกผู้ใช้เดิม : {userData[0].dep_name || "ยังไม่มีแผนก"}
             </Typography>
             <Box display="flex">
-              {/* <Typography>แผนกผู้ใช้ใหม่: {userData[0].dep_id}</Typography> */}
+              <Typography>แผนกผู้ใช้ใหม่: {userData[0].dep_id}</Typography>
               <Select
                 sx={{ ml: 3 }}
                 onChange={(e) => setNewDepname(e.target.value)}
               >
-                {/* {depName.map((item) => ( */}
-                {/*   <MenuItem key={item.id} value={item.dep_id}> */}
-                {/*     {item.dep_name} */}
-                {/*   </MenuItem> */}
-                {/* ))} */}
+                {depName.map((item) => (
+                  <MenuItem key={item.id} value={item.dep_id}>
+                    {item.dep_name}
+                  </MenuItem>
+                ))}
               </Select>
             </Box>
           </Box>
           <br />
           <Box>
-            {/* <Typography>บทบาทเดิม : {userData[0].role_name}</Typography> */}
+            <Typography>บทบาทเดิม : {userData[0].role_name}</Typography>
             <Typography component="span">บทบาทใหม่ : </Typography>
             <Select
               onChange={(e) => setNewRolename(e.target.value)}
               value={newRolename}
             >
               <MenuItem value="none">none</MenuItem>
-              {/* {roleData.map((data, idx) => ( */}
-              {/*   <MenuItem key={idx} value={data.role_id}> */}
-              {/*     {data.role_name} */}
-              {/*   </MenuItem> */}
-              {/* ))} */}
+              {roleData.map((data, idx) => (
+                <MenuItem key={idx} value={data.role_id}>
+                  {data.role_name}
+                </MenuItem>
+              ))}
             </Select>
           </Box>
           <br />

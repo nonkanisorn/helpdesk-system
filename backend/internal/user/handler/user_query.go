@@ -42,7 +42,7 @@ func (u userQueryHandler) GetCurrentUser(c *fiber.Ctx) error {
 }
 
 func (u userQueryHandler) GetUserByRolesID(c *fiber.Ctx) error {
-	id, err := strconv.Atoi(c.Params("id"))
+	id, err := strconv.Atoi(c.Params("roleID"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

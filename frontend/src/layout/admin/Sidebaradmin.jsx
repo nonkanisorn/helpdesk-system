@@ -16,35 +16,29 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useSelector } from "react-redux";
 
 const Sidebaradmin = () => {
-  const token = useSelector((state) => state.user.token);
   const [isCollapsed, setisCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const [broken, setBroken] = useState(false);
-  const firstName = useSelector((state) => state.user.first_name);
-  const users_id = useSelector((state) => state.user.users_id);
+  const full_name = useSelector((state) => state.user.full_name);
+  const user_id = useSelector((state) => state.user.user_id);
   const [url, setUrl] = useState("");
 
   useEffect(() => {
-    if (users_id) {
+    if (user_id) {
       const fetchdata = async () => {
         const response = await axios.get(
-          `http://localhost:5011/users/${users_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+          `http://localhost:5011/users/${user_id}`,
         );
         if (
-          !response.data[0].avatar_path ||
-          response.data[0].avatar_path.data.length === 0
+          !response.data[0].user_img ||
+          response.data[0].user_img.data.length === 0
         ) {
           // setUrl("../../../public/assets/user.png");
           setUrl("/assets/user.png");
         } else {
           const user = response.data[0];
-          // console.log(response);
-          const array = new Uint8Array(user.avatar_path.data);
+          console.log(response);
+          const array = new Uint8Array(user.user_img.data);
           const blob = new Blob([array], { type: "image/jpeg" });
           const url = URL.createObjectURL(blob);
           setUrl(url);
@@ -53,7 +47,7 @@ const Sidebaradmin = () => {
 
       fetchdata();
     }
-  }, [users_id]);
+  }, [user_id]);
   return (
     <div
       style={{
@@ -117,7 +111,7 @@ const Sidebaradmin = () => {
                   </Box>
                   <Box textAlign="center" color="#ffff">
                     <Typography sx={{ m: "10px 0 0 0" }}>
-                      {firstName}
+                      {full_name}
                     </Typography>
                   </Box>
                 </Box>
@@ -137,11 +131,11 @@ const Sidebaradmin = () => {
                   จัดการบทบาท
                 </MenuItem>
               </Link>
-              <Link to="/admin/Managedevice" className="menu-bars">
-                <MenuItem style={{ color: "#fff" }} icon={<EditOutlinedIcon />}>
-                  จัดการอุปกรณ์
-                </MenuItem>
-              </Link>
+              {/* <Link to="/admin/Managedevice" className="menu-bars"> */}
+              {/*   <MenuItem style={{ color: "#fff" }} icon={<EditOutlinedIcon />}> */}
+              {/*     จัดการอุปกรณ์ */}
+              {/*   </MenuItem> */}
+              {/* </Link> */}
               <Link to="/admin/Managestatus" className="menu-bars">
                 <MenuItem style={{ color: "#fff" }} icon={<EditOutlinedIcon />}>
                   จัดการสถานะ
@@ -157,7 +151,7 @@ const Sidebaradmin = () => {
                   จัดการประเภทอุปกรณ์
                 </MenuItem>
               </Link>
-              <Link to="/admin/Managedepartment" className="menu-bars">
+              <Link to="/admin/manage/issues-categories" className="menu-bars">
                 <MenuItem style={{ color: "#fff" }} icon={<EditOutlinedIcon />}>
                   จัดการประเภทปัญหา
                 </MenuItem>

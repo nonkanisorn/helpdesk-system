@@ -21,6 +21,10 @@ import (
 	deviceInstanceRepo "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/repository"
 	deviceInstanceServ "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
 
+	// deviceInstanceQueryHand "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/handler"
+	deviceInstanceQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/repository"
+	// deviceInstanceQueryServ "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
+	// deviceInstanceServ "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
 	deviceHand "github.com/nonkanisorn/helpdesk-system/internal/device/handler"
 	deviceRepo "github.com/nonkanisorn/helpdesk-system/internal/device/repository"
 	deviceServ "github.com/nonkanisorn/helpdesk-system/internal/device/service"
@@ -43,6 +47,8 @@ import (
 	registerServ "github.com/nonkanisorn/helpdesk-system/internal/auth/register/service"
 	ticketHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
 	ticketQueryHand "github.com/nonkanisorn/helpdesk-system/internal/case/handler"
+
+	// "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketRepo "github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	ticketQueryServ "github.com/nonkanisorn/helpdesk-system/internal/case/service"
@@ -66,16 +72,14 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{AllowOrigins: "http://localhost:5173"}))
 	app.Use(func(c *fiber.Ctx) error {
-		fmt.Println("HIT:", c.Method(), c.Path())
+		fmt.Println("HITTTss:", c.Method(), c.Path())
 		return c.Next()
 	})
-
 	// app.Use(logger.New())
 	db, err := sqlx.Open("mysql", "root:@tcp(localhost:3306)/helpdesk_system?parseTime=true&loc=Local")
 	if err != nil {
 		panic(err)
 	}
-
 	h := wire.NewHandlers(db)
 	routes.RegisterLogin(app, h)
 	// Auth
@@ -93,20 +97,33 @@ func main() {
 	}))
 	// case
 	// ticket
+	// note := "testeiei"
+	deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
+
 	ticketQueryRepo := ticketQueryRepo.NewTicketQueryRepository(db)
-	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo)
+	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo, deviceInstanceQueryRepo)
+	// ticketQueryServ.CompletedJobByTechnician(46, "test", "ABC1234")
 	ticketQueryHand := ticketQueryHand.NewTicketQueryHandlers(ticketQueryServ)
+
 	app.Post("/tickets/status", ticketQueryHand.UpdateStatusTicket)
 	app.Patch("/tickets/:id<int>/assign-technician", ticketQueryHand.AssignTechToTicket)
-	app.Get("/technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
+	app.Get("technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
+	app.Patch("technician/:ticketID<int>/start", ticketQueryHand.StartJobByTechnicianID)
+	app.Patch("technician/:ticketID<int>/complete", ticketQueryHand.CompletedJobByTechnician)
+	app.Patch("/tickets/:ticketID<int>/confirmation", ticketQueryHand.ConfirmAndCloseTicketByUser)
 	app.Get("/tickets/:ticketID<int>/technician", ticketQueryHand.GetTicketForTechnicianByTicketID)
+	app.Get("/tickets/:userID<int>/latest/:limit<int>", ticketQueryHand.GetLatestTickets)
+	app.Get("/tickets/users/:userID<int>", ticketQueryHand.GetTicketsByUsersID)
+	app.Get("/tickets/status/:statusID<int>", ticketQueryHand.GetTicketsByStatusID)
 
 	ticketRepo := ticketRepo.NewTicketRepository(db)
 	ticketServ := ticketServ.NewTicketService(ticketRepo)
+
 	ticketHand := ticketHand.NewTicketHandler(ticketServ)
+
 	app.Get("/tickets", ticketHand.GetAllTickets)
-	app.Get("/tickets/:id<int>", ticketHand.GetTicketByID)
 	app.Post("/tickets", ticketHand.CreateTicket)
+	app.Get("/tickets/:ticketID<int>", ticketHand.GetTicketByID)
 	// User
 	userRepo := userRepo.NewUserRepository(db)
 	userServ := userServ.NewUserService(userRepo)
@@ -124,7 +141,7 @@ func main() {
 	userQueryRepo := userQueryRepo.NewUserQueryRepository(db)
 	userQueryServ := userQueryServ.NewUserQueryService(userQueryRepo)
 	userQueryHandler := userQueryHand.NewUserQueryHandler(userQueryServ)
-	app.Get("/users/:id<int>/role", userQueryHandler.GetUserByRolesID)
+	app.Get("/users/by-role/:roleID<int>", userQueryHandler.GetUserByRolesID)
 	app.Get("/users/view", userQueryHandler.GetUserWithRolesName)
 	app.Get("/current-user/:id<int>", userQueryHandler.GetCurrentUser)
 	// admin
@@ -141,8 +158,8 @@ func main() {
 	roleService := roleServ.NewRoleService(roleReposityDB)
 	roleHandler := roleHand.NewRoleHandler(roleService)
 	app.Get("/roles", roleHandler.GetRole)
-	app.Get("/roles/:id<int>", roleHandler.GetRoleByID())
 	app.Post("/roles", roleHandler.CreateRoles)
+	app.Get("/roles/:id<int>", roleHandler.GetRoleByID())
 	app.Delete("/roles/:id<int>", roleHandler.DeleteRolesByID)
 
 	// department
@@ -171,6 +188,15 @@ func main() {
 	deviceInstanceServ := deviceInstanceServ.NewDeviceInstanceService(deviceInstanceRepo)
 	deviceInstanceHandler := deviceInstanceHand.NewDeviceInstanceHandler(deviceInstanceServ)
 	app.Get("/device-instances", deviceInstanceHandler.GetAllDeviceInstance)
+
+	// deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
+	_ = deviceInstanceQueryRepo
+
+	// row, err := deviceInstanceQueryRepo.CheckSerialNumber("ABC1234")
+	// if err != nil {
+	// 	fmt.Println("errnaja", err)
+	// }
+	// fmt.Println("ropooowoeqoe", row)
 	// Issue
 	issueRepo := issueRepo.NewIssueRepository(db)
 	issueServ := issueServ.NewIssueService(issueRepo)

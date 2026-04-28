@@ -26,7 +26,7 @@ const getUserRole = () => {
   const token = cookies.get("token");
   const decodedToken = jwtDecode(token);
   const role = decodedToken.role;
-  // console.log(role);
+  console.log(role);
   return role;
 };
 

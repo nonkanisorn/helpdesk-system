@@ -11,6 +11,7 @@ const AdminQuickActionCard = ({
   icon = "icon",
   title = "title",
   subtitle = "subtitle",
+  func = "func",
 }) => {
   return (
     <>
@@ -19,7 +20,13 @@ const AdminQuickActionCard = ({
           <Typography>{icon}</Typography>
           <Typography fontWeight="fontWeightBold">{title}</Typography>
           <Typography color="grey">{subtitle}</Typography>
-          <Button variant="contained" sx={{ width: "100%", mt: 2 }}>
+          <Button
+            variant="contained"
+            sx={{ width: "100%", mt: 2 }}
+            onClick={() => {
+              func();
+            }}
+          >
             เพิ่ม
           </Button>
         </Stack>

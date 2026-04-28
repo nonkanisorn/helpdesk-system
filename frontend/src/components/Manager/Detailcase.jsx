@@ -12,106 +12,95 @@ import { Box, Grid, Paper, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
-function Detailcase() {
+export const Detailcase = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { case_id } = useParams();
-  const [casedatabyID, setcasedatabyID] = useState([]);
+  const { ticket_id } = useParams();
+  const [ticketdatabyID, setticketdatabyID] = useState([]);
   const [imgurl, setImgUrls] = useState([]);
-  const status_id = 2;
+  const roleTechnician = 3
   const [technician, settechnician] = useState([]);
   const [selectedTechnicians, setSelectedTechnicians] = useState({});
-  const { caseData } = location.state || {};
+  const { ticketData } = location.state || {};
   const [refresh, setRefresh] = useState(false);
-  const manager_id = useSelector((state) => state.user.users_id);
-  const [caseById, setCaseById] = useState();
-  console.log("case_id", case_id);
-  const sendtech = async (case_id, techid) => {
+  const manager_id = useSelector((state) => state.user.user_id);
+  const token = useSelector((state) => state.user.token);
+  const [ticketById, setticketById] = useState();
+  const sendtech = async (ticket_id, techid) => {
     await axios
-      .patch(`http://localhost:5011/addtechcase/${case_id}`, {
+      .patch(`http://localhost:5011/tickets/${ticket_id}/assign-technician`, {
         technician_id: techid,
         manager_id,
-        status_id,
-
-        // case_device_id: caseData[0].case_device_id,
-      })
+      },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
+      )
       .then(() => {
         setSelectedTechnicians({});
         setRefresh(true); // ตั้งค่า refresh ให้เป็น true หลังจากการส่งข้อมูลสำเร็จ
-        navigate("/manager/reportcase");
+        navigate("/manager/reportticket");
       })
       .catch((error) => {
         console.log(error);
       });
   };
-  // useEffect(() => {
-  //   const fetchdata = async () => {
-  //     try {
-  //       const technicianResponse = await axios.get(
-  //         "http://localhost:5011/technicians/role",
-  //       );
-  //       const technicianData = await technicianResponse.data.map(
-  //         (technician) => ({
-  //           id: technician.users_id,
-  //           name: technician.name,
-  //           user_img: technician.user_img,
-  //           user_email: technician.user_email,
-  //           user_phone: technician.user_phone,
-  //         }),
-  //       );
-  //       settechnician(technicianData);
-  //       const imgUrlArray = technician.map((item, idx) => {
-  //         if (item.user_img) {
-  //           console.log("มีค่า", idx);
-  //           const user = item.user_img;
-  //           const array = new Uint8Array(user.data);
-  //           const blob = new Blob([array], { type: "image/jpeg" });
-  //           return URL.createObjectURL(blob);
-  //         } else {
-  //           return null;
-  //         }
-  //       });
-  //       setImgUrls(imgUrlArray);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  const fetchCaseById = async () => {
-    // const { case_id } = useParams();
-    try {
-      const res = await axios.get(`http://localhost:5011/caseid/${case_id}`);
-      console.log(res.data[0]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  //   fetchdata();
-  //   fetchCaseById();
-  // }, [case_id]);
-  // TODO: create func fetch technician role & ticketbyid
-  //
   useEffect(() => {
-    try {
-      const fetchUserTechData = () => {
-        // This api is want role_id to query db with role_id
-        const role_id = 1;
-
-        axios
-          .get(`${apiUrl}/users/${role_id}/role`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => setUserTech(response.data.result))
-          .catch((error) => console.log(error));
-      };
-      fetchUserTechData();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-  console.log("dasdasd", usersTech);
-
+    const fetchdata = async () => {
+      try {
+        const technicianResponse = await axios.get(
+          `http://localhost:5011/users/by-role/${roleTechnician}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
+        );
+        const technicianData = await technicianResponse.data.result.map(
+          (technician) => ({
+            id: technician.user_id,
+            full_name: `${technician.first_name || ""} ${technician.last_name || ""}`.trim(),
+            user_img: technician.avatar_path,
+            email: technician.email,
+            phone: technician.phone,
+          }),
+        );
+        settechnician(technicianData);
+        const imgUrlArray = technician.map((item, idx) => {
+          if (item.user_img) {
+            console.log("มีค่า", idx);
+            const user = item.user_img;
+            const array = new Uint8Array(user.data);
+            const blob = new Blob([array], { type: "image/jpeg" });
+            return URL.createObjectURL(blob);
+          } else {
+            return null;
+          }
+        });
+        setImgUrls(imgUrlArray);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const fetchticketById = async () => {
+      // const { ticket_id } = useParams();
+      try {
+        const res = await axios.get(
+          `http://localhost:5011/tickets/${ticket_id}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }
+        );
+        console.log(res.data[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchdata();
+    fetchticketById();
+  }, [ticket_id]);
   useEffect(() => {
     if (refresh) {
       setRefresh(false); // รีเซ็ต refresh หลังจากการดึงข้อมูลใหม่เสร็จสมบูรณ์
@@ -129,13 +118,13 @@ function Detailcase() {
                     ข้อมูลรายละเอียดช่าง
                   </Typography>
                   <br />
-                  <Typography variant="h5">{tech.name}</Typography>
+                  <Typography variant="h5">{tech.full_name}</Typography>
                   <br />
                   <Typography color="text.secondary">
-                    Email: {tech.user_email}
+                    Email: {tech.email}
                   </Typography>
                   <Typography color="text.secondary">
-                    Phone: {tech.user_phone}
+                    Phone: {tech.phone}
                   </Typography>
                 </CardContent>
                 <CardMedia
@@ -157,7 +146,7 @@ function Detailcase() {
                   color="success"
                   sx={{ mb: 3, mr: 3 }}
                   onClick={() => {
-                    sendtech(case_id, tech.id);
+                    sendtech(ticket_id, tech.id);
                   }}
                 >
                   {" "}
@@ -170,6 +159,4 @@ function Detailcase() {
       </Grid>
     </Box>
   );
-}
-
-export default Detailcase;
+};

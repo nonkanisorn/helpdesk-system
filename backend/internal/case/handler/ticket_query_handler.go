@@ -17,6 +17,28 @@ func NewTicketQueryHandlers(ticketQueryServ service.TicketQueryService) ticketsQ
 	return ticketsQueryHandler{ticketQueryServ: ticketQueryServ}
 }
 
+func (t ticketsQueryHandler) GetLatestTickets(c *fiber.Ctx) error {
+	limit, err := strconv.Atoi(c.Params("limit", "2"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	userID, err := strconv.Atoi(c.Params("userID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	tickets, err := t.ticketQueryServ.GetLatestTickets(userID, limit)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"result":  tickets,
+	})
+}
+
 func (t ticketsQueryHandler) GetTicketsByTechnicianID(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -100,7 +122,6 @@ func (t ticketsQueryHandler) GetTicketForTechnicianByTicketID(c *fiber.Ctx) erro
 		})
 	}
 	ticket, err := t.ticketQueryServ.GetTicketForTechnicianByTicketID(id)
-
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"success": false,
@@ -110,5 +131,119 @@ func (t ticketsQueryHandler) GetTicketForTechnicianByTicketID(c *fiber.Ctx) erro
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"result":  ticket,
+	})
+}
+
+func (t ticketsQueryHandler) GetTicketsByStatusID(c *fiber.Ctx) error {
+	// var statusID []int
+
+	statusIDParams, err := strconv.Atoi(c.Params("statusID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	// return nil
+	tickets, err := t.ticketQueryServ.GetTicketsByStatusID(statusIDParams)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"result":  tickets,
+	})
+}
+
+func (t ticketsQueryHandler) GetTicketsByUsersID(c *fiber.Ctx) error {
+	userID, err := strconv.Atoi(c.Params("userID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	tickets, err := t.ticketQueryServ.GetTicketsByUsersID(userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"result":  tickets,
+	})
+}
+
+func (t ticketsQueryHandler) StartJobByTechnicianID(c *fiber.Ctx) error {
+	ticketID, err := strconv.Atoi(c.Params("ticketID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	err = t.ticketQueryServ.StartJobByTechnicianID(ticketID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
+}
+
+func (t ticketsQueryHandler) CompletedJobByTechnician(c *fiber.Ctx) error {
+	var req domain.TicketCompleteRequest
+	ticketID, err := strconv.Atoi(c.Params("ticketID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+
+	err = c.BodyParser(&req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	err = t.ticketQueryServ.CompletedJobByTechnician(ticketID, req.ResolutionNote, req.SerialNumber)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
+}
+
+func (t ticketsQueryHandler) ConfirmAndCloseTicketByUser(c *fiber.Ctx) error {
+	ticketID, err := strconv.Atoi(c.Params("ticketID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	err = t.ticketQueryServ.ConfirmAndCloseTicketByUser(ticketID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
 	})
 }

@@ -49,12 +49,6 @@ const Headerbaruser = () => {
       {/* icons */}
       <Box display="flex">
         <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton>
           <AccountCircleIcon onClick={handleMenu} />
           <Menu
             id="menu-appbar"

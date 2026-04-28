@@ -208,7 +208,7 @@ const DeviceDetailPages = () => {
         </Box>
       </>
     );
-
+  console.log("dasds", deviceDetail.length);
   return (
     <>
       {/* ADD DIALOG */}
@@ -333,7 +333,7 @@ const DeviceDetailPages = () => {
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
         <Typography>อุปกรณ์: {deviceDetail[0].dev_name}</Typography>
-        <Typography>จำนวนทั้งหมด {deviceDetail[0].total_instance}</Typography>
+        <Typography>จำนวนทั้งหมด {deviceDetail.length}</Typography>
         <Button variant="contained" onClick={openAdd}>
           เพิ่ม
         </Button>

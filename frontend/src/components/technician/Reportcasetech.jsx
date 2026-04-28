@@ -13,20 +13,28 @@ import { useSelector } from "react-redux";
 import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
 function Reportcasetech() {
-  const token = useSelector((state) => state.user.token);
-  const technician_id = useSelector((state) => state.user.users_id);
   const navigate = useNavigate();
-  const [tickets, settickets] = useState([]);
+  const technician_id = useSelector((state) => state.user.user_id);
+  const token = useSelector((state) => state.user.token);
+  const [ticketData, setticketData] = useState([]);
   const status_id = 4;
   const [refresh, setRefresh] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
-
+  const technicianStatusMap = {
+    1: "งานใหม่",
+    2: "ได้รับมอบหมาย",
+    3: "กำลังดำเนินการ",
+    4: "บันทึกผลแล้ว",
+    5: "รอผู้ใช้ยืนยัน",
+    6: "ปิดงานแล้ว",
+    7: "รออะไหล่",
+  };
   const topagedetail = (ticket_id) => {
     navigate(`/technician/repairs/${ticket_id}`);
   };
   const waitingforpart = (ticket_id) => {
     axios
-      .patch(`${apiUrl}/Case/${technician_id}/${ticket_id}`, {
+      .patch(`${apiUrl}/ticket/${technician_id}/${ticket_id}`, {
         status_id,
       })
       .then(setRefresh(true));
@@ -34,20 +42,21 @@ function Reportcasetech() {
   useEffect(() => {
     axios
       .get(`${apiUrl}/technician/${technician_id}/tickets`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
-      .then(function (response) {
-        settickets(response.data.result);
-        // console.log("respponseasd", response);
+      .then(function(response) {
+        setticketData(response.data.result);
+        console.log(response);
       })
-      .catch(function (error) {
-        // console.log(error);
+      .catch(function(error) {
+        console.log(error);
       })
-      .finally(function () {});
+      .finally(function() { });
   }, [refresh]);
 
   return (
-    // TODO: เพิ่มปุ่ม เพิ่มเติม ย้ายรายละเอียด ไปอีกหน้า
     <Box>
       <Typography variant="h3">รายการแจ้งซ่อม</Typography>
       <TableContainer component={Paper}>
@@ -63,7 +72,7 @@ function Reportcasetech() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tickets.map((item, index) => (
+            {ticketData.map((item, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -72,9 +81,9 @@ function Reportcasetech() {
                   {index + 1}
                 </TableCell>
                 <TableCell>{item.title}</TableCell>
-                <TableCell>{item.user_id}</TableCell>
+                <TableCell>{item.usersname}</TableCell>
                 <TableCell>{item.description}</TableCell>
-                <TableCell>{item.status_id}</TableCell>
+                <TableCell>{technicianStatusMap[item.status_id]}</TableCell>
 
                 <TableCell>
                   <Button
@@ -85,16 +94,7 @@ function Reportcasetech() {
                     onClick={() => topagedetail(item.ticket_id)}
                     sx={{ mr: 2 }}
                   >
-                    ปิดงาน
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    sx={{ mr: 2 }}
-                    onClick={() => waitingforpart(item.ticket_id)}
-                  >
-                    รออะไหล่
+                    จัดการงาน
                   </Button>
                   {/* <Button variant="contained" color="error" size="small"> */}
                   {/*   ซ่อมไม่ได้ */}

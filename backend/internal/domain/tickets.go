@@ -36,6 +36,10 @@ type TicketsResponse struct {
 	CompletedAt       *time.Time `json:"completed_at"`
 	ClosedAt          *time.Time `json:"closed_at"`
 }
+type TicketCompleteRequest struct {
+	ResolutionNote string `json:"resolution_note"`
+	SerialNumber   string `json:"serial_number"`
+}
 type TicketsForTechnicianResponse struct {
 	TicketID    int        `json:"ticket_id"`
 	IssueName   string     `json:"issue_name"`

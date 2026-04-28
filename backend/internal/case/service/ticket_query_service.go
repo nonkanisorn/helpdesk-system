@@ -5,14 +5,20 @@ import (
 
 	"github.com/nonkanisorn/helpdesk-system/internal/case/repository"
 	"github.com/nonkanisorn/helpdesk-system/internal/domain"
+
+	deviceInstanceQueryRepo "github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/repository"
 )
 
 type ticketQueryService struct {
-	ticketRepo repository.TicketQueryRepository
+	ticketRepo              repository.TicketQueryRepository
+	deviceInstanceQueryRepo deviceInstanceQueryRepo.DeviceInstanceQueryRepository
 }
 
-func NewTicketQueryService(ticketRepo repository.TicketQueryRepository) ticketQueryService {
-	return ticketQueryService{ticketRepo: ticketRepo}
+func NewTicketQueryService(ticketRepo repository.TicketQueryRepository, deviceInstanceQueryRepo deviceInstanceQueryRepo.DeviceInstanceQueryRepository) ticketQueryService {
+	return ticketQueryService{
+		ticketRepo:              ticketRepo,
+		deviceInstanceQueryRepo: deviceInstanceQueryRepo,
+	}
 }
 
 func toDB(updateTicketRequest *domain.UpdateTicketRequest) *repository.UpdateTicketRow {
@@ -76,7 +82,6 @@ func (t ticketQueryService) UpdateStatusTicket(updateTicketRequest *domain.Updat
 	err := t.ticketRepo.UpdateStatusTicket(updateStatusTicket)
 	if err != nil {
 		return err
-
 	}
 	return nil
 }
@@ -89,7 +94,6 @@ func (t ticketQueryService) AssignTechToTicket(technicianID int, managerID int, 
 	}
 
 	return nil
-
 }
 
 func (t ticketQueryService) GetTicketForTechnicianByTicketID(ticketID int) (*domain.TicketsForTechnicianResponse, error) {
@@ -113,4 +117,77 @@ func (t ticketQueryService) GetTicketForTechnicianByTicketID(ticketID int) (*dom
 		ClosedAt:    ticketRow.ClosedAt,
 	}
 	return &ticketRes, nil
+}
+
+func (t ticketQueryService) UpdateStatusCompleteByTechnician(serialNumber string) error {
+	deviceInstanceRow, err := t.deviceInstanceQueryRepo.CheckSerialNumber(serialNumber)
+	if err != nil {
+		return err
+	}
+	fmt.Println(deviceInstanceRow)
+	return nil
+}
+
+func (t ticketQueryService) GetLatestTickets(userID int, limit int) ([]domain.TicketsResponse, error) {
+	tickets, err := t.ticketRepo.GetLatestTickets(userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	ticketsResponse, err := toRes(tickets)
+	return ticketsResponse, nil
+}
+
+func (t ticketQueryService) GetTicketsByStatusID(statusID int) ([]domain.TicketsResponse, error) {
+	ticketsFromDB, err := t.ticketRepo.GetTicketsByStatusID(statusID)
+	if err != nil {
+		return nil, err
+	}
+	tickets, err := toRes(ticketsFromDB)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
+}
+
+func (t ticketQueryService) GetTicketsByUsersID(usersID int) ([]domain.TicketsResponse, error) {
+	ticketsFromRepo, err := t.ticketRepo.GetTicketsByUsersID(usersID)
+	if err != nil {
+		return nil, err
+	}
+	ticketRes, err := toRes(ticketsFromRepo)
+	if err != nil {
+		return nil, err
+	}
+	return ticketRes, nil
+}
+
+func (t ticketQueryService) StartJobByTechnicianID(ticketID int) error {
+	err := t.ticketRepo.StartJobByTechnicianID(ticketID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t ticketQueryService) CompletedJobByTechnician(ticketID int, resolutionNote string, serialNumber string) error {
+	instanceDeviceID, err := t.deviceInstanceQueryRepo.CheckSerialNumber(serialNumber)
+	if err != nil {
+		fmt.Println("error", err)
+		return err
+	}
+	fmt.Println("instanceDeviceID", instanceDeviceID)
+	err = t.ticketRepo.CompletedJobByTechnician(ticketID, 98, resolutionNote)
+	if err != nil {
+		return err
+	}
+	fmt.Println("resolutionNote from service = ", resolutionNote)
+	return nil
+}
+
+func (t ticketQueryService) ConfirmAndCloseTicketByUser(ticketID int) error {
+	err := t.ticketRepo.ConfirmAndCloseTicketByUser(ticketID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

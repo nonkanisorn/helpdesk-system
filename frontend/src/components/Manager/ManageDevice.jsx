@@ -56,6 +56,7 @@ const ManageDevice = () => {
       .post(`${apiUrl}/device`, {
         dev_name: inputNewDeviceName,
         dev_type: selectTypeDevice,
+        dev_detail: inputNewDeviceDetail,
       })
       .catch((error) => {
         if (error) {
@@ -294,7 +295,7 @@ const ManageDevice = () => {
                         color="success"
                         sx={{ ml: 2 }}
                       >
-                        ดูอุปกรณ์แต่ละตัว
+                        รายการอุปกรณ์
                       </Button>
                     </Link>
                   </TableCell>

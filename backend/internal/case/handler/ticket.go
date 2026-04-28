@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,14 +22,15 @@ func NewTicketHandler(ticketServ service.TicketService) *ticketHandler {
 }
 
 func (t ticketHandler) GetTicketByID(c *fiber.Ctx) error {
-	id, err := strconv.Atoi(c.Params("id"))
+	ticketID, err := strconv.Atoi(c.Params("ticketID"))
+	fmt.Println("params", c.Params("ticketID"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"success": false,
 			"error":   err.Error(),
 		})
 	}
-	ticket, err := t.tickerServ.GetTicketByID(id)
+	ticket, err := t.tickerServ.GetTicketByID(ticketID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"success": false,
@@ -36,7 +38,7 @@ func (t ticketHandler) GetTicketByID(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"result":  ticket,
 	})
@@ -66,6 +68,7 @@ func (t ticketHandler) CreateTicket(c *fiber.Ctx) error {
 
 func (t ticketHandler) GetAllTickets(c *fiber.Ctx) error {
 	tickets, err := t.tickerServ.GetAllTickets()
+	fmt.Println("test")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"success": false,
@@ -75,5 +78,6 @@ func (t ticketHandler) GetAllTickets(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"result":  tickets,
+		"sssss":   "ssss,",
 	})
 }
