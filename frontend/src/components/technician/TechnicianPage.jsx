@@ -27,6 +27,7 @@ function Technicianpage() {
   const [ticketdata, setticketdata] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   const technician_id = useSelector((state) => state.user.user_id);
+  const token = useSelector((state) => state.user.token);
   const ticketdatalenght = () => {
     return ticketdata.length;
   };
@@ -51,9 +52,13 @@ function Technicianpage() {
   };
   console.log("st2", datafilterstatusticket2());
   useEffect(() => {
-    axios.get(`${apiUrl}/ticket/user/${technician_id}`).then((response) => {
-      setticketdata(response.data);
-    });
+    axios
+      .get(`${apiUrl}/technician/${technician_id}/tickets`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setticketdata(response.data.result);
+      });
   }, []);
   console.log(ticketdata);
   return (

@@ -37,21 +37,8 @@ type TicketsResponse struct {
 	ClosedAt          *time.Time `json:"closed_at"`
 }
 type TicketCompleteRequest struct {
-	TicketID          int        `json:"ticket_id"`
-	Title             string     `json:"title"`
-	Description       string     `json:"description"`
-	ResolutionNote    *string    `json:"resolution_note"`
-	IssueCategoriesID int        `json:"issue_categories_id"`
-	InstanceID        *int       `json:"instance_id"`
-	UserID            int        `json:"user_id"`
-	TechnicianID      *int       `json:"technician_id"`
-	ManagerID         *int       `json:"manager_id"`
-	StatusID          int        `json:"status_id"`
-	CreatedAt         time.Time  `json:"created_at"`
-	AssignedDate      *time.Time `json:"assigned_at"`
-	StartAt           *time.Time `json:"started_at"`
-	CompletedAt       *time.Time `json:"completed_at"`
-	ClosedAt          *time.Time `json:"closed_at"`
+	ResolutionNote string `json:"resolution_note"`
+	SerialNumber   string `json:"serial_number"`
 }
 type TicketsForTechnicianResponse struct {
 	TicketID    int        `json:"ticket_id"`

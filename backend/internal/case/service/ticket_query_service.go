@@ -14,8 +14,11 @@ type ticketQueryService struct {
 	deviceInstanceQueryRepo deviceInstanceQueryRepo.DeviceInstanceQueryRepository
 }
 
-func NewTicketQueryService(ticketRepo repository.TicketQueryRepository) ticketQueryService {
-	return ticketQueryService{ticketRepo: ticketRepo}
+func NewTicketQueryService(ticketRepo repository.TicketQueryRepository, deviceInstanceQueryRepo deviceInstanceQueryRepo.DeviceInstanceQueryRepository) ticketQueryService {
+	return ticketQueryService{
+		ticketRepo:              ticketRepo,
+		deviceInstanceQueryRepo: deviceInstanceQueryRepo,
+	}
 }
 
 func toDB(updateTicketRequest *domain.UpdateTicketRequest) *repository.UpdateTicketRow {
@@ -156,4 +159,35 @@ func (t ticketQueryService) GetTicketsByUsersID(usersID int) ([]domain.TicketsRe
 		return nil, err
 	}
 	return ticketRes, nil
+}
+
+func (t ticketQueryService) StartJobByTechnicianID(ticketID int) error {
+	err := t.ticketRepo.StartJobByTechnicianID(ticketID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t ticketQueryService) CompletedJobByTechnician(ticketID int, resolutionNote string, serialNumber string) error {
+	instanceDeviceID, err := t.deviceInstanceQueryRepo.CheckSerialNumber(serialNumber)
+	if err != nil {
+		fmt.Println("error", err)
+		return err
+	}
+	fmt.Println("instanceDeviceID", instanceDeviceID)
+	err = t.ticketRepo.CompletedJobByTechnician(ticketID, 98, resolutionNote)
+	if err != nil {
+		return err
+	}
+	fmt.Println("resolutionNote from service = ", resolutionNote)
+	return nil
+}
+
+func (t ticketQueryService) ConfirmAndCloseTicketByUser(ticketID int) error {
+	err := t.ticketRepo.ConfirmAndCloseTicketByUser(ticketID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

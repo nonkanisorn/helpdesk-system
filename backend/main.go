@@ -98,13 +98,19 @@ func main() {
 	// case
 	// ticket
 	// note := "testeiei"
+	deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
+
 	ticketQueryRepo := ticketQueryRepo.NewTicketQueryRepository(db)
-	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo)
+	ticketQueryServ := ticketQueryServ.NewTicketQueryService(ticketQueryRepo, deviceInstanceQueryRepo)
+	// ticketQueryServ.CompletedJobByTechnician(46, "test", "ABC1234")
 	ticketQueryHand := ticketQueryHand.NewTicketQueryHandlers(ticketQueryServ)
 
 	app.Post("/tickets/status", ticketQueryHand.UpdateStatusTicket)
 	app.Patch("/tickets/:id<int>/assign-technician", ticketQueryHand.AssignTechToTicket)
 	app.Get("technician/:id<int>/tickets", ticketQueryHand.GetTicketsByTechnicianID)
+	app.Patch("technician/:ticketID<int>/start", ticketQueryHand.StartJobByTechnicianID)
+	app.Patch("technician/:ticketID<int>/complete", ticketQueryHand.CompletedJobByTechnician)
+	app.Patch("/tickets/:ticketID<int>/confirmation", ticketQueryHand.ConfirmAndCloseTicketByUser)
 	app.Get("/tickets/:ticketID<int>/technician", ticketQueryHand.GetTicketForTechnicianByTicketID)
 	app.Get("/tickets/:userID<int>/latest/:limit<int>", ticketQueryHand.GetLatestTickets)
 	app.Get("/tickets/users/:userID<int>", ticketQueryHand.GetTicketsByUsersID)
@@ -183,14 +189,14 @@ func main() {
 	deviceInstanceHandler := deviceInstanceHand.NewDeviceInstanceHandler(deviceInstanceServ)
 	app.Get("/device-instances", deviceInstanceHandler.GetAllDeviceInstance)
 
-	deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
+	// deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
 	_ = deviceInstanceQueryRepo
 
-	row, err := deviceInstanceQueryRepo.CheckSerialNumber("ABC1234")
-	if err != nil {
-		fmt.Println("errnaja", err)
-	}
-	fmt.Println("ropooowoeqoe", row)
+	// row, err := deviceInstanceQueryRepo.CheckSerialNumber("ABC1234")
+	// if err != nil {
+	// 	fmt.Println("errnaja", err)
+	// }
+	// fmt.Println("ropooowoeqoe", row)
 	// Issue
 	issueRepo := issueRepo.NewIssueRepository(db)
 	issueServ := issueServ.NewIssueService(issueRepo)

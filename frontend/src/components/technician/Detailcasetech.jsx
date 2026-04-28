@@ -21,6 +21,8 @@ function Detailcasetech() {
   const navigate = useNavigate();
   const user_id = useSelector((state) => state.user.user_id);
 
+  const token = useSelector((state) => state.user.token);
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [ticketDatabyId, setticketDatabyId] = useState({});
   const [noSerial, setNoSerial] = useState(false);
 
@@ -34,7 +36,7 @@ function Detailcasetech() {
   } = useForm({
     defaultValues: {
       serial_number: "",
-      ticket_resolution: "",
+      resolution_note: "",
     },
   });
 
@@ -57,11 +59,16 @@ function Detailcasetech() {
 
     try {
       await axios.patch(
-        `http://localhost:5011/ticket/${user_id}/${ticket_id}`,
+        `${apiUrl}/technician/${ticket_id}/complete`,
         {
           status_id,
           serial_number: noSerial ? null : data.serial_number.trim(),
-          ticket_resolution: data.ticket_resolution,
+          resulotion_note: data.resulotion_note,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
 
@@ -163,14 +170,14 @@ function Detailcasetech() {
                 resize: "vertical",
                 border: "1px solid #ccc",
               }}
-              {...register("ticket_resolution", {
+              {...register("resulotion_note", {
                 required: "กรุณาระบุผลการซ่อม",
               })}
             />
 
-            {errors.ticket_resolution && (
+            {errors.resulotion_note && (
               <Typography color="error" sx={{ mt: 1 }}>
-                {errors.ticket_resolution.message}
+                {errors.resulotion_note.message}
               </Typography>
             )}
           </Stack>

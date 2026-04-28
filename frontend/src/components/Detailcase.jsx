@@ -31,7 +31,7 @@ function Detailcase() {
   const token = useSelector((state) => state.user.token);
   const user_id = useSelector((state) => state.user.user_id);
   const apiUrl = process.env.REACT_APP_API_URL;
-  console.log("role", role_id);
+  console.log("tokennaja", token);
   const waitingForPartButton = async (ticket_id) => {
     try {
       await axios.patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
@@ -45,10 +45,10 @@ function Detailcase() {
     try {
       if (window.confirm("เริ่มการทำงาน?")) {
         await axios.patch(
-          `${apiUrl}/ticket/${user_id}/${ticket_id}`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          `${apiUrl}/technician/${ticket_id}/start`,
+          {},
           {
-            status_id: 3,
+            headers: { Authorization: `Bearer ${token}` },
           },
         );
         await fetchDetail(); // 👈 รีโหลดข้อมูลใหม่ทันที
@@ -72,9 +72,13 @@ function Detailcase() {
     try {
       if (window.confirm("ยืนยันการซ่อม")) {
         axios
-          .patch(`${apiUrl}/ticket/${user_id}/${ticket_id}`, {
-            status_id,
-          })
+          .patch(
+            `${apiUrl}/tickets/${ticket_id}/confirmation`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          )
           .then(() => navigate(-1));
       }
     } catch (error) {
@@ -292,9 +296,9 @@ function Detailcase() {
                     </TimelineSeparator>
                     <TimelineContent sx={{ py: 1 }}>
                       <Typography>รอผู้ใช้ยืนยัน</Typography>
-                      {ticketData.work_completed_at && (
+                      {ticketData.completed_at && (
                         <Typography>
-                          วันที่: {formatDateTime(ticketData.work_completed_at)}
+                          วันที่: {formatDateTime(ticketData.completed_at)}
                         </Typography>
                       )}
                     </TimelineContent>

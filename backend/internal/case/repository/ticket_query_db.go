@@ -88,7 +88,6 @@ func (t ticketQueryRepository) UpdateStatusTicketByTechnician(ticket *TicketRow)
 		}
 		return nil
 	}
-
 	query := "UPDATE  tickets SET status_id = ? ,started_at = ?  WHERE ticket_id = ? "
 	statusID := 3
 	startedAt := time.Now()
@@ -126,4 +125,39 @@ func (t ticketQueryRepository) GetTicketsByStatusID(statusID int) ([]TicketRow, 
 		return nil, err
 	}
 	return tickets, nil
+}
+
+func (t ticketQueryRepository) StartJobByTechnicianID(ticketID int) error {
+	statusID := 3
+	startedAt := time.Now()
+	query := "UPDATE  tickets SET status_id = ? ,started_at = ?  WHERE ticket_id = ? "
+	_, err := t.db.Exec(query, statusID, startedAt, ticketID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t ticketQueryRepository) CompletedJobByTechnician(ticketID int, instanceDeviceID int, resolutionNote string) error {
+	statusID := 4
+	completedAt := time.Now()
+	query := "UPDATE  tickets SET resolution_note = ?, instance_id = ?  ,status_id = ? ,completed_at = ?  WHERE ticket_id = ? "
+	_, err := t.db.Exec(query, resolutionNote, instanceDeviceID, statusID, completedAt, ticketID)
+	if err != nil {
+		return err
+	}
+	fmt.Println("resolutionNote = ", resolutionNote)
+	return nil
+}
+
+func (t ticketQueryRepository) ConfirmAndCloseTicketByUser(ticketID int) error {
+	statusID := 5
+	closedAt := time.Now()
+	query := "UPDATE  tickets SET status_id = ?, closed_at = ?  WHERE ticket_id = ? "
+	_, err := t.db.Exec(query, statusID, closedAt, ticketID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

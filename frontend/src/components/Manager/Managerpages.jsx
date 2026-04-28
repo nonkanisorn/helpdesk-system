@@ -12,9 +12,12 @@ import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlin
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 function Managerpages() {
   const [ticketdata, setticketdata] = useState([]);
   const [technicianData, setTechnicianData] = useState([]);
+  const token = useSelector((state) => state.user.token);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   console.log(ticketdata);
   const ticketdatalenght = () => {
@@ -45,15 +48,19 @@ function Managerpages() {
 
   console.log("countntaj", countIsOverDue());
   useEffect(() => {
-    axios.get(`${apiUrl}/ticketall`).then((response) => {
-      setticketdata(response.data);
-    });
+    axios
+      .get(`${apiUrl}/tickets`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setticketdata(response.data.result);
+      });
   }, []);
-  useEffect(() => {
-    axios.get(`${apiUrl}/users/technician`).then((response) => {
-      setTechnicianData(response.data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   axios.get(`${apiUrl}/users/technician`).then((response) => {
+  //     setTechnicianData(response.data);
+  //   });
+  // }, []);
   console.log("asd", technicianData);
   return (
     <Box>

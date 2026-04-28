@@ -34,15 +34,14 @@ const AdminRoute = ({ children }) => {
   const [loading, setLoading] = useState(true); // เพิ่ม state สำหรับตรวจสอบการโหลด
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const currentAdmin = async (idToken) => {
+  const currentAdmin = async (token) => {
     try {
-      const res = await axios.post(
+      const res = await axios.get(
         // `${process.env.REACT_APP_API_URL}/current-admin`,
-        `${process.env.REACT_APP_API_URL}/current-admin`,
-        {},
+        `${process.env.REACT_APP_API_URL}/admin/ping`,
         {
           headers: {
-            authtoken: idToken,
+            Authorization: `Bearer ${token}`,
           },
         },
       );

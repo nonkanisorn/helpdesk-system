@@ -32,7 +32,7 @@ function LoginPage() {
       });
       // ดำเนินการหลังจากเข้าสู่ระบบสำเร็จ
 
-      console.log("responsenaa", response.data.user)
+      console.log("responsenaa", response.data.user);
       const is_active = response.data.user.is_active;
       if (is_active === 0) {
         return alert("คุณไม่มีสิทธื์เข้า");
@@ -133,13 +133,13 @@ function LoginPage() {
                   label="Password"
                   type="password"
                   {...register("password")}
-                // {...register("password", {
-                //   minLength: {
-                //     value: 6,
-                //     message: "Password should be at least 6 characters",
-                //   },
-                // })}
-                // label="Password"
+                  // {...register("password", {
+                  //   minLength: {
+                  //     value: 6,
+                  //     message: "Password should be at least 6 characters",
+                  //   },
+                  // })}
+                  // label="Password"
                 ></TextField>
                 {/* {errors.password && ( */}
                 {/*   <Typography>{errors.password.message}</Typography> */}
