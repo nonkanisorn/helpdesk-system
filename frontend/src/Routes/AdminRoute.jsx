@@ -26,8 +26,8 @@ import Addstatus from "../components/admin/ManagestatusPages/Addstatus";
 import Editstatus from "../components/admin/ManagestatusPages/Editstatus";
 import Adduser from "../components/admin/ManageuserPages/Adduser";
 import Edituser from "../components/admin/ManageuserPages/Edituser";
-import Addtypedevice from "../components/admin/ManagedevicePages/Addtypedevice";
 import ManageissuesPages from "../components/admin/Manageissues/ManageissuesPages";
+import ManageTypeDevices from "../components/admin/ManagedevicePages/ManageTypeDevices";
 const AdminRoute = ({ children }) => {
   const { user } = useSelector((state) => ({ ...state }));
   const [ok, setOk] = useState(false);
@@ -87,56 +87,131 @@ const AdminRoute = ({ children }) => {
   }
   const text = "No permission";
   return ok ? (
-    <div className="app">
+    <Box
+      className="app"
+      sx={{
+        display: "flex",
+        minHeight: "100dvh",
+        overflow: "hidden",
+      }}
+    >
       <Sidebaradmin />
-      <main className="content" style={{ backgroundColor: "#f5f6fa" }}>
+
+      <Box
+        component="main"
+        className="content"
+        sx={{
+          backgroundColor: "#f5f6fa",
+          flexGrow: 1,
+          minWidth: 0,
+          height: "100dvh",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
         <Headerbaradmin />
-        <Box>
-          <Box m="19px">
-            <Routes>
-              <Route path="manageuser" element={<Manageuser />} />
-              <Route path="managerole" element={<Managerole />} />
-              <Route path="managedevice" element={<Managedevice />} />
-              <Route path="index" element={<Adminpages />} />
-              <Route path="managestatus" element={<Managestatus />} />
-              <Route path="managedepartment" element={<Managedepartment />} />
-              {/* <Route path="" element={<Managedepartment />} /> */}
-              <Route path="adddevice" element={<Adddevice />} />
-              <Route path="edituser/:users_id" element={<Edituser />} />
-              <Route
-                path="editdevice/:dev_id/:dev_name"
-                element={<Editdevice />}
-              />
-              <Route path="addrole" element={<Addrole />} />
-              <Route
-                path="editrole/:role_id/:role_name"
-                element={<Editrole />}
-              />
-              <Route path="addstatus" element={<Addstatus />} />
-              <Route
-                path="editstatus/:status_id/:status_name"
-                element={<Editstatus />}
-              />
-              <Route path="adddepartment" element={<Adddepartment />} />
-              <Route
-                path="editdepartment/:dep_id/:dep_name"
-                element={<Editdepartment />}
-              />
-              <Route path="managetypedevice" element={<Addtypedevice />} />
-              <Route
-                path="manage/issues-categories"
-                element={<ManageissuesPages />}
-              />
-              <Route path="adduser" element={<Adduser />} />
-              <Route path="*" element={<Notfound404 text="ไม่มีpathนี้" />} />
-            </Routes>
-          </Box>
+
+        <Box
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+          }}
+        >
+          <Routes>
+            <Route path="manageuser" element={<Manageuser />} />
+            <Route path="managerole" element={<Managerole />} />
+            <Route path="managedevice" element={<Managedevice />} />
+            <Route path="index" element={<Adminpages />} />
+            <Route path="managestatus" element={<Managestatus />} />
+            <Route path="managedepartment" element={<Managedepartment />} />
+
+            <Route path="adddevice" element={<Adddevice />} />
+            <Route path="edituser/:users_id" element={<Edituser />} />
+            <Route
+              path="editdevice/:dev_id/:dev_name"
+              element={<Editdevice />}
+            />
+
+            <Route path="addrole" element={<Addrole />} />
+            <Route path="editrole/:role_id/:role_name" element={<Editrole />} />
+
+            <Route path="addstatus" element={<Addstatus />} />
+            <Route
+              path="editstatus/:status_id/:status_name"
+              element={<Editstatus />}
+            />
+
+            <Route path="adddepartment" element={<Adddepartment />} />
+            <Route
+              path="editdepartment/:dep_id/:dep_name"
+              element={<Editdepartment />}
+            />
+
+            <Route path="managetypedevice" element={<ManageTypeDevices />} />
+            <Route
+              path="manage/issues-categories"
+              element={<ManageissuesPages />}
+            />
+
+            <Route path="adduser" element={<Adduser />} />
+            <Route path="*" element={<Notfound404 text="ไม่มีpathนี้" />} />
+          </Routes>
         </Box>
-      </main>
-    </div>
+      </Box>
+    </Box>
   ) : (
     <Notfound404 text={text} />
   );
+  // return ok ? (
+  //   <div className="app">
+  //     <Sidebaradmin />
+  //     <main className="content" style={{ backgroundColor: "#f5f6fa" }}>
+  //       <Headerbaradmin />
+  //       <Box>
+  //         <Box m="19px">
+  //           <Routes>
+  //             <Route path="manageuser" element={<Manageuser />} />
+  //             <Route path="managerole" element={<Managerole />} />
+  //             <Route path="managedevice" element={<Managedevice />} />
+  //             <Route path="index" element={<Adminpages />} />
+  //             <Route path="managestatus" element={<Managestatus />} />
+  //             <Route path="managedepartment" element={<Managedepartment />} />
+  //             {/* <Route path="" element={<Managedepartment />} /> */}
+  //             <Route path="adddevice" element={<Adddevice />} />
+  //             <Route path="edituser/:users_id" element={<Edituser />} />
+  //             <Route
+  //               path="editdevice/:dev_id/:dev_name"
+  //               element={<Editdevice />}
+  //             />
+  //             <Route path="addrole" element={<Addrole />} />
+  //             <Route
+  //               path="editrole/:role_id/:role_name"
+  //               element={<Editrole />}
+  //             />
+  //             <Route path="addstatus" element={<Addstatus />} />
+  //             <Route
+  //               path="editstatus/:status_id/:status_name"
+  //               element={<Editstatus />}
+  //             />
+  //             <Route path="adddepartment" element={<Adddepartment />} />
+  //             <Route
+  //               path="editdepartment/:dep_id/:dep_name"
+  //               element={<Editdepartment />}
+  //             />
+  //             <Route path="managetypedevice" element={<Addtypedevice />} />
+  //             <Route
+  //               path="manage/issues-categories"
+  //               element={<ManageissuesPages />}
+  //             />
+  //             <Route path="adduser" element={<Adduser />} />
+  //             <Route path="*" element={<Notfound404 text="ไม่มีpathนี้" />} />
+  //           </Routes>
+  //         </Box>
+  //       </Box>
+  //     </main>
+  //   </div>
+  // ) : (
+  //   <Notfound404 text={text} />
+  // );
 };
 
 export default AdminRoute;

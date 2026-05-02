@@ -17,6 +17,8 @@ type DeviceInstanceRow struct {
 }
 type DeviceInstanceRepository interface {
 	GetAll() ([]DeviceInstance, error)
+	Create(int, int, int, string) error
+	DeleteDeviceInstanceByID(int) error
 }
 type DeviceInstanceQueryRepository interface {
 	CheckSerialNumber(string) (int, error)

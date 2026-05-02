@@ -37,7 +37,7 @@ function EditRoleDialog({ token, open, onClose, onSuccess, role }) {
     try {
       setLoading(true);
 
-      await axios.put(
+      await axios.patch(
         `${apiUrl}/roles/${role.role_id}`,
         { role_name: roleName.trim() },
         {

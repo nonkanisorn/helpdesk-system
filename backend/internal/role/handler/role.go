@@ -74,3 +74,35 @@ func (r roleHandler) DeleteRolesByID(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{"success": true})
 }
+
+func (r roleHandler) EditRoleByRoleID(c *fiber.Ctx) error {
+	roleID, err := strconv.Atoi(c.Params("roleID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	var roleReq domain.EditRoleRequest
+	if err = c.BodyParser(&roleReq); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	role := domain.Role{
+		RoleID:   roleID,
+		RoleName: roleReq.RoleName,
+	}
+	err = r.roleSrv.EditRoleByRoleID(role)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
+}

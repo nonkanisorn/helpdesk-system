@@ -13,29 +13,29 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
+function EditDepartmentDialog({ token, open, onClose, onSuccess, department }) {
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const [deviceTypeName, setDeviceTypeName] = useState("");
+  const [departmentName, setDepartmentName] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open && deviceType) {
-      setDeviceTypeName(deviceType.devicetype_name ?? "");
+    if (open && department) {
+      setDepartmentName(department.dep_name ?? "");
     }
-  }, [open, deviceType]);
+  }, [open, department]);
 
-  const updateDeviceTypeName = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!deviceTypeName.trim() || !deviceType?.devicetype_id) return;
+    if (!departmentName.trim() || !department?.dep_id) return;
 
     try {
       setLoading(true);
 
       await axios.patch(
-        `${apiUrl}/device-types/${deviceType.devicetype_id}`,
-        { devicetype_name: deviceTypeName.trim() },
+        `${apiUrl}/departments/${department.dep_id}`,
+        { dep_name: departmentName.trim() },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
       onSuccess?.();
       onClose?.();
     } catch (error) {
-      console.log(error);
+      console.error("Error updating department:", error);
     } finally {
       setLoading(false);
     }
@@ -55,8 +55,8 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
 
   const isDisabled =
     loading ||
-    !deviceTypeName.trim() ||
-    deviceTypeName.trim() === deviceType?.devicetype_name;
+    !departmentName.trim() ||
+    departmentName.trim() === department?.dep_name;
 
   return (
     <Dialog
@@ -73,11 +73,11 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
         >
           <Box>
             <Typography variant="h5" fontWeight={600}>
-              แก้ไขประเภทอุปกรณ์
+              แก้ไขแผนก
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              เปลี่ยนชื่อประเภทอุปกรณ์ที่ใช้จัดกลุ่มอุปกรณ์ในระบบ
+              เปลี่ยนชื่อแผนกที่ใช้สำหรับจัดกลุ่มผู้ใช้งานในองค์กร
             </Typography>
           </Box>
 
@@ -88,11 +88,7 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
       </DialogTitle>
 
       <DialogContent dividers>
-        <Box
-          component="form"
-          id="edit-device-type-form"
-          onSubmit={updateDeviceTypeName}
-        >
+        <Box component="form" id="edit-department-form" onSubmit={handleSubmit}>
           <Stack spacing={3}>
             <Box
               sx={{
@@ -104,27 +100,25 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                ชื่อประเภทอุปกรณ์เดิม
+                ชื่อแผนกเดิม
               </Typography>
 
               <Typography variant="subtitle1" fontWeight={600}>
-                {deviceType?.devicetype_name ?? "-"}
+                {department?.dep_name ?? "-"}
               </Typography>
             </Box>
 
             <TextField
-              label="ชื่อประเภทอุปกรณ์ใหม่"
-              value={deviceTypeName}
-              onChange={(e) => setDeviceTypeName(e.target.value)}
-              placeholder="เช่น คอมพิวเตอร์"
+              label="ชื่อแผนกใหม่"
+              value={departmentName}
+              onChange={(e) => setDepartmentName(e.target.value)}
+              placeholder="เช่น ฝ่ายไอที"
               fullWidth
               autoFocus
               required
               disabled={loading}
-              error={!deviceTypeName.trim()}
-              helperText={
-                !deviceTypeName.trim() ? "กรุณากรอกชื่อประเภทอุปกรณ์" : " "
-              }
+              error={!departmentName.trim()}
+              helperText={!departmentName.trim() ? "กรุณากรอกชื่อแผนก" : " "}
             />
           </Stack>
         </Box>
@@ -148,7 +142,7 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
         </Button>
 
         <Button
-          form="edit-device-type-form"
+          form="edit-department-form"
           type="submit"
           variant="contained"
           disabled={isDisabled}
@@ -168,4 +162,4 @@ function EditDeviceTypeDialog({ token, open, onClose, onSuccess, deviceType }) {
   );
 }
 
-export default EditDeviceTypeDialog;
+export default EditDepartmentDialog;

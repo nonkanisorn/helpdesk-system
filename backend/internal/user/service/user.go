@@ -22,7 +22,7 @@ type UserService interface {
 }
 
 type UserQueryService interface {
-	GetUserWithRolesName() ([]UserResponseWithRoleName, error)
+	GetUserList() ([]UserResponseWithRoleName, error)
 	GetCurrentUser(int) (*UserResponseWithRoleName, error)
 	GetUserByRolesID(int) ([]domain.UserResponse, error)
 }

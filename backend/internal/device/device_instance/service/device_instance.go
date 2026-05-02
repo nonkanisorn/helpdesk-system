@@ -11,6 +11,8 @@ type DeviceInstanceResponse struct {
 }
 type DeviceInstanceService interface {
 	GetAllDeviceInstance() ([]DeviceInstanceResponse, error)
+	Create(int, int, int, string) error
+	DeleteDeviceInstanceByID(int) error
 }
 
 type DeviceInstanceQueryService interface {

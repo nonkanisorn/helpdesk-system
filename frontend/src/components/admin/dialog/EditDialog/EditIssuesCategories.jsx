@@ -1,80 +1,175 @@
-import axios from "axios";
-import { useEffect } from "react";
-import { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import { useForm, Controller } from "react-hook-form";
 import {
+  Box,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
-  DialogContentText,
   DialogActions,
+  TextField,
+  Typography,
+  Stack,
+  CircularProgress,
 } from "@mui/material";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-const EditIssuesCategoriesDialog = ({ id, open, onClose, onSuccess }) => {
+function EditIssuesCategoriesDialog({
+  token,
+  open,
+  onClose,
+  onSuccess,
+  issueCategory,
+}) {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [issuesCategoriesName, setIssuesCategoriesName] = useState("");
-  const createIssuesCateries = async (e) => {
+
+  const [issuesName, setIssuesName] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && issueCategory) {
+      setIssuesName(issueCategory.issues_name ?? "");
+    }
+  }, [open, issueCategory]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!issuesName.trim() || !issueCategory?.issues_id) return;
+
     try {
-      const response = await axios.patch(
-        `${apiUrl}/issues-categories/${id}`,
-        { issues_categories_name: issuesCategoriesName },
+      setLoading(true);
+
+      await axios.patch(
+        `${apiUrl}/issues-categories/${issueCategory.issues_id}`,
+        { issues_name: issuesName.trim() },
         {
           headers: {
-            "Content-Type": "application/json", // ระบุ Content-Type ไปยัง server
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         },
       );
-      onClose?.();
-      onSuccess?.();
 
-      console.log(response);
+      onSuccess?.();
+      onClose?.();
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
-  console.log("id", id);
+
+  const isDisabled =
+    loading ||
+    !issuesName.trim() ||
+    issuesName.trim() === issueCategory?.issues_name;
+
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="sm"
-        fullWidth
-        // sx={{ p: 1 }}
-      >
-        <DialogTitle>แก้ไขประเภทปัญหา</DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ pt: 1.5, mb: 2 }}>
-            ใช้สำหรับกำหนดประเภทของปัญหาในระบบ
-          </DialogContentText>
-          <form
-            onSubmit={createIssuesCateries}
-            id="create-issues-categories-form"
-          >
-            <TextField
-              label="ประเภทปัญหา"
-              fullWidth
-              onChange={(e) => setIssuesCategoriesName(e.target.value)}
-            ></TextField>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>ยกเลิก</Button>
-          <Button
-            form="create-issues-categories-form"
-            type="submit"
-            onClick={onClose}
-          >
-            บันทึก
+    <Dialog
+      open={open}
+      onClose={loading ? undefined : onClose}
+      fullWidth
+      maxWidth="sm"
+    >
+      <DialogTitle>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Typography variant="h5" fontWeight={600}>
+              แก้ไขประเภทปัญหา
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              เปลี่ยนชื่อประเภทปัญหาที่ใช้ในระบบแจ้งซ่อม
+            </Typography>
+          </Box>
+
+          <Button onClick={onClose} color="inherit" disabled={loading}>
+            ✕
           </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+        </Stack>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        <Box
+          component="form"
+          id="edit-issues-categories-form"
+          onSubmit={handleSubmit}
+        >
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                bgcolor: "grey.50",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                p: 2,
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                ชื่อประเภทปัญหาเดิม
+              </Typography>
+
+              <Typography variant="subtitle1" fontWeight={600}>
+                {issueCategory?.issues_name ?? "-"}
+              </Typography>
+            </Box>
+
+            <TextField
+              label="ชื่อประเภทปัญหาใหม่"
+              value={issuesName}
+              onChange={(e) => setIssuesName(e.target.value)}
+              placeholder="เช่น เครื่องเปิดไม่ติด"
+              fullWidth
+              autoFocus
+              required
+              disabled={loading}
+              error={!issuesName.trim()}
+              helperText={!issuesName.trim() ? "กรุณากรอกชื่อประเภทปัญหา" : " "}
+            />
+          </Stack>
+        </Box>
+      </DialogContent>
+
+      <DialogActions
+        sx={{
+          px: 3,
+          py: 2,
+          flexDirection: { xs: "column-reverse", sm: "row" },
+          gap: 1,
+        }}
+      >
+        <Button
+          onClick={onClose}
+          color="inherit"
+          disabled={loading}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
+        >
+          ยกเลิก
+        </Button>
+
+        <Button
+          form="edit-issues-categories-form"
+          type="submit"
+          variant="contained"
+          disabled={isDisabled}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
+        >
+          {loading ? (
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CircularProgress size={18} color="inherit" />
+              <span>กำลังบันทึก...</span>
+            </Stack>
+          ) : (
+            "บันทึกการแก้ไข"
+          )}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
-};
+}
 
 export default EditIssuesCategoriesDialog;

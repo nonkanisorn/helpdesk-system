@@ -1,5 +1,7 @@
 package service
 
+import "github.com/nonkanisorn/helpdesk-system/internal/domain"
+
 type Role struct {
 	RoleID   int    `db:"role_id" json:"role_id"`
 	RoleName string `db:"role_name" json:"role_name"`
@@ -9,4 +11,5 @@ type RoleService interface {
 	GetRoleByID(int) (*Role, error)
 	CreateRoles(string) error
 	DeleteRolesByID(int) error
+	EditRoleByRoleID(role domain.Role) error
 }

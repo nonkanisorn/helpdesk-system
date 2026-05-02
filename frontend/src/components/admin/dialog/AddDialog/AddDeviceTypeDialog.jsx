@@ -1,35 +1,41 @@
-import axios from "axios";
-import { useEffect } from "react";
-import { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import { useForm, Controller } from "react-hook-form";
 import {
+  Box,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
-  DialogContentText,
   DialogActions,
+  TextField,
+  Typography,
+  Stack,
 } from "@mui/material";
+import axios from "axios";
+import { useState } from "react";
 
-const AddDeviceTypeDialog = ({ open, onClose, onSuccess }) => {
+function AddDeviceTypeDialog({ token, open, onClose, onSuccess }) {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [deviceTypeName, setDeviceTypename] = useState("");
+  const [deviceTypeName, setDeviceTypeName] = useState("");
+
   const createDeviceType = async (e) => {
     e.preventDefault();
+
+    if (!deviceTypeName.trim()) return;
+
     try {
       const response = await axios.post(
-        `${apiUrl}/device/type`,
-        { devicetype_name: deviceTypeName },
+        `${apiUrl}/device-types`,
+        { devicetype_name: deviceTypeName.trim() },
         {
           headers: {
-            "Content-Type": "application/json", // ระบุ Content-Type ไปยัง server
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         },
       );
-      onClose?.();
+
+      setDeviceTypeName("");
       onSuccess?.();
+      onClose?.();
 
       console.log(response);
     } catch (error) {
@@ -38,40 +44,79 @@ const AddDeviceTypeDialog = ({ open, onClose, onSuccess }) => {
   };
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="sm"
-        fullWidth
-        // sx={{ p: 1 }}
-      >
-        <DialogTitle>เพิ่มประเภทอุปกรณ์</DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ pt: 1.5, mb: 2 }}>
-            ใช้สำหรับกำหนดประเภทของอุปกรณ์ในระบบ
-          </DialogContentText>
-          <form onSubmit={createDeviceType} id="create-device-type-form">
-            <TextField
-              label="ประเภทอุปกรณ์"
-              fullWidth
-              onChange={(e) => setDeviceTypename(e.target.value)}
-            ></TextField>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>ยกเลิก</Button>
-          <Button
-            form="create-device-type-form"
-            type="submit"
-            onClick={onClose}
-          >
-            บันทึก
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Box>
+            <Typography variant="h5" fontWeight={600}>
+              เพิ่มประเภทอุปกรณ์
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              เพิ่มประเภทอุปกรณ์ใหม่สำหรับใช้จัดกลุ่มอุปกรณ์ในระบบ
+            </Typography>
+          </Box>
+
+          <Button onClick={onClose} color="inherit">
+            ✕
           </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+        </Stack>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        <Box
+          component="form"
+          id="create-device-type-form"
+          onSubmit={createDeviceType}
+        >
+          <TextField
+            label="ชื่อประเภทอุปกรณ์"
+            value={deviceTypeName}
+            onChange={(e) => setDeviceTypeName(e.target.value)}
+            placeholder="เช่น คอมพิวเตอร์"
+            fullWidth
+            autoFocus
+            required
+            helperText={
+              !deviceTypeName.trim() ? "กรุณากรอกชื่อประเภทอุปกรณ์" : " "
+            }
+            error={!deviceTypeName.trim()}
+          />
+        </Box>
+      </DialogContent>
+
+      <DialogActions
+        sx={{
+          px: 3,
+          py: 2,
+          flexDirection: { xs: "column-reverse", sm: "row" },
+          gap: 1,
+        }}
+      >
+        <Button
+          onClick={onClose}
+          color="inherit"
+          sx={{ width: { xs: "100%", sm: "auto" } }}
+        >
+          ยกเลิก
+        </Button>
+
+        <Button
+          form="create-device-type-form"
+          type="submit"
+          variant="contained"
+          disabled={!deviceTypeName.trim()}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
+        >
+          เพิ่มประเภทอุปกรณ์
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
-};
+}
 
 export default AddDeviceTypeDialog;

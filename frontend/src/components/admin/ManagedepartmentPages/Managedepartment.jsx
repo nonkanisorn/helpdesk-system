@@ -1,145 +1,320 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button } from "@mui/material";
-
-import { Link } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Stack,
+  TablePagination,
+  Divider,
+  Chip,
+} from "@mui/material";
 import AddDepartmentDialog from "../dialog/AddDialog/AddDepartmentDialog";
+import EditDepartmentDialog from "../dialog/EditDialog/EditDepartmentsDialog";
+import { useSelector } from "react-redux";
 
 function Managedepartment() {
-  const [departmentData, setDepartmentdata] = useState([]);
-  const [openAddDepartmentDialog, setOpenAddDepartmentDialog] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const handleOpenAddDepartmentDialog = () => {
-    setOpenAddDepartmentDialog(true);
-  };
-  const handleCloseAddDepartmentDialog = () => {
-    setOpenAddDepartmentDialog(false);
-  };
-  const Deletedepartment = async (dep_id) => {
-    const shouldDelete = window.confirm("คุณต้องการลบอุปกรณ์นี้หรือไม่?");
-    if (!shouldDelete) {
-      return;
-    }
 
-    axios
-      .delete(`${apiUrl}/departments/${dep_id}`)
-      .then((response) => {
-        console.log(response.data);
-        axios
-          .get(`${apiUrl}/departments`)
-          .then((response) => {
-            setDepartmentdata(response.data);
-            console.log(response);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error deeteing data: ", error``);
+  const [departmentData, setDepartmentData] = useState([]);
+  const [openAddDepartmentDialog, setOpenAddDepartmentDialog] = useState(false);
+  const [openEditDepartmentDialog, setOpenEditDepartmentDialog] =
+    useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+
+  const token = useSelector((state) => state.user.token);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const fetchDepartment = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/departments`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      setDepartmentData(response.data.result ?? response.data ?? []);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
   };
 
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/departments`)
-      .then(function (response) {
-        setDepartmentdata(response.data);
-        console.log(departmentData);
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-      .finally(function () {});
-  }, []);
+    if (token) fetchDepartment();
+  }, [token]);
 
-  const fetchDepartment = () => {
-    axios
-      .get(`${apiUrl}/departments`)
-      .then(function (response) {
-        setDepartmentdata(response.data);
-        console.log(departmentData);
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-      .finally(function () {});
+  const handleOpenEditDepartmentDialog = (department) => {
+    setSelectedDepartment(department);
+    setOpenEditDepartmentDialog(true);
   };
-  return (
-    <div>
-      <h1>
-        จัดการแผนก {"\u00A0"}
-        <Button
-          variant="contained"
-          size="small"
-          onClick={handleOpenAddDepartmentDialog}
-        >
-          +ADD
-        </Button>
-        <AddDepartmentDialog
-          open={openAddDepartmentDialog}
-          onClose={handleCloseAddDepartmentDialog}
-          onSuccess={fetchDepartment}
-        />
-      </h1>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>แผนก</TableCell>
-              <TableCell>แก้ไข / ลบ</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {departmentData.map((item, index) => (
-              <TableRow
-                key={index}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                {/* <TableCell component="th" scope="row">
-                  {item.dev_id}
-                </TableCell> */}
-                <TableCell>{item.dep_id} </TableCell>
 
-                <TableCell>{item.dep_name}</TableCell>
-                <TableCell>
-                  <Link
-                    to={`/admin/Editdepartment/${item.dep_id}/${item.dep_name}`}
+  const handleCloseEditDepartmentDialog = () => {
+    setOpenEditDepartmentDialog(false);
+    setSelectedDepartment(null);
+  };
+
+  const handleDeleteDepartment = async (depId) => {
+    const shouldDelete = window.confirm("ต้องการลบแผนกนี้ใช่ไหม?");
+    if (!shouldDelete) return;
+
+    try {
+      await axios.delete(`${apiUrl}/departments/${depId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchDepartment();
+    } catch (error) {
+      console.error("Error deleting department:", error);
+    }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const paginatedDepartments = departmentData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  );
+
+  return (
+    <>
+      <AddDepartmentDialog
+        open={openAddDepartmentDialog}
+        onClose={() => setOpenAddDepartmentDialog(false)}
+        onSuccess={fetchDepartment}
+        token={token}
+      />
+
+      <EditDepartmentDialog
+        open={openEditDepartmentDialog}
+        onClose={handleCloseEditDepartmentDialog}
+        onSuccess={fetchDepartment}
+        token={token}
+        department={selectedDepartment}
+      />
+
+      <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        <Paper
+          elevation={2}
+          sx={{
+            p: { xs: 2, sm: 3 },
+            borderRadius: 3,
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "stretch", sm: "center" }}
+            spacing={2}
+            sx={{ mb: 3 }}
+          >
+            <Box>
+              <Typography variant="h5" fontWeight={600}>
+                จัดการแผนก
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                เพิ่ม แก้ไข และลบแผนกในระบบ
+              </Typography>
+            </Box>
+
+            <Button
+              variant="contained"
+              onClick={() => setOpenAddDepartmentDialog(true)}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
+              + เพิ่มแผนก
+            </Button>
+          </Stack>
+
+          <TableContainer
+            sx={{
+              display: { xs: "none", md: "block" },
+              overflowX: "auto",
+            }}
+          >
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>ชื่อแผนก</TableCell>
+                  <TableCell align="right">จัดการ</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {paginatedDepartments.map((item) => (
+                  <TableRow key={item.dep_id} hover>
+                    <TableCell>{item.dep_id}</TableCell>
+
+                    <TableCell>
+                      <Typography fontWeight={500}>{item.dep_name}</Typography>
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        justifyContent="flex-end"
+                      >
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleOpenEditDepartmentDialog(item)}
+                        >
+                          แก้ไข
+                        </Button>
+
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteDepartment(item.dep_id)}
+                        >
+                          ลบ
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+
+                {departmentData.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center">
+                      ไม่พบข้อมูลแผนก
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Stack
+            spacing={1.5}
+            sx={{
+              display: { xs: "flex", md: "none" },
+            }}
+          >
+            {paginatedDepartments.map((item) => (
+              <Paper
+                key={item.dep_id}
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  borderRadius: 2.5,
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                    spacing={2}
                   >
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        ชื่อแผนก
+                      </Typography>
+
+                      <Typography
+                        fontWeight={600}
+                        sx={{
+                          mt: 0.25,
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {item.dep_name}
+                      </Typography>
+                    </Box>
+
+                    <Chip
+                      label={`ID: ${item.dep_id}`}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </Stack>
+
+                  <Divider />
+
+                  <Stack direction="row" spacing={1}>
                     <Button
-                      variant="contained"
-                      sx={{ fontSize: "12px", backgroundColor: "#FF9933" }}
+                      variant="outlined"
+                      fullWidth
+                      onClick={() => handleOpenEditDepartmentDialog(item)}
                     >
                       แก้ไข
                     </Button>
-                  </Link>
 
-                  <Button
-                    onClick={() => Deletedepartment(item.dep_id)}
-                    variant="contained"
-                    sx={{
-                      fontSize: "12px",
-                      backgroundColor: "red",
-                      marginLeft: 3,
-                    }}
-                  >
-                    ลบ
-                  </Button>
-                </TableCell>
-              </TableRow>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      fullWidth
+                      onClick={() => handleDeleteDepartment(item.dep_id)}
+                    >
+                      ลบ
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Paper>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+
+            {departmentData.length === 0 && (
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 3,
+                  borderRadius: 2.5,
+                  textAlign: "center",
+                }}
+              >
+                <Typography color="text.secondary">ไม่พบข้อมูลแผนก</Typography>
+              </Paper>
+            )}
+          </Stack>
+
+          <TablePagination
+            component="div"
+            count={departmentData.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+            labelRowsPerPage="แถวต่อหน้า"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} จาก ${count}`
+            }
+            sx={{
+              mt: 2,
+              ".MuiTablePagination-toolbar": {
+                px: { xs: 0, sm: 2 },
+                flexWrap: "wrap",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: 1,
+              },
+              ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+                {
+                  m: 0,
+                },
+            }}
+          />
+        </Paper>
+      </Box>
+    </>
   );
 }
+
 export default Managedepartment;

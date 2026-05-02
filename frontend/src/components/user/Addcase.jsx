@@ -30,7 +30,7 @@ function Addcase() {
   const createticket = async (e) => {
     try {
       const response = await axios.post(
-        "http://localhost:5011/tickets",
+        `${apiUrl}/tickets`,
         {
           // dep_name: selectedDepartment,
           title,
@@ -43,7 +43,7 @@ function Addcase() {
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
         },
       );
@@ -60,12 +60,11 @@ function Addcase() {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        const response = await axios.get(apiUrl + "/devices",
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
+        const response = await axios.get(apiUrl + "/devices", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setDataDev(response.data);
       };
       fetchData();
@@ -76,12 +75,12 @@ function Addcase() {
   useEffect(() => {
     try {
       const fetchdata = async () => {
-        const response = await axios.get(apiUrl + "/issues", {
+        const response = await axios.get(apiUrl + "/issues-categories", {
           headers: {
-            "Authorization": `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-        setCategories(response.data.result);
+        setCategories(response.data.data);
       };
       fetchdata();
     } catch (error) {
@@ -158,10 +157,7 @@ function Addcase() {
                   onChange={(e) => setSelectcategory(e.target.value)}
                 >
                   {categories.map((item) => (
-                    <MenuItem
-                      key={item.issues_id}
-                      value={item.issues_id}
-                    >
+                    <MenuItem key={item.issues_id} value={item.issues_id}>
                       {item.issues_name}
                     </MenuItem>
                   ))}

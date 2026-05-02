@@ -49,7 +49,7 @@ type UserRepository interface {
 }
 
 type UserQueryRepository interface {
-	GetUserWithRolesName() ([]UserWithRolesName, error)
+	GetUserList() ([]UserWithRolesName, error)
 	GetCurrentUser(int) (*UserWithRolesName, error)
 	GetUserByRolesID(int) ([]UserTechinicianRolesRow, error)
 }

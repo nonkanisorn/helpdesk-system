@@ -81,3 +81,35 @@ func (d departmentHandler) DeleteDepartmentsByID(c *fiber.Ctx) error {
 		"success": true,
 	})
 }
+
+func (d departmentHandler) EditDepartmentByID(c *fiber.Ctx) error {
+	departmentID, err := strconv.Atoi(c.Params("departmentID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	var departmentReq domain.DepartmentsRequest
+	err = c.BodyParser(&departmentReq)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	department := domain.Department{
+		DepID:   departmentID,
+		DepName: departmentReq.DepName,
+	}
+	err = d.depServ.EditDepartmentByID(department)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
+}
