@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 	"github.com/nonkanisorn/helpdesk-system/internal/status/service"
 )
 
@@ -51,4 +52,36 @@ func (s statusHandler) DeleteStatusByID(c *fiber.Ctx) error {
 		return err
 	}
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+func (s statusHandler) EditStatusByID(c *fiber.Ctx) error {
+	statusID, err := strconv.Atoi(c.Params("statusID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	var statusReq domain.StatusRequest
+	err = c.BodyParser(&statusReq)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	status := domain.Status{
+		StatusID:   statusID,
+		StatusName: statusReq.StatusName,
+	}
+	err = s.statusServ.EditStatusByID(status)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"error":   err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
 }

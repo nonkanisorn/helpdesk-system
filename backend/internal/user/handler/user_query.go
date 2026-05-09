@@ -15,8 +15,8 @@ func NewUserQueryHandler(userQueryService service.UserQueryService) userQueryHan
 	return userQueryHandler{userQueryService: userQueryService}
 }
 
-func (u userQueryHandler) GetUserWithRolesName(c *fiber.Ctx) error {
-	users, err := u.userQueryService.GetUserWithRolesName()
+func (u userQueryHandler) GetUserList(c *fiber.Ctx) error {
+	users, err := u.userQueryService.GetUserList()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err})
 	}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 	"github.com/nonkanisorn/helpdesk-system/internal/role/repository"
 )
 
@@ -47,4 +48,12 @@ func (r roleService) DeleteRolesByID(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (r roleService) EditRoleByRoleID(role domain.Role) error {
+	err := r.roleRepo.EditRoleByRoleID(role)
+	if err != nil {
+		return err
+	}
+	return err
 }

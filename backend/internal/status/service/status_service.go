@@ -1,6 +1,9 @@
 package service
 
 import (
+	"fmt"
+
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 	"github.com/nonkanisorn/helpdesk-system/internal/status/repository"
 )
 
@@ -49,5 +52,14 @@ func (s statusService) DeleteStatusByID(id int) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s statusService) EditStatusByID(status domain.Status) error {
+	err := s.statusRepo.EditStatusByID(status)
+	if err != nil {
+		return err
+	}
+	fmt.Println("from service", status)
 	return nil
 }

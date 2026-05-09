@@ -1,6 +1,9 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
+)
 
 type departmentRepositoryDB struct {
 	db *sqlx.DB
@@ -49,6 +52,15 @@ func (d departmentRepositoryDB) Create(departmentName string) error {
 func (d departmentRepositoryDB) DeleteByID(id int) error {
 	query := "delete from departments where dep_id = ? "
 	_, err := d.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d departmentRepositoryDB) EditDepartmentByID(department domain.Department) error {
+	query := "update departments set dep_name = ? where dep_id = ? "
+	_, err := d.db.Exec(query, department.DepName, department.DepID)
 	if err != nil {
 		return err
 	}

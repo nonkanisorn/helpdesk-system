@@ -13,8 +13,8 @@ func NewUserQueryService(userQueryRepo repository.UserQueryRepository) UserQuery
 	return userQueryService{userQeryRepo: userQueryRepo}
 }
 
-func (u userQueryService) GetUserWithRolesName() ([]UserResponseWithRoleName, error) {
-	users, err := u.userQeryRepo.GetUserWithRolesName()
+func (u userQueryService) GetUserList() ([]UserResponseWithRoleName, error) {
+	users, err := u.userQeryRepo.GetUserList()
 	if err != nil {
 		return nil, err
 	}

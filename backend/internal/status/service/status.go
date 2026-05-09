@@ -1,5 +1,7 @@
 package service
 
+import "github.com/nonkanisorn/helpdesk-system/internal/domain"
+
 type StatusResponse struct {
 	StatusID   int64  `db:"status_id" json:"status_id"`
 	StatusName string `db:"status_name" json:"status_name"`
@@ -9,4 +11,5 @@ type StatusService interface {
 	GetStatusAll() ([]StatusResponse, error)
 	GetStatusByID(int) (*StatusResponse, error)
 	DeleteStatusByID(int) error
+	EditStatusByID(status domain.Status) error
 }

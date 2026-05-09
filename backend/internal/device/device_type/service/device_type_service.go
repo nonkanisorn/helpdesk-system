@@ -1,6 +1,9 @@
 package service
 
-import "github.com/nonkanisorn/helpdesk-system/internal/device/device_type/repository"
+import (
+	"github.com/nonkanisorn/helpdesk-system/internal/device/device_type/repository"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
+)
 
 type deviceTypeService struct {
 	DeviceTypeRepo repository.DeviceTypeRepository
@@ -24,4 +27,28 @@ func (d deviceTypeService) GetAllDeviceType() ([]DeviceTypeResponse, error) {
 		deviceTypesRes = append(deviceTypesRes, devicetpye)
 	}
 	return deviceTypesRes, nil
+}
+
+func (d deviceTypeService) Create(deviceTypeName string) error {
+	err := d.DeviceTypeRepo.Create(deviceTypeName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d deviceTypeService) DeleteDeviceTypesByID(deviceTypeID int) error {
+	err := d.DeviceTypeRepo.DeleteDeviceTypeByID(deviceTypeID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d deviceTypeService) EditDeviceTypeByID(deviceType domain.DeviceType) error {
+	err := d.DeviceTypeRepo.EditDeviceTypeByID(deviceType)
+	if err != nil {
+		return err
+	}
+	return nil
 }

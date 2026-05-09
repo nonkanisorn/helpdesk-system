@@ -14,7 +14,7 @@ func NewUserQueryRepository(db *sqlx.DB) UserQueryRepository {
 	return userQueryRepository{db: db}
 }
 
-func (u userQueryRepository) GetUserWithRolesName() ([]UserWithRolesName, error) {
+func (u userQueryRepository) GetUserList() ([]UserWithRolesName, error) {
 	var users []UserWithRolesName
 	query := "select id, username,  first_name, last_name, email, phone, u.role_id,r.role_name , department_id, is_active from users u join roles r on u.role_id  = r.role_id"
 	err := u.db.Select(&users, query)

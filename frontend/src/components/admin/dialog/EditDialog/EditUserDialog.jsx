@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useSelector } from "react-redux";
 import {
+  Box,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   TextField,
   Typography,
@@ -14,6 +15,8 @@ import {
   MenuItem,
   Stack,
   CircularProgress,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 
 const EditUserDialog = ({
@@ -25,6 +28,7 @@ const EditUserDialog = ({
   depData,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const token = useSelector((state) => state.user.token);
 
   const {
     register,
@@ -35,39 +39,41 @@ const EditUserDialog = ({
   } = useForm({
     defaultValues: {
       username: "",
-      userpassword: "", // ถ้าไม่อยากให้แก้รหัสผ่าน ให้เอาออกได้
-      full_name: "",
+      password: "",
+      first_name: "",
+      last_name: "",
       email: "",
       phone: "",
-      role_id: "",
-      department_id: "",
+      role_id: null,
+      department_id: null,
       is_active: 1,
     },
   });
 
   const [loading, setLoading] = useState(false);
-  console.log("id", id);
-  // โหลดข้อมูลเดิมมาใส่ฟอร์มเมื่อเปิด dialog / เปลี่ยน id
+
   useEffect(() => {
     if (!open || !id) return;
 
     const fetchUser = async () => {
       setLoading(true);
-      try {
-        // ✅ ปรับ endpoint ตาม backend ของคุณ
-        const res = await axios.get(`${apiUrl}/users/${id}`);
 
-        // สมมติ backend ส่ง user object กลับมา
-        const u = res.data;
+      try {
+        const res = await axios.get(`${apiUrl}/users/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const u = res.data.result ?? res.data;
 
         reset({
           username: u.username ?? "",
-          userpassword: u.userpassword ?? "", // ไม่เติม password เดิม (ปกติ backend ก็ไม่ส่งมาอยู่แล้ว)
-          full_name: u.full_name ?? "",
+          password: "",
+          first_name: u.first_name ?? "",
+          last_name: u.last_name ?? "",
           email: u.email ?? "",
           phone: u.phone ?? "",
           role_id: u.role_id ?? null,
-          department_id: u.dep_id ?? null,
+          department_id: u.department_id ?? u.dep_id ?? null,
           is_active: typeof u.is_active === "number" ? u.is_active : 1,
         });
       } catch (err) {
@@ -78,15 +84,14 @@ const EditUserDialog = ({
     };
 
     fetchUser();
-  }, [open, id, apiUrl, reset]);
+  }, [open, id, apiUrl, token, reset]);
 
   const onSubmit = async (data) => {
     try {
-      // ✅ ปรับ payload ตาม backend
-      // ถ้าไม่ต้องการแก้รหัสผ่าน: ไม่ต้องส่ง userpassword ถ้าเป็น ""
       const payload = {
         username: data.username,
-        full_name: data.full_name,
+        first_name: data.first_name,
+        last_name: data.last_name,
         email: data.email,
         phone: data.phone,
         role_id: Number(data.role_id),
@@ -94,13 +99,15 @@ const EditUserDialog = ({
         is_active: Number(data.is_active),
       };
 
-      // ส่งรหัสผ่านเฉพาะตอนกรอก
-      if (data.userpassword && data.userpassword.trim() !== "") {
-        payload.userpassword = data.userpassword;
+      if (data.password?.trim()) {
+        payload.password = data.password;
       }
 
       await axios.patch(`${apiUrl}/users/${id}`, payload, {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       onClose?.();
@@ -111,112 +118,154 @@ const EditUserDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography variant="h6">แก้ไขผู้ใช้</Typography>
-          <Button onClick={onClose}>x</Button>
+          <Box>
+            <Typography variant="h5" fontWeight={600}>
+              แก้ไขผู้ใช้
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              แก้ไขข้อมูลผู้ใช้งาน บทบาท แผนก และสถานะ
+            </Typography>
+          </Box>
+
+          <Button onClick={onClose} color="inherit">
+            ✕
+          </Button>
         </Stack>
       </DialogTitle>
 
-      <DialogContent>
-        <DialogContentText sx={{ pt: 1.5, mb: 2 }}>
-          ใช้สำหรับแก้ไขข้อมูลผู้ใช้งานในระบบ
-        </DialogContentText>
-
+      <DialogContent dividers>
         {loading ? (
-          <Stack alignItems="center" sx={{ py: 3 }}>
+          <Stack alignItems="center" justifyContent="center" sx={{ py: 6 }}>
             <CircularProgress />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              กำลังโหลดข้อมูลผู้ใช้...
+            </Typography>
           </Stack>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} id="edit-user-form">
-            <Stack spacing={1.2}>
-              <Typography>ชื่อผู้ใช้</Typography>
-              <TextField {...register("username")} />
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "1fr 1fr",
+                },
+                gap: 2,
+                pt: 1,
+              }}
+            >
+              <TextField
+                label="ชื่อผู้ใช้"
+                fullWidth
+                {...register("username")}
+              />
 
-              <Typography>รหัสผ่าน (กรอกเมื่ออยากเปลี่ยน)</Typography>
-              <TextField type="password" {...register("userpassword")} />
+              <TextField label="อีเมล์" fullWidth {...register("email")} />
 
-              <Typography>ชื่อ-นามสกุล</Typography>
-              <TextField {...register("full_name")} />
+              <TextField
+                label="รหัสผ่านใหม่"
+                type="password"
+                fullWidth
+                helperText="เว้นว่างไว้ หากไม่ต้องการเปลี่ยนรหัสผ่าน"
+                {...register("password")}
+              />
 
-              <Typography>อีเมล์</Typography>
-              <TextField {...register("email")} />
+              <TextField
+                label="เบอร์โทรศัพท์"
+                fullWidth
+                {...register("phone")}
+              />
 
-              <Typography>เบอร์โทรศัพท์</Typography>
-              <TextField {...register("phone")} />
+              <TextField label="ชื่อ" fullWidth {...register("first_name")} />
 
-              <Typography>บทบาท</Typography>
+              <TextField label="นามสกุล" fullWidth {...register("last_name")} />
+
               <Controller
                 control={control}
                 name="role_id"
                 render={({ field }) => (
-                  <Select
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  >
-                    {(roleData ?? []).map((r) => (
-                      <MenuItem key={r.role_id} value={r.role_id}>
-                        {r.role_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <FormControl fullWidth>
+                    <InputLabel>บทบาท</InputLabel>
+                    <Select
+                      {...field}
+                      label="บทบาท"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    >
+                      {(roleData ?? []).map((r) => (
+                        <MenuItem key={r.role_id} value={r.role_id}>
+                          {r.role_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 )}
               />
 
-              <Typography>แผนก</Typography>
               <Controller
                 control={control}
                 name="department_id"
                 render={({ field }) => (
-                  <Select
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  >
-                    {(depData ?? []).map((d) => (
-                      <MenuItem key={d.dep_id} value={d.dep_id}>
-                        {d.dep_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <FormControl fullWidth>
+                    <InputLabel>แผนก</InputLabel>
+                    <Select
+                      {...field}
+                      label="แผนก"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    >
+                      {(depData ?? []).map((d) => (
+                        <MenuItem key={d.dep_id} value={d.dep_id}>
+                          {d.dep_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 )}
               />
 
-              <Typography>สถานะผู้ใช้งาน</Typography>
               <Controller
                 control={control}
                 name="is_active"
                 render={({ field }) => (
-                  <Select
-                    {...field}
-                    value={field.value ?? 1}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  >
-                    <MenuItem value={0}>ไม่พร้อมใช้งาน</MenuItem>
-                    <MenuItem value={1}>พร้อมใช้งาน</MenuItem>
-                  </Select>
+                  <FormControl fullWidth>
+                    <InputLabel>สถานะผู้ใช้งาน</InputLabel>
+                    <Select
+                      {...field}
+                      label="สถานะผู้ใช้งาน"
+                      value={field.value ?? 1}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    >
+                      <MenuItem value={1}>พร้อมใช้งาน</MenuItem>
+                      <MenuItem value={0}>ไม่พร้อมใช้งาน</MenuItem>
+                    </Select>
+                  </FormControl>
                 )}
               />
-            </Stack>
+            </Box>
           </form>
         )}
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose}>ยกเลิก</Button>
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button onClick={onClose} color="inherit">
+          ยกเลิก
+        </Button>
+
         <Button
           form="edit-user-form"
           type="submit"
           variant="contained"
           disabled={loading || isSubmitting}
         >
-          บันทึก
+          {isSubmitting ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
         </Button>
       </DialogActions>
     </Dialog>

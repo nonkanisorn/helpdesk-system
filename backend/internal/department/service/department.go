@@ -1,5 +1,7 @@
 package service
 
+import "github.com/nonkanisorn/helpdesk-system/internal/domain"
+
 type DepartmentResponse struct {
 	DepartmentID   int64  `db:"dep_id" json:"dep_id"`
 	DepartmentName string `db:"dep_name" json:"dep_name"`
@@ -9,4 +11,5 @@ type DepartmentService interface {
 	GetDepartmentByID(int) (*DepartmentResponse, error)
 	CreateDepartments(string) error
 	DeleteDepartmentsByID(int) error
+	EditDepartmentByID(department domain.Department) error
 }

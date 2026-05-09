@@ -1,6 +1,11 @@
 package service
 
-import "github.com/nonkanisorn/helpdesk-system/internal/issue/repository"
+import (
+	"fmt"
+
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
+	"github.com/nonkanisorn/helpdesk-system/internal/issue/repository"
+)
 
 type issueService struct {
 	IssueRepo repository.IssueRepository
@@ -25,4 +30,29 @@ func (i issueService) GetAllIssues() ([]IssueResponse, error) {
 
 	}
 	return issuesResponse, nil
+}
+
+func (i issueService) Create(issuesCategoriesName string) error {
+	err := i.IssueRepo.Create(issuesCategoriesName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i issueService) DeleteIssuesByID(issuesCategoriesID int) error {
+	err := i.IssueRepo.DeleteIssuesByID(issuesCategoriesID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i issueService) EditIssueByID(issue domain.Issue) error {
+	fmt.Println("from serivce", issue.IssuesCategoriesName)
+	err := i.IssueRepo.EditIssueByID(issue)
+	if err != nil {
+		return err
+	}
+	return nil
 }

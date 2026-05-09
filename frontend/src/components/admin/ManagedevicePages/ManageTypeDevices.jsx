@@ -16,63 +16,64 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
-
-import Addstatus from "./Addstatus.jsx";
-import Editstatus from "./Editstatus.jsx";
+import AddDeviceTypeDialog from "../dialog/AddDialog/AddDeviceTypeDialog";
+import EditDeviceTypeDialog from "../dialog/EditDialog/EditDeviceTypeDialog";
 import { useSelector } from "react-redux";
-import AddStatusDialog from "../dialog/AddDialog/AddStatusDialog.jsx";
 
-function Managestatus() {
+function ManageTypeDevices() {
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const [statusData, setStatusData] = useState([]);
-  const token = useSelector((state) => state.user.token);
+  const [typeDevice, setTypeDevice] = useState([]);
+  const [openAddDeviceType, setOpenAddDeviceType] = useState(false);
+  const [openEditDeviceTypeDialog, setOpenEditDeviceTypeDialog] =
+    useState(false);
+  const [selectedDeviceType, setSelectedDeviceType] = useState(null);
 
-  const [openAddStatusDialog, setOpenAddStatusDialog] = useState(false);
-  const [openEditStatusDialog, setOpenEditStatusDialog] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const token = useSelector((state) => state.user.token);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const fetchData = async () => {
+  const fetchTypeDevice = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/status`, {
+      const response = await axios.get(`${apiUrl}/device-types`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setStatusData(res.data.result ?? res.data);
+      setTypeDevice(
+        response.data.data ?? response.data.result ?? response.data ?? [],
+      );
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching device types:", error);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (token) fetchTypeDevice();
+  }, [token]);
 
-  const handleOpenEdit = (status) => {
-    setSelectedStatus(status);
-    setOpenEditStatusDialog(true);
+  const handleOpenEditDeviceTypeDialog = (deviceType) => {
+    setSelectedDeviceType(deviceType);
+    setOpenEditDeviceTypeDialog(true);
   };
 
-  const handleCloseEdit = () => {
-    setOpenEditStatusDialog(false);
-    setSelectedStatus(null);
+  const handleCloseEditDeviceTypeDialog = () => {
+    setOpenEditDeviceTypeDialog(false);
+    setSelectedDeviceType(null);
   };
 
-  const handleDelete = async (statusId) => {
-    const confirmDelete = window.confirm("ต้องการลบสถานะนี้ใช่ไหม?");
-    if (!confirmDelete) return;
+  const handleDeleteDeviceType = async (deviceTypeId) => {
+    const shouldDelete = window.confirm("ต้องการลบประเภทอุปกรณ์นี้ใช่ไหม?");
+    if (!shouldDelete) return;
 
     try {
-      await axios.delete(`${apiUrl}/Status/${statusId}`, {
+      await axios.delete(`${apiUrl}/device-types/${deviceTypeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      fetchData();
+      fetchTypeDevice();
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting device type:", error);
     }
   };
 
@@ -85,26 +86,26 @@ function Managestatus() {
     setPage(0);
   };
 
-  const paginatedStatusData = statusData.slice(
+  const paginatedDeviceTypes = typeDevice.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage,
   );
 
   return (
     <>
-      <AddStatusDialog
-        open={openAddStatusDialog}
-        onClose={() => setOpenAddStatusDialog(false)}
-        onSuccess={fetchData}
+      <AddDeviceTypeDialog
+        open={openAddDeviceType}
+        onClose={() => setOpenAddDeviceType(false)}
+        onSuccess={fetchTypeDevice}
         token={token}
       />
 
-      <Editstatus
-        open={openEditStatusDialog}
-        onClose={handleCloseEdit}
-        onSuccess={fetchData}
-        status={selectedStatus}
+      <EditDeviceTypeDialog
+        open={openEditDeviceTypeDialog}
+        onClose={handleCloseEditDeviceTypeDialog}
+        onSuccess={fetchTypeDevice}
         token={token}
+        deviceType={selectedDeviceType}
       />
 
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
@@ -124,24 +125,23 @@ function Managestatus() {
           >
             <Box>
               <Typography variant="h5" fontWeight={600}>
-                จัดการสถานะ
+                จัดการประเภทอุปกรณ์
               </Typography>
 
               <Typography variant="body2" color="text.secondary">
-                เพิ่ม แก้ไข และลบสถานะของรายการแจ้งซ่อม
+                เพิ่ม แก้ไข และลบประเภทอุปกรณ์ในระบบ
               </Typography>
             </Box>
 
             <Button
               variant="contained"
-              onClick={() => setOpenAddStatusDialog(true)}
+              onClick={() => setOpenAddDeviceType(true)}
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              + เพิ่มสถานะ
+              + เพิ่มประเภทอุปกรณ์
             </Button>
           </Stack>
 
-          {/* Desktop / Tablet Table */}
           <TableContainer
             sx={{
               display: { xs: "none", md: "block" },
@@ -152,19 +152,19 @@ function Managestatus() {
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
-                  <TableCell>ชื่อสถานะ</TableCell>
+                  <TableCell>ชื่อประเภทอุปกรณ์</TableCell>
                   <TableCell align="right">จัดการ</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {paginatedStatusData.map((item) => (
-                  <TableRow key={item.status_id} hover>
-                    <TableCell>{item.status_id}</TableCell>
+                {paginatedDeviceTypes.map((item) => (
+                  <TableRow key={item.devicetype_id} hover>
+                    <TableCell>{item.devicetype_id}</TableCell>
 
                     <TableCell>
                       <Typography fontWeight={500}>
-                        {item.status_name}
+                        {item.devicetype_name}
                       </Typography>
                     </TableCell>
 
@@ -177,7 +177,7 @@ function Managestatus() {
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() => handleOpenEdit(item.status_id)}
+                          onClick={() => handleOpenEditDeviceTypeDialog(item)}
                         >
                           แก้ไข
                         </Button>
@@ -186,7 +186,9 @@ function Managestatus() {
                           variant="outlined"
                           color="error"
                           size="small"
-                          onClick={() => handleDelete(item.status_id)}
+                          onClick={() =>
+                            handleDeleteDeviceType(item.devicetype_id)
+                          }
                         >
                           ลบ
                         </Button>
@@ -195,10 +197,10 @@ function Managestatus() {
                   </TableRow>
                 ))}
 
-                {statusData.length === 0 && (
+                {typeDevice.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={3} align="center">
-                      ไม่พบข้อมูลสถานะ
+                      ไม่พบข้อมูลประเภทอุปกรณ์
                     </TableCell>
                   </TableRow>
                 )}
@@ -206,16 +208,15 @@ function Managestatus() {
             </Table>
           </TableContainer>
 
-          {/* Mobile Card */}
           <Stack
             spacing={1.5}
             sx={{
               display: { xs: "flex", md: "none" },
             }}
           >
-            {paginatedStatusData.map((item) => (
+            {paginatedDeviceTypes.map((item) => (
               <Paper
-                key={item.status_id}
+                key={item.devicetype_id}
                 variant="outlined"
                 sx={{
                   p: 2,
@@ -231,7 +232,7 @@ function Managestatus() {
                   >
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="caption" color="text.secondary">
-                        ชื่อสถานะ
+                        ชื่อประเภทอุปกรณ์
                       </Typography>
 
                       <Typography
@@ -241,12 +242,12 @@ function Managestatus() {
                           wordBreak: "break-word",
                         }}
                       >
-                        {item.status_name}
+                        {item.devicetype_name}
                       </Typography>
                     </Box>
 
                     <Chip
-                      label={`ID: ${item.status_id}`}
+                      label={`ID: ${item.devicetype_id}`}
                       size="small"
                       variant="outlined"
                     />
@@ -258,7 +259,7 @@ function Managestatus() {
                     <Button
                       variant="outlined"
                       fullWidth
-                      onClick={() => handleOpenEdit(item)}
+                      onClick={() => handleOpenEditDeviceTypeDialog(item)}
                     >
                       แก้ไข
                     </Button>
@@ -267,7 +268,7 @@ function Managestatus() {
                       variant="outlined"
                       color="error"
                       fullWidth
-                      onClick={() => handleDelete(item.status_id)}
+                      onClick={() => handleDeleteDeviceType(item.devicetype_id)}
                     >
                       ลบ
                     </Button>
@@ -276,7 +277,7 @@ function Managestatus() {
               </Paper>
             ))}
 
-            {statusData.length === 0 && (
+            {typeDevice.length === 0 && (
               <Paper
                 variant="outlined"
                 sx={{
@@ -285,14 +286,16 @@ function Managestatus() {
                   textAlign: "center",
                 }}
               >
-                <Typography color="text.secondary">ไม่พบข้อมูลสถานะ</Typography>
+                <Typography color="text.secondary">
+                  ไม่พบข้อมูลประเภทอุปกรณ์
+                </Typography>
               </Paper>
             )}
           </Stack>
 
           <TablePagination
             component="div"
-            count={statusData.length}
+            count={typeDevice.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
@@ -322,4 +325,4 @@ function Managestatus() {
   );
 }
 
-export default Managestatus;
+export default ManageTypeDevices;

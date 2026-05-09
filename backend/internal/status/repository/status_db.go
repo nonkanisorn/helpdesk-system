@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 )
 
 type statusRepositoryDB struct {
@@ -45,6 +47,16 @@ func (s statusRepositoryDB) GetByID(id int) (*Status, error) {
 func (s statusRepositoryDB) DeleteByID(id int) error {
 	query := "delete from status where status_id = ?"
 	_, err := s.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s statusRepositoryDB) EditStatusByID(status domain.Status) error {
+	query := "update status set status_name = ? where status_id = ?"
+	fmt.Println("from db", status.StatusName)
+	_, err := s.db.Exec(query, status.StatusName, status.StatusID)
 	if err != nil {
 		return err
 	}

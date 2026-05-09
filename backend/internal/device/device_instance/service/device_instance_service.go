@@ -28,3 +28,19 @@ func (d deviceInstanceService) GetAllDeviceInstance() ([]DeviceInstanceResponse,
 	}
 	return deviceInstanceResponse, nil
 }
+
+func (d deviceInstanceService) Create(deviceID int, deviceNumber int, depID int, serialNumber string) error {
+	err := d.deviceInstanceRepo.Create(deviceID, deviceNumber, depID, serialNumber)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d deviceInstanceService) DeleteDeviceInstanceByID(deviceInstanceID int) error {
+	err := d.deviceInstanceRepo.DeleteDeviceInstanceByID(deviceInstanceID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

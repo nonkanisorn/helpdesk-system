@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/nonkanisorn/helpdesk-system/internal/department/repository"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 )
 
 type departmentService struct {
@@ -49,6 +50,14 @@ func (d departmentService) CreateDepartments(departmentName string) error {
 
 func (d departmentService) DeleteDepartmentsByID(id int) error {
 	err := d.depRepo.DeleteByID(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d departmentService) EditDepartmentByID(department domain.Department) error {
+	err := d.depRepo.EditDepartmentByID(department)
 	if err != nil {
 		return err
 	}

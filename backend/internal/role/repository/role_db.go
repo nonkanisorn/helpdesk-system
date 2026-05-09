@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 )
 
 type roleRepositoryDB struct {
@@ -14,8 +15,8 @@ func NewRoleRepositoryDB(db *sqlx.DB) RoleRepository {
 	return roleRepositoryDB{db: db}
 }
 
-func (r roleRepositoryDB) GetAll() ([]Role, error) {
-	roles := []Role{}
+func (r roleRepositoryDB) GetAll() ([]RoleRow, error) {
+	roles := []RoleRow{}
 	query := "select role_id, role_name from roles"
 	err := r.db.Select(&roles, query)
 	if err != nil {
@@ -24,7 +25,7 @@ func (r roleRepositoryDB) GetAll() ([]Role, error) {
 	return roles, nil
 }
 
-func (r roleRepositoryDB) GetByID(id int) (*Role, error) {
+func (r roleRepositoryDB) GetByID(id int) (*RoleRow, error) {
 	return nil, nil
 }
 
@@ -44,5 +45,15 @@ func (r roleRepositoryDB) DeleteByID(id int) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r roleRepositoryDB) EditRoleByRoleID(role domain.Role) error {
+	query := "update roles set role_name = ? where role_id = ?"
+	_, err := r.db.Exec(query, role.RoleName, role.RoleID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

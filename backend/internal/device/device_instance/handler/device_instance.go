@@ -2,9 +2,11 @@ package handler
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nonkanisorn/helpdesk-system/internal/device/device_instance/service"
+	"github.com/nonkanisorn/helpdesk-system/internal/domain"
 )
 
 type deviceInstanceHandler struct {
@@ -24,4 +26,45 @@ func (d deviceInstanceHandler) GetAllDeviceInstance(c *fiber.Ctx) error {
 		})
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"result": deviceInstance})
+}
+
+func (d deviceInstanceHandler) Create(c *fiber.Ctx) error {
+	var req domain.DeviceInstanceCreateRequest
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	err = d.deviceInstanceServ.Create(req.DeviceID, req.DeviceNumber, req.DepID, req.SerialNumber)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
+}
+
+func (d deviceInstanceHandler) DeleteDeviceInstanceByID(c *fiber.Ctx) error {
+	deviceInstanceID, err := strconv.Atoi(c.Params("deviceInstanceID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	err = d.deviceInstanceServ.DeleteDeviceInstanceByID(deviceInstanceID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
 }

@@ -1,12 +1,15 @@
 package repository
 
-type Role struct {
+import "github.com/nonkanisorn/helpdesk-system/internal/domain"
+
+type RoleRow struct {
 	RoleID   int    `db:"role_id"`
 	RoleName string `db:"role_name"`
 }
 type RoleRepository interface {
-	GetAll() ([]Role, error)
-	GetByID(int) (*Role, error)
+	GetAll() ([]RoleRow, error)
+	GetByID(int) (*RoleRow, error)
 	Create(string) error
 	DeleteByID(int) error
+	EditRoleByRoleID(role domain.Role) error
 }

@@ -142,7 +142,7 @@ func main() {
 	userQueryServ := userQueryServ.NewUserQueryService(userQueryRepo)
 	userQueryHandler := userQueryHand.NewUserQueryHandler(userQueryServ)
 	app.Get("/users/by-role/:roleID<int>", userQueryHandler.GetUserByRolesID)
-	app.Get("/users/view", userQueryHandler.GetUserWithRolesName)
+	app.Get("/users/view", userQueryHandler.GetUserList)
 	app.Get("/current-user/:id<int>", userQueryHandler.GetCurrentUser)
 	// admin
 	// api.Get("/users", userHand.GetAllUsers)
@@ -153,12 +153,14 @@ func main() {
 	app.Get("/status", statusHandlers.GetStatusAll)
 	app.Post("/status", statusHandlers.CreateStatus)
 	app.Delete("/status/:id", statusHandlers.DeleteStatusByID)
+	app.Patch("/status/:statusID<int>", statusHandlers.EditStatusByID)
 	// roles
 	roleReposityDB := roleRepo.NewRoleRepositoryDB(db)
 	roleService := roleServ.NewRoleService(roleReposityDB)
 	roleHandler := roleHand.NewRoleHandler(roleService)
 	app.Get("/roles", roleHandler.GetRole)
 	app.Post("/roles", roleHandler.CreateRoles)
+	app.Patch("/roles/:roleID<int>", roleHandler.EditRoleByRoleID)
 	app.Get("/roles/:id<int>", roleHandler.GetRoleByID())
 	app.Delete("/roles/:id<int>", roleHandler.DeleteRolesByID)
 
@@ -171,6 +173,7 @@ func main() {
 	app.Get("/departments/:id<int>", departmentHandler.GetDepartmentByID)
 	app.Post("/departments", departmentHandler.CreateDepartments)
 	app.Delete("/departments/:id<int>", departmentHandler.DeleteDepartmentsByID)
+	app.Patch("/departments/:departmentID<int>", departmentHandler.EditDepartmentByID)
 	// Device
 	deviceRepo := deviceRepo.NewDeviceRepository(db)
 	deviceService := deviceServ.NewDeviceService(deviceRepo)
@@ -183,11 +186,16 @@ func main() {
 	deviceTypeServ := deviceTypeServ.NewDeviceTypeService(deviceTypeRepo)
 	deviceTypeHandler := deviceTypeHand.NewDeviceTypeHandler(deviceTypeServ)
 	app.Get("/device-types", deviceTypeHandler.GetAllDeviceTypes)
+	app.Post("/device-types", deviceTypeHandler.Create)
+	app.Delete("/device-types/:deviceTypeID<int>", deviceTypeHandler.DeleteDeviceTypesByID)
+	app.Patch("/device-types/:deviceTypeID<int>", deviceTypeHandler.EditDeviceTypeByID)
 	// Device-Instance
 	deviceInstanceRepo := deviceInstanceRepo.NewDeviceInstanceRepository(db)
 	deviceInstanceServ := deviceInstanceServ.NewDeviceInstanceService(deviceInstanceRepo)
 	deviceInstanceHandler := deviceInstanceHand.NewDeviceInstanceHandler(deviceInstanceServ)
 	app.Get("/device-instances", deviceInstanceHandler.GetAllDeviceInstance)
+	app.Post("/device-instances", deviceInstanceHandler.Create)
+	app.Delete("/device-instances/:deviceInstanceID<int>", deviceInstanceHandler.DeleteDeviceInstanceByID)
 
 	// deviceInstanceQueryRepo := deviceInstanceQueryRepo.NewDeviceInstanceQueryRepositoryDB(db)
 	_ = deviceInstanceQueryRepo
@@ -201,7 +209,10 @@ func main() {
 	issueRepo := issueRepo.NewIssueRepository(db)
 	issueServ := issueServ.NewIssueService(issueRepo)
 	issueHandler := issueHand.NewIssueHandler(issueServ)
-	app.Get("/issues", issueHandler.GetAllIssues)
+	app.Get("/issues-categories", issueHandler.GetAllIssues)
+	app.Post("/issues-categories", issueHandler.Create)
+	app.Delete("/issues-categories/:issuesCategoriesID<int>", issueHandler.DeleteIssuesByID)
+	app.Patch("/issues-categories/:issuesCategoriesID<int>", issueHandler.EditIssueByID)
 
 	if err := app.Listen(":5011"); err != nil {
 		panic(err)

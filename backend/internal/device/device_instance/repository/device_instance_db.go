@@ -19,3 +19,21 @@ func (d deviceInstanceRepository) GetAll() ([]DeviceInstance, error) {
 	}
 	return deviceInstances, nil
 }
+
+func (d deviceInstanceRepository) Create(deviceID int, deviceNumber int, depID int, serialNumber string) error {
+	query := "insert into device_instances (device_id,serial_number,device_number,dep_id) values(?,?,?,?)"
+	_, err := d.db.Exec(query, deviceID, serialNumber, deviceNumber, depID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d deviceInstanceRepository) DeleteDeviceInstanceByID(deviceInstanceID int) error {
+	query := "delete from device_instances where instance_id = ? "
+	_, err := d.db.Exec(query, deviceInstanceID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
